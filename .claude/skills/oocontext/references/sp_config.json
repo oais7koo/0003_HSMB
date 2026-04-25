@@ -1,0 +1,16 @@
+{
+  "project": "1_oais",
+  "description": "OAIS 서브프로젝트 SP 목록. SSOT: 00_doc/sp00/d0001_prd.md §2.1",
+  "sp_list": [
+    {"sp": "00", "folder": null,                    "doc_range": "d0001~d9999",   "description": "OAIS 전체 공통"},
+    {"sp": "01", "folder": "01_obsidian",            "doc_range": "d10001~d19999", "description": "옵시디언 노트"},
+    {"sp": "02", "folder": "02_pycode",              "doc_range": "d20001~d29999", "description": "Python/알고리즘"},
+    {"sp": "03", "folder": "03_paper",               "doc_range": "d30001~d39999", "description": "논문/도서 관리"},
+    {"sp": "04", "folder": "04_scraping",            "doc_range": "d40001~d49999", "description": "스크래핑 콘텐츠 처리"},
+    {"sp": "05", "folder": "05_youtube_graphRAG",    "doc_range": "d50001~d59999", "description": "Graph RAG 파일럿"},
+    {"sp": "06", "folder": "06_oohwp_skill",         "doc_range": "d60001~d69999", "description": "oohwp 스킬 개발"},
+    {"sp": "07", "folder": "07_designsystem",        "doc_range": "d70001~d79999", "description": "디자인 시스템 구축"},
+    {"sp": "08", "folder": "08_RRag",                "doc_range": "d80001~d89999", "description": "RAG 평가 파이프라인"},
+    {"sp": "09", "folder": "09_ooppt",               "doc_range": "d90001~d99999", "description": "PPT 프레젠테이션 제작"}
+  ]
+}

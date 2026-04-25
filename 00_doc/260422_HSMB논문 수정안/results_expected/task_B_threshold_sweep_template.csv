@@ -1,0 +1,11 @@
+hsmb_threshold,n_passed,pass_ratio,precision_passed,recall_passed,f1_passed
+0.1,,,,,
+0.2,,,,,
+0.3,,,,,
+0.4,,,,,
+0.5,,,,,
+0.6,,,,,
+0.63,,,,,
+0.7,,,,,
+0.8,,,,,
+0.9,,,,,

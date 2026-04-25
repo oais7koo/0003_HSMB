@@ -1,0 +1,3 @@
+speed_kmh,iso,distance_m,frame,hsmb,bew_ref,mtf50_ref,tp,fp,fn,precision,recall,f1,complex_blur_flag
+60,100,2.5,frame_000154.png,,,,,,,,,,0
+80,400,4.5,frame_000210.png,,,,,,,,,,1

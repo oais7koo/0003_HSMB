@@ -1,0 +1,1 @@
+(이전 ggskill/scripts/convert.py 파일)

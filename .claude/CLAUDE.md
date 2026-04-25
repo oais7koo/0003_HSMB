@@ -1,0 +1,123 @@
+<!-- OMC:START -->
+<!-- OMC:VERSION:4.12.0 -->
+
+# oh-my-claudecode - Intelligent Multi-Agent Orchestration
+
+You are running with oh-my-claudecode (OMC), a multi-agent orchestration layer for Claude Code.
+Coordinate specialized agents, tools, and skills so work is completed accurately and efficiently.
+
+<operating_principles>
+- Delegate specialized work to the most appropriate agent.
+- Prefer evidence over assumptions: verify outcomes before final claims.
+- Choose the lightest-weight path that preserves quality.
+- Consult official docs before implementing with SDKs/frameworks/APIs.
+</operating_principles>
+
+<delegation_rules>
+Delegate for: multi-file changes, refactors, debugging, reviews, planning, research, verification.
+Work directly for: trivial ops, small clarifications, single commands.
+Route code to `executor` (use `model=opus` for complex work). Uncertain SDK usage → `document-specialist` (repo docs first; Context Hub / `chub` when available, graceful web fallback otherwise).
+</delegation_rules>
+
+<model_routing>
+`haiku` (quick lookups), `sonnet` (standard), `opus` (architecture, deep analysis).
+Direct writes OK for: `~/.claude/**`, `.omc/**`, `.claude/**`, `CLAUDE.md`, `AGENTS.md`.
+</model_routing>
+
+<skills>
+Invoke via `/oh-my-claudecode:<name>`. Trigger patterns auto-detect keywords.
+Tier-0 workflows include `autopilot`, `ultrawork`, `ralph`, `team`, and `ralplan`.
+Keyword triggers: `"autopilot"→autopilot`, `"ralph"→ralph`, `"ulw"→ultrawork`, `"ccg"→ccg`, `"ralplan"→ralplan`, `"deep interview"→deep-interview`, `"deslop"`/`"anti-slop"`→ai-slop-cleaner, `"deep-analyze"`→analysis mode, `"tdd"`→TDD mode, `"deepsearch"`→codebase search, `"ultrathink"`→deep reasoning, `"cancelomc"`→cancel.
+Team orchestration is explicit via `/team`.
+Detailed agent catalog, tools, team pipeline, commit protocol, and full skills registry live in the native `omc-reference` skill when skills are available, including reference for `explore`, `planner`, `architect`, `executor`, `designer`, and `writer`; this file remains sufficient without skill support.
+</skills>
+
+<verification>
+Verify before claiming completion. Size appropriately: small→haiku, standard→sonnet, large/security→opus.
+If verification fails, keep iterating.
+</verification>
+
+<execution_protocols>
+Broad requests: explore first, then plan. 2+ independent tasks in parallel. `run_in_background` for builds/tests.
+Keep authoring and review as separate passes: writer pass creates or revises content, reviewer/verifier pass evaluates it later in a separate lane.
+Never self-approve in the same active context; use `code-reviewer` or `verifier` for the approval pass.
+Before concluding: zero pending tasks, tests passing, verifier evidence collected.
+</execution_protocols>
+
+<hooks_and_context>
+Hooks inject `<system-reminder>` tags. Key patterns: `hook success: Success` (proceed), `[MAGIC KEYWORD: ...]` (invoke skill), `The boulder never stops` (ralph/ultrawork active).
+Persistence: `<remember>` (7 days), `<remember priority>` (permanent).
+Kill switches: `DISABLE_OMC`, `OMC_SKIP_HOOKS` (comma-separated).
+</hooks_and_context>
+
+<cancellation>
+`/oh-my-claudecode:cancel` ends execution modes. Cancel when done+verified or blocked. Don't cancel if work incomplete.
+</cancellation>
+
+<worktree_paths>
+State: `.omc/state/`, `.omc/state/sessions/{sessionId}/`, `.omc/notepad.md`, `.omc/project-memory.json`, `.omc/plans/`, `.omc/research/`, `.omc/logs/`
+</worktree_paths>
+
+## Setup
+
+Say "setup omc" or run `/oh-my-claudecode:omc-setup`.
+
+<!-- OMC:END -->
+
+<!-- User customizations -->
+# SuperClaude Entry Point
+
+@COMMANDS.md
+@PRINCIPLES.md
+@RULES.md
+@PERSONAS.md
+@ORCHESTRATOR.md
+
+# note
+allways answer in Korean.
+
+# OAIS 스킬 카탈로그
+
+## oo 스킬 (.claude/skills/oo*/)
+
+### 핵심 개발 (core-dev)
+`ooflow` 전체 워크플로우 오케스트레이터 | `ooprd` PRD 생성/clarify | `ooplan` 구현 계획(d0002) | `oofeature` 문서 생명주기 | `oodev` TDD 개발 | `ootest` 통합 테스트 | `oocheck` 에러 체크 | `oofix` 오류 수정 | `oocommit` 커밋+이력
+
+### 모듈/DB (doc-env)
+`oolib` 모듈 최적화 | `oodb` DB 관리/마이그레이션 | `oodeep` 딥러닝 GPU 최적화 | `ooopti` 코드/문서 최적화
+
+### 문서/환경 (doc-env)
+`oodoc` 문서 자동화 | `ooenv` 환경 현황(d0009) | `oohistory` 이력(d0010) | `oonote` 연구노트(d0011) | `ootodo` TODO(d0004) | `oouser` 사용자(d0008) | `oodesign` 디자인시스템(SP07) | `ootutorial` 튜토리얼 | `oowiki` LLM Wiki 지식체계(01_obsidian/0020_wiki)
+
+### 실행/유틸 (meta-util)
+`oorun` 실행 | `oouv` uv패키지 | `oocontext` 서브프로젝트 컨텍스트 | `oonext` 다음작업 추천 | `oonow` 현재상태 | `ooprevious` 이전세션 | `ootoken` 토큰 모니터링 | `oowork` 작업관리 | `oocapture` 화면캡처(Playwright) | `oodata` 데이터 관리 | `oobatch` 배치 실행 | `oomemo` 메모 | `ooref` 레퍼런스 체크
+
+### 콘텐츠 (content)
+`ooppt` PPT | `ooword` Word | `oobook` 도서요약 | `oopaper` 문헌관리(EN/KO) | `ooreport` 리포트(MD→PPTX/DOCX) | `ooreview` 코드리뷰(병렬+Codex) | `oopdf` PDF변환 | `ooresearch` SOTA연구 | `oosota` 학술논문 | `oosurvey` 설문분석 | `ooscrap` 스크래핑/STT | `oohwp` HWP | `oosidi` 소개서
+
+### 메타 (meta-util)
+`oostart` 세션시작 | `oostop` 세션종료 | `oohelp` 도움말 | `ooskill` 스킬관리 | `oosync` 동기화
+
+### alias
+`ooc`=oocontext | `ood`=oodev | `oof`=oofeature | `ook`=oocheck | `oos`=oostart
+
+## 범용 명령어 (.claude/commands/sc/)
+analyze · improve · test · implement · build · design · workflow · task · git · document · cleanup · troubleshoot · explain · estimate · spawn · load · index
+
+## 에이전트 (.claude/agents/)
+
+**코드분석**: python-code-reviewer · oo-python-algorithm-expert · code-error-checker · codebase_investigator · streamlit-code-reviewer  
+**태스크**: oo-leader · task-orchestrator · task-executor · task-checker · ooqa  
+**Streamlit**: streamlit-page-planner · streamlit-page-designer · streamlit-implementer  
+**웹**: frontend-developer · web-design-expert · oo-web-test-orchestrator  
+**데이터/AI**: data-analyst · data-engineer · data-scientist · ai-engineer · jupyter-specialist  
+**연구/콘텐츠**: academic-researcher · translator · img-extract · ooppt-agent
+
+
+<claude-mem-context>
+# Recent Activity
+
+<!-- This section is auto-generated by claude-mem. Edit content outside the tags. -->
+
+*No recent activity*
+</claude-mem-context>

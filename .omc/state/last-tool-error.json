@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"uv run --no-sync python -c \\\"\\nimport pandas as pd\\nold = pd.read_excel('data/ps2000/02_그룹별통계.xlsx', sheet_name=None)\\nnew = pd.read_excel('data/ps2000/02_그룹별통계_2604231647.xlsx', sheet_nam...",
+  "error": "Exit code 1\nTraceback (most recent call last):\r\n  File \"<string>\", line 4, in <module>\r\n    new = pd.read_excel('data/ps2000/02_�׷캰���_2604231647.xlsx', sheet_name=None)\r\n          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"D:\\3_code\\0003_HSMB\\.venv\\Lib\\site-packages\\pandas\\io\\excel\\_base.py\", line 481, in read_excel\r\n    io = ExcelFile(\r\n        io,\r\n    ...<2 lines>...\r\n        engine_kwargs=engine_kwargs,\r\n    )\r\n  File \"D:\\3_code\\0003_HSMB\\.venv\\Lib\\...",
+  "timestamp": "2026-04-23T08:15:37.099Z",
+  "retry_count": 1
+}

@@ -1,0 +1,52 @@
+{
+  "env": {
+    "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+    "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(echo:*)",
+      "Bash(uv run:*)",
+      "WebFetch(domain:www.sungshin.ac.kr)",
+      "WebFetch(domain:www.kci.go.kr)",
+      "WebFetch(domain:www.nia.or.kr)",
+      "WebFetch(domain:www.svakorea.org)",
+      "WebFetch(domain:koreascience.kr)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.adventuresincre.com)",
+      "WebSearch",
+      "Skill(oocheck)",
+      "mcp__desktop-commander__list_directory",
+      "mcp__github__create_repository",
+      "WebFetch(domain:share.google)",
+      "WebFetch(domain:www.google.com)",
+      "WebFetch(domain:news.hada.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:discuss.pytorch.kr)",
+      "WebFetch(domain:www.localdata.go.kr)",
+      "WebFetch(domain:www.data.go.kr)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "Read(//c/Users/oaiskoo/.claude/.omc/**)",
+      "Bash(PYTHONIOENCODING=utf-8 uv run python .claude/skills/oosync/scripts/oosync_run.py list)",
+      "mcp__plugin_oh-my-claudecode_t__python_repl",
+      "Bash(cp D:/resilio/1_oais/.claude/skills/oodev/SKILL.md D:/resilio/3_code/0001_SApp/.claude/skills/oodev/SKILL.md)",
+      "Bash(cp D:/resilio/1_oais/.claude/skills/ooenv/SKILL.md D:/resilio/3_code/0001_SApp/.claude/skills/ooenv/SKILL.md)",
+      "Bash(cp D:/resilio/1_oais/.claude/skills/oofeature/SKILL.md D:/resilio/3_code/0001_SApp/.claude/skills/oofeature/SKILL.md)",
+      "Bash(cp D:/resilio/1_oais/.claude/skills/oodev/SKILL.md D:/resilio/3_code/0002_CCone/.claude/skills/oodev/SKILL.md)",
+      "Bash(cp D:/resilio/1_oais/.claude/skills/oofeature/SKILL.md D:/resilio/3_code/0002_CCone/.claude/skills/oofeature/SKILL.md)",
+      "Bash(cp \".claude/skills/oofeature/SKILL.md\" \"D:/resilio/3_code/0001_SApp/.claude/skills/oofeature/SKILL.md\")",
+      "Bash(cp \".claude/skills/oofeature/SKILL.md\" \"D:/resilio/3_code/0002_CCone/.claude/skills/oofeature/SKILL.md\")",
+      "WebFetch(domain:code.visualstudio.com)",
+      "Bash(mkdir -p \".claude/reference/development/streamlit\")",
+      "Bash(cp \"D:/resilio/3_code/0001_SApp/.claude/reference/development/streamlit/\"*.md \".claude/reference/development/streamlit/\")"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "sequential-thinking",
+    "desktop-commander",
+    "taskmaster-ai"
+  ]
+}

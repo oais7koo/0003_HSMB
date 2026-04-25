@@ -1,0 +1,74 @@
+---
+name: oobatch
+description: "모든 oo* 스킬에 동일한 서브명령어 일괄 실행. 'oobatch', '배치 실행', '일괄 check' 등의 키워드로 트리거된다"
+metadata:
+  version: "v01"
+  category: "meta-util"
+---
+
+## 0. 스킬 요약
+
+| 항목 | 내용 |
+|------|------|
+| **핵심 역할** | 모든 oo* 스킬에 동일한 서브명령어 일괄 실행 |
+| **하는 것** | oo* SKILL.md 스캔 → 서브명령어 보유 스킬 탐지 → 일괄 실행 |
+| **하지 않는 것** | 개별 스킬 로직 수정, 코드 변경 |
+| **참조 범위** | `.claude/skills/oo*/SKILL.md` 전체 |
+| **수정 대상** | 없음 (실행만) |
+| **실행 레벨** | [자동] — 스캔 후 일괄 실행 |
+| **에이전트 호환** | 범용 |
+
+## 문서 이력 관리
+- v01 2026-04-19 — 최초 생성
+
+## 1. 개요
+
+`oobatch <subcmd>` 형식으로 모든 oo* 스킬 중 해당 서브명령어를 가진 스킬을 자동 탐지하여 일괄 실행한다.
+
+```
+oobatch check        → check 서브명령어가 있는 모든 oo* 스킬에서 check 실행
+oobatch check --fix  → check --fix 서브명령어가 있는 모든 oo* 스킬에서 check --fix 실행
+```
+
+## 2. 서브명령어
+
+| 명령어 | 설명 | 출력 |
+|--------|------|------|
+| `oobatch <subcmd>` | 해당 서브명령어 보유 스킬 전체 실행 | 터미널 |
+| `oobatch list <subcmd>` | 해당 서브명령어 보유 스킬 목록만 출력 | 터미널 |
+| `oobatch help` | 도움말 | 터미널 |
+
+실행: `uv run python .claude/skills/oobatch/scripts/oobatch_run.py [subcmd] [args]`
+
+## 3. 실행 방식
+
+1. `.claude/skills/oo*/SKILL.md` 전체 스캔
+2. 서브명령어 테이블에서 `<subcmd>` 보유 스킬 탐지
+3. 스킬별 스크립트(`{skill}_run.py`) 존재 여부 확인
+4. 스크립트 있는 스킬 → `uv run python` 실행
+5. 스크립트 없는 스킬 → SKIP 표시 (Claude 오케스트레이션 필요)
+6. 결과 요약 리포트
+
+## 4. 결과 상태
+
+| 상태 | 의미 |
+|------|------|
+| ✅ OK | 정상 실행 완료 |
+| ⏭ SKIP | 스크립트 없음 (Claude가 직접 실행 필요) |
+| ❌ FAIL | 실행 실패 |
+| ⏱ TIMEOUT | 120초 초과 |
+
+> **관련 명령어**: analyze, implement (`.claude/commands/sc/`)
+
+## 5. 예시
+
+```bash
+# check 서브명령어 일괄 실행
+oobatch check
+
+# check --fix 일괄 실행
+oobatch check --fix
+
+# check 지원 스킬 목록 확인
+oobatch list check
+```
