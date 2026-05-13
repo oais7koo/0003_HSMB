@@ -1,0 +1,17 @@
+# Project-scoped Codex execution defaults.
+# Keep behavioral/project rules in AGENTS.md and use this file for runtime settings only.
+# This file is loaded only when the project is trusted.
+
+model = "gpt-5.3-codex"
+
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+model_reasoning_effort = "medium"
+model_verbosity = "low"
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = []
+
+[tools]
+view_image = true

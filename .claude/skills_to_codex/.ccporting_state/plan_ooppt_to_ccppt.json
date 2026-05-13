@@ -1,0 +1,15 @@
+{
+  "name": "ooppt_to_ccppt",
+  "source": ".claude/skills/ooppt",
+  "target": "ccppt",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooppt_run.py",
+    "templates/ooppt_quickstart.md",
+    "templates/네이비_template.pptx",
+    "templates/민트_template.pptx",
+    "templates/핑크_template.pptx"
+  ]
+}

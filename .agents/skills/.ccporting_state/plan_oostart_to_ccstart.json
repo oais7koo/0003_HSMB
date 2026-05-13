@@ -1,0 +1,11 @@
+{
+  "name": "oostart_to_ccstart",
+  "source": ".claude/skills/oostart",
+  "target": "ccstart",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oostart_run.py"
+  ]
+}

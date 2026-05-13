@@ -1,0 +1,11 @@
+{
+  "name": "oosidi_to_ccsidi",
+  "source": ".claude/skills/oosidi",
+  "target": "ccsidi",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oosidi_run.py"
+  ]
+}

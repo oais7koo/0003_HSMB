@@ -1,0 +1,11 @@
+{
+  "name": "oouser_to_ccuser",
+  "source": ".claude/skills/oouser",
+  "target": "ccuser",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oouser_run.py"
+  ]
+}

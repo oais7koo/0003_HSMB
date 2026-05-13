@@ -1,0 +1,16 @@
+{
+  "name": "oodesign_to_ccdesign",
+  "source": ".claude/skills/oodesign",
+  "target": "ccdesign",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/design-detail.md",
+    "references/guide.md",
+    "scripts/audit_script.py",
+    "scripts/oodesign_run.py",
+    "scripts/token_sync.py",
+    "templates/colors_template.json",
+    "templates/component_template.html"
+  ]
+}

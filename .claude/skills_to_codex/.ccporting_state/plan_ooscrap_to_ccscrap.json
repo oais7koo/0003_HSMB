@@ -1,0 +1,17 @@
+{
+  "name": "ooscrap_to_ccscrap",
+  "source": ".claude/skills/ooscrap",
+  "target": "ccscrap",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/__pycache__/ooscrap_factory.cpython-313.pyc",
+    "scripts/ooscrap_add.py",
+    "scripts/ooscrap_factory.py",
+    "scripts/ooscrap_run.py",
+    "scripts/ooscrap_search.py",
+    "scripts/ooscrap_summary.py",
+    "scripts/ooscrap_sync.py"
+  ]
+}

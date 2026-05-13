@@ -1,0 +1,12 @@
+{
+  "name": "ootodo_to_cctodo",
+  "source": ".claude/skills/ootodo",
+  "target": "cctodo",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ootodo_run.py",
+    "templates/oaistodo_template.md"
+  ]
+}

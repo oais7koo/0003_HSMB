@@ -1,0 +1,13 @@
+{
+  "name": "ooplan_to_ccplan",
+  "source": ".claude/skills/ooplan",
+  "target": "ccplan",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "references/streamlit_guide.md",
+    "scripts/ooplan_run.py",
+    "templates/plan_template.md"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "oonext_to_ccnext",
+  "source": ".claude/skills/oonext",
+  "target": "ccnext",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oonext_run.py"
+  ]
+}

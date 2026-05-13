@@ -1,0 +1,11 @@
+{
+  "name": "ooreview_to_ccreview",
+  "source": ".claude/skills/ooreview",
+  "target": "ccreview",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/codex_prompts.md",
+    "references/guide.md"
+  ]
+}

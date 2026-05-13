@@ -1,0 +1,16 @@
+{
+  "name": "ooprd_to_ccprd",
+  "source": ".claude/skills/ooprd",
+  "target": "ccprd",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooprd_run.py",
+    "templates/prd/README.md",
+    "templates/prd/agent_prd_template.md",
+    "templates/prd/algorithm_prd_template.md",
+    "templates/prd/common_prd_template.md",
+    "templates/prd/streamlit_prd_template.md"
+  ]
+}

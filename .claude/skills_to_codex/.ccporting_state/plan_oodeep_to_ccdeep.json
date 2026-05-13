@@ -1,0 +1,12 @@
+{
+  "name": "oodeep_to_ccdeep",
+  "source": ".claude/skills/oodeep",
+  "target": "ccdeep",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oodeep_monitor.py",
+    "scripts/oodeep_run.py"
+  ]
+}

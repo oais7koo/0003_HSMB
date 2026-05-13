@@ -1,0 +1,11 @@
+{
+  "name": "oohistory_to_cchistory",
+  "source": ".claude/skills/oohistory",
+  "target": "cchistory",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oohistory_run.py"
+  ]
+}

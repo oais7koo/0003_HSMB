@@ -1,0 +1,11 @@
+{
+  "name": "ooresearch_to_ccresearch",
+  "source": ".claude/skills/ooresearch",
+  "target": "ccresearch",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooresearch_run.py"
+  ]
+}

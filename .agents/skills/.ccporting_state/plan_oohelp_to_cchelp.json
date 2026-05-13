@@ -1,0 +1,11 @@
+{
+  "name": "oohelp_to_cchelp",
+  "source": ".claude/skills/oohelp",
+  "target": "cchelp",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oohelp_run.py"
+  ]
+}

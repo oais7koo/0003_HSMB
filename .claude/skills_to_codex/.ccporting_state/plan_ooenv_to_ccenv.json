@@ -1,0 +1,28 @@
+{
+  "name": "ooenv_to_ccenv",
+  "source": ".claude/skills/ooenv",
+  "target": "ccenv",
+  "files": [
+    "SKILL.md",
+    "config/standard_spec.json",
+    "references/checklist.md",
+    "references/commands-detail.md",
+    "references/guide.md",
+    "references/hud-config-default.json",
+    "references/machines.json",
+    "references/settings_python_dev.json",
+    "scripts/__pycache__/ooenv_run.cpython-313.pyc",
+    "scripts/__pycache__/ooenv_uv_cleanup.cpython-313.pyc",
+    "scripts/__pycache__/ooenv_validate_full.cpython-313.pyc",
+    "scripts/ooenv_claude_settings.py",
+    "scripts/ooenv_context.py",
+    "scripts/ooenv_kill.py",
+    "scripts/ooenv_run.py",
+    "scripts/ooenv_settings.py",
+    "scripts/ooenv_standard.py",
+    "scripts/ooenv_sync_agents.py",
+    "scripts/ooenv_uv_cleanup.py",
+    "scripts/ooenv_validate_full.py",
+    "templates/ooenv_template.md"
+  ]
+}

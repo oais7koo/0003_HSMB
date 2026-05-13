@@ -1,0 +1,11 @@
+{
+  "name": "oocapture_to_cccapture",
+  "source": ".claude/skills/oocapture",
+  "target": "cccapture",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oocapture_run.py"
+  ]
+}

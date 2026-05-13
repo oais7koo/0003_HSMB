@@ -1,0 +1,12 @@
+{
+  "name": "oonote_to_ccnote",
+  "source": ".claude/skills/oonote",
+  "target": "ccnote",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oonote_run.py",
+    "templates/oonote_template.md"
+  ]
+}

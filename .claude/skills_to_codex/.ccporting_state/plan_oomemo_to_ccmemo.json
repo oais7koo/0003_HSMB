@@ -1,0 +1,9 @@
+{
+  "name": "oomemo_to_ccmemo",
+  "source": ".claude/skills/oomemo",
+  "target": "ccmemo",
+  "files": [
+    "SKILL.md",
+    "scripts/oomemo_run.py"
+  ]
+}

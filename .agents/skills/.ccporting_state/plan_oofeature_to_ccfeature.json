@@ -1,0 +1,20 @@
+{
+  "name": "oofeature_to_ccfeature",
+  "source": ".claude/skills/oofeature",
+  "target": "ccfeature",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "references/workflow-detail.md",
+    "scripts/oofeature_issue.py",
+    "scripts/oofeature_note.py",
+    "scripts/oofeature_rmdup.py",
+    "scripts/oofeature_run.py",
+    "scripts/oofeature_update.py",
+    "scripts/oofeature_validate.py",
+    "templates/상세기획_template.md",
+    "templates/상세기획_template_fastapi.md",
+    "templates/상세기획_template_streamlit.md"
+  ]
+}

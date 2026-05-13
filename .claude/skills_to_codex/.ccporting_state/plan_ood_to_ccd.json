@@ -1,0 +1,8 @@
+{
+  "name": "ood_to_ccd",
+  "source": ".claude/skills/ood",
+  "target": "ccd",
+  "files": [
+    "SKILL.md"
+  ]
+}

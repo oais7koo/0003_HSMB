@@ -1,0 +1,11 @@
+{
+  "name": "oocommit_to_cccommit",
+  "source": ".claude/skills/oocommit",
+  "target": "cccommit",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oocommit_run.py"
+  ]
+}

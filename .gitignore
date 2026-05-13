@@ -1,11 +1,37 @@
 # Track only project documents and source code.
 *
 !/.gitignore
+
+# oosync 관리 파일 (vibe 환경)
+!/.claude/
+!/.claude/**
+!/CLAUDE.md
+!/AGENTS.md
+!/.mcp.json
+!/.claudeignore
+!/cclaude.bat
+!/cclaude.sh
+!/gemma.ps1
+!/gemma.sh
+!/.codex/
+!/.codex/**
+!/.agents/
+!/.agents/**
+!/.github/
+!/.github/**
+!/pyproject.toml
+
+# 문서 및 소스코드
 !/00_doc/
 !/00_doc/**
 !/src/
 !/src/**
 
-# Generated files inside allowed folders
+# Generated files (제외)
 **/__pycache__/
 *.py[oc]
+
+# oosync 제외 대상
+.claude/settings.local.json
+.claude/.omc/
+scheduled_tasks.lock

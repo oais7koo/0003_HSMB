@@ -1,0 +1,14 @@
+{
+  "name": "ootutorial_to_cctutorial",
+  "source": ".claude/skills/ootutorial",
+  "target": "cctutorial",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ootutorial_run.py",
+    "scripts/sync_flag.py",
+    "templates/SKILL_md_template.md",
+    "templates/tutorial_skill_template.md"
+  ]
+}

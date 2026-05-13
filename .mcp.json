@@ -1,0 +1,45 @@
+{
+	"serverConfig": {
+		"command": "cmd.exe",
+		"args": [
+			"/c"
+		]
+	},
+	"mcpServers": {
+		"sequential-thinking": {
+			"command": "npx.cmd",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			]
+		},
+		"desktop-commander": {
+			"command": "npx.cmd",
+			"args": [
+				"-y",
+				"@anthropic/desktop-commander"
+			]
+		},
+		"qmd": {
+			"type": "stdio",
+			"command": "qmd.cmd",
+			"args": [
+				"mcp",
+				"--collection",
+				"1_oais"
+			]
+		},
+		"pencil": {
+			"type": "stdio",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"npx",
+				"-y",
+				"pencil"
+			],
+			"disabled": true,
+			"_note": "Unknown server - verify package name and enable manually"
+		}
+	}
+}

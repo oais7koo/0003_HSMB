@@ -1,0 +1,8 @@
+{
+  "name": "oof_to_ccf",
+  "source": ".claude/skills/oof",
+  "target": "ccf",
+  "files": [
+    "SKILL.md"
+  ]
+}

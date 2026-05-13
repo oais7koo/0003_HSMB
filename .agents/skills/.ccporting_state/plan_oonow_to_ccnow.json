@@ -1,0 +1,10 @@
+{
+  "name": "oonow_to_ccnow",
+  "source": ".claude/skills/oonow",
+  "target": "ccnow",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "scripts/oonow_run.py"
+  ]
+}

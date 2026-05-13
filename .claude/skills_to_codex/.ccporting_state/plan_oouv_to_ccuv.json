@@ -1,0 +1,11 @@
+{
+  "name": "oouv_to_ccuv",
+  "source": ".claude/skills/oouv",
+  "target": "ccuv",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oouv_run.py"
+  ]
+}

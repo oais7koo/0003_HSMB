@@ -1,0 +1,19 @@
+{
+  "name": "oosync_to_ccsync",
+  "source": ".claude/skills/oosync",
+  "target": "ccsync",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/ftp_config.json",
+    "references/ftp_guide.md",
+    "references/guide.md",
+    "references/sync_config.json",
+    "scripts/oosync_ftp.py",
+    "scripts/oosync_pipeline.py",
+    "scripts/oosync_run.py",
+    "templates/oosync_diff.md",
+    "templates/oosync_list.md",
+    "templates/oosync_view.md"
+  ]
+}

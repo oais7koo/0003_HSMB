@@ -1,0 +1,21 @@
+{
+  "_description": "gemma 스킬에 위임 가능한 oo 스킬 화이트리스트. gemma <skill_name> \"프롬프트\" 형태로 호출 시 caller로 자동 기록된다.",
+  "_updated": "2026-04-17",
+  "whitelist": {
+    "oopaper":   "논문 요약/번역/키워드 추출",
+    "ooscrap":   "스크래핑 콘텐츠 요약/분류",
+    "oobook":    "도서 서머리",
+    "oosurvey":  "논문 서베이 분석",
+    "oosota":    "SOTA 논문 작성 보조",
+    "oonote":    "연구노트 작성",
+    "oosidi":    "옵시디언 노트 작성",
+    "oodoc":     "문서 자동화 보조 (요약·리네임·정리)",
+    "ootutorial":"튜토리얼 생성 보조",
+    "ooppt":     "PPT 노트 변환",
+    "oohwp":     "한글 문서 작성 보조",
+    "ooword":    "Word 문서 변환 보조",
+    "ooresearch":"SOTA 연구 보조 분석",
+    "oomemo":    "메모 정리/요약",
+    "ootodo":    "TODO 분류/요약"
+  }
+}

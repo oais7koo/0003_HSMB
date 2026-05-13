@@ -1,0 +1,13 @@
+{
+  "name": "oodb_to_ccdb",
+  "source": ".claude/skills/oodb",
+  "target": "ccdb",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oodb_run.py",
+    "scripts/oodb_update.py",
+    "templates/db_standard_word.md"
+  ]
+}

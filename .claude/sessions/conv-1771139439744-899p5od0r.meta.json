@@ -1,0 +1,23 @@
+{
+  "id": "conv-1771139439744-899p5od0r",
+  "title": "Find Claude CLI installation path",
+  "titleGenerationStatus": "success",
+  "createdAt": 1771139439774,
+  "updatedAt": 1771139712918,
+  "lastResponseAt": 1771139712918,
+  "sessionId": "df2bfe4f-e5d2-4c6a-9e25-f3bcba91fe4b",
+  "sdkSessionId": "df2bfe4f-e5d2-4c6a-9e25-f3bcba91fe4b",
+  "previousSdkSessionIds": [
+    "8bc0e13d-01de-41b5-b217-661b669e272c"
+  ],
+  "currentNote": "00_obsidian/0001_memo/01_memo.md",
+  "usage": {
+    "model": "opus",
+    "inputTokens": 3,
+    "cacheCreationInputTokens": 39079,
+    "cacheReadInputTokens": 25602,
+    "contextWindow": 200000,
+    "contextTokens": 64684,
+    "percentage": 32
+  }
+}

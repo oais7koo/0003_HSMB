@@ -1,0 +1,12 @@
+{
+  "name": "oofix_to_ccfix",
+  "source": ".claude/skills/oofix",
+  "target": "ccfix",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oofix_run.py",
+    "templates/oaisfix_command.md"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "ooword_to_ccword",
+  "source": ".claude/skills/ooword",
+  "target": "ccword",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooword_run.py",
+    "templates/quotation_docx.js",
+    "templates/quotation_docx.json",
+    "templates/quotation_docx.md"
+  ]
+}

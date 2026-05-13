@@ -1,0 +1,9 @@
+{
+  "name": "oowiki_to_ccwiki",
+  "source": ".claude/skills/oowiki",
+  "target": "ccwiki",
+  "files": [
+    "SKILL.md",
+    "scripts/oowiki_run.py"
+  ]
+}

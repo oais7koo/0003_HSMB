@@ -1,0 +1,9 @@
+{
+  "name": "ooprevious_to_ccprevious",
+  "source": ".claude/skills/ooprevious",
+  "target": "ccprevious",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md"
+  ]
+}

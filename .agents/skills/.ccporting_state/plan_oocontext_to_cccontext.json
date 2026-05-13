@@ -1,0 +1,12 @@
+{
+  "name": "oocontext_to_cccontext",
+  "source": ".claude/skills/oocontext",
+  "target": "cccontext",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "references/sp_config.json",
+    "scripts/oocontext_run.py"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "oos_to_ccs",
+  "source": ".claude/skills/oos",
+  "target": "ccs",
+  "files": [
+    "SKILL.md"
+  ]
+}

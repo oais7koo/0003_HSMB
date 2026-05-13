@@ -1,0 +1,11 @@
+{
+  "name": "ooref_to_ccref",
+  "source": ".claude/skills/ooref",
+  "target": "ccref",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooref_run.py"
+  ]
+}

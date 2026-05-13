@@ -1,0 +1,13 @@
+{
+  "name": "oodev_to_ccdev",
+  "source": ".claude/skills/oodev",
+  "target": "ccdev",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "references/streamlit_guide.md",
+    "scripts/oodev_run.py",
+    "templates/streamlit-page.md"
+  ]
+}

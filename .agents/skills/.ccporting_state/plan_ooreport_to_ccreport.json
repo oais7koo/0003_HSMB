@@ -1,0 +1,15 @@
+{
+  "name": "ooreport_to_ccreport",
+  "source": ".claude/skills/ooreport",
+  "target": "ccreport",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooreport_md2docx.py",
+    "scripts/ooreport_md2pdf.py",
+    "scripts/ooreport_run.py",
+    "templates/oaisreport_algorithm.md",
+    "templates/oaisreport_error.md"
+  ]
+}

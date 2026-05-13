@@ -1,0 +1,22 @@
+{
+  "name": "ooskill_to_ccskill",
+  "source": ".claude/skills/ooskill",
+  "target": "ccskill",
+  "files": [
+    "SKILL.md",
+    "references/agents.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/add_agent_sections.py",
+    "scripts/add_show_checklist.py",
+    "scripts/oo_usage_validator.py",
+    "scripts/ooskill_backup.py",
+    "scripts/ooskill_gemma_ref.py",
+    "scripts/ooskill_karpathy_ref.py",
+    "scripts/ooskill_qmd_ref.py",
+    "scripts/ooskill_run.py",
+    "scripts/ooskill_run_update_ref.py",
+    "templates/checklist_template.md",
+    "templates/oais_skill_template.md"
+  ]
+}

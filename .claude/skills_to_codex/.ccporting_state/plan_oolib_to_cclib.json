@@ -1,0 +1,12 @@
+{
+  "name": "oolib_to_cclib",
+  "source": ".claude/skills/oolib",
+  "target": "cclib",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oolib_run.py",
+    "scripts/oolib_update.py"
+  ]
+}

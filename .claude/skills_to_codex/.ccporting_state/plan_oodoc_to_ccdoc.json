@@ -1,0 +1,17 @@
+{
+  "name": "oodoc_to_ccdoc",
+  "source": ".claude/skills/oodoc",
+  "target": "ccdoc",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/doc_numbering.md",
+    "references/guide.md",
+    "scripts/oodoc_check.py",
+    "scripts/oodoc_clear.py",
+    "scripts/oodoc_md_to_docx.py",
+    "scripts/oodoc_numbering.py",
+    "scripts/oodoc_run.py",
+    "templates/d1000_상세문서인덱스_template.md"
+  ]
+}

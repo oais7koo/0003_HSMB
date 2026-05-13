@@ -1,0 +1,11 @@
+{
+  "name": "ooflow_to_ccflow",
+  "source": ".claude/skills/ooflow",
+  "target": "ccflow",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooflow_run.py"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "ook_to_cck",
+  "source": ".claude/skills/ook",
+  "target": "cck",
+  "files": [
+    "SKILL.md"
+  ]
+}

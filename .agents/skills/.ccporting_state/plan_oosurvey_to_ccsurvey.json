@@ -1,0 +1,11 @@
+{
+  "name": "oosurvey_to_ccsurvey",
+  "source": ".claude/skills/oosurvey",
+  "target": "ccsurvey",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oosurvey_run.py"
+  ]
+}

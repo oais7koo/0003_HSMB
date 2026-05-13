@@ -1,0 +1,163 @@
+{
+  "oaisai": {
+    "user": "oaiskoo",
+    "project_root": "D:\\1_oais",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  },
+  "oaisblack": {
+    "user": "oaiskoo",
+    "project_root": "C:\\Users\\oaiskoo\\doom\\1_oais",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  },
+  "koowin2": {
+    "user": "oaiskoo",
+    "project_root": "C:\\Users\\oaiskoo\\doom\\3_code\\0001_SApp",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  },
+  "koowin3": {
+    "user": "oaiskoo",
+    "project_root": "C:\\Users\\oaiskoo\\doom\\3_code\\0002_CCone",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  },
+  "koohp3": {
+    "user": "oaiskoo",
+    "project_root": "C:\\Users\\oaiskoo\\1_oais",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      },
+      "extraKnownMarketplaces": {
+        "openai-codex": {
+          "source": {
+            "source": "github",
+            "repo": "openai/codex-plugin-cc"
+          }
+        },
+        "karpathy-skills": {
+          "source": {
+            "source": "github",
+            "repo": "forrestchang/andrej-karpathy-skills"
+          }
+        }
+      },
+      "skipDangerousModePermissionPrompt": true,
+      "enabledPlugins": {
+        "codex@openai-codex": true,
+        "andrej-karpathy-skills@karpathy-skills": true
+      },
+      "permissions": {
+        "allow": [
+          "mcp__pencil"
+        ],
+        "defaultMode": "auto"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  },
+  "koohp2": {
+    "user": "oaiskoo",
+    "project_root": "C:\\Users\\oaiskoo\\doom\\1_oais",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  },
+  "oais300": {
+    "user": "oaiskoo",
+    "project_root": "/Users/oaiskoo/resilo/1_oais",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node /Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      },
+      "env": {
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+      },
+      "permissions": {
+        "allow": ["mcp__pencil"]
+      },
+      "enabledPlugins": {
+        "context7@claude-plugins-official": true,
+        "oh-my-claudecode@omc": true
+      },
+      "alwaysThinkingEnabled": true,
+      "voiceEnabled": true,
+      "skipDangerousModePermissionPrompt": true
+    },
+    "settings_local": {}
+  },
+  "koodesk": {
+    "user": "oaiskoo",
+    "project_root": "D:\\resilio\\1_oais",
+    "settings_global": {
+      "statusLine": {
+        "type": "command",
+        "command": "node C:/Users/oaiskoo/.claude/hud/omc-hud.mjs"
+      }
+    },
+    "settings_local": {
+      "env": {
+        "TEMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\oaiskoo\\AppData\\Local\\Temp"
+      }
+    }
+  }
+}

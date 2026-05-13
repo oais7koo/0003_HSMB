@@ -1,0 +1,10 @@
+{
+  "name": "ootoken_to_cctoken",
+  "source": ".claude/skills/ootoken",
+  "target": "cctoken",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "scripts/ootoken_run.py"
+  ]
+}

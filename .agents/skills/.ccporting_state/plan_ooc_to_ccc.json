@@ -1,0 +1,8 @@
+{
+  "name": "ooc_to_ccc",
+  "source": ".claude/skills/ooc",
+  "target": "ccc",
+  "files": [
+    "SKILL.md"
+  ]
+}

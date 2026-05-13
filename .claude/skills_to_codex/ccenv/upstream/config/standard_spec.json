@@ -1,0 +1,22 @@
+{
+  "version": "2026-04-05",
+  "system": {
+    "python": {"min_version": "3.13.7"},
+    "uv": {"min_version": "0.8.15"},
+    "node": {"min_version": "22.0.0"},
+    "git": {"min_version": "2.43.0"},
+    "gh": {"min_version": "2.0.0"}
+  },
+  "mcp_servers": {
+    "required": ["sequential-thinking", "desktop-commander"]
+  },
+  "plugins": {
+    "global": ["oh-my-claudecode@omc"],
+    "project": ["context7@claude-plugins-official", "serena@claude-plugins-official", "pyright-lsp@claude-plugins-official", "andrej-karpathy-skills@forrestchang-andrej-karpathy-skills"]
+  },
+  "counts": {
+    "oo_skills": 34,
+    "agents": 26,
+    "commands": 4
+  }
+}

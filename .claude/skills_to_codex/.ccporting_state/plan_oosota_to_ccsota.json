@@ -1,0 +1,12 @@
+{
+  "name": "oosota_to_ccsota",
+  "source": ".claude/skills/oosota",
+  "target": "ccsota",
+  "files": [
+    "SKILL.md",
+    "paper_quality_checklist.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oosota_run.py"
+  ]
+}

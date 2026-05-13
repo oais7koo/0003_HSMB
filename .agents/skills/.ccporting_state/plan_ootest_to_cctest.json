@@ -1,0 +1,18 @@
+{
+  "name": "ootest_to_cctest",
+  "source": ".claude/skills/ootest",
+  "target": "cctest",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "references/streamlit_guide.md",
+    "scripts/ootest_run.py",
+    "templates/d0003_dashboard_template.md",
+    "templates/d0003_sp_template.md",
+    "templates/oaistest_checklist.md",
+    "templates/test/README.md",
+    "templates/test/common_test_template.md",
+    "templates/test_page_import_template.py"
+  ]
+}

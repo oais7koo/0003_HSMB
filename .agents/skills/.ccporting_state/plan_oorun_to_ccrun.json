@@ -1,0 +1,11 @@
+{
+  "name": "oorun_to_ccrun",
+  "source": ".claude/skills/oorun",
+  "target": "ccrun",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oorun_run.py"
+  ]
+}

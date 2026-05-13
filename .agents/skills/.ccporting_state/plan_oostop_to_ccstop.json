@@ -1,0 +1,11 @@
+{
+  "name": "oostop_to_ccstop",
+  "source": ".claude/skills/oostop",
+  "target": "ccstop",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oostop_run.py"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "oobatch_to_ccbatch",
+  "source": ".claude/skills/oobatch",
+  "target": "ccbatch",
+  "files": [
+    "SKILL.md",
+    "references/guide.md",
+    "scripts/oobatch_run.py"
+  ]
+}

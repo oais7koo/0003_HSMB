@@ -1,0 +1,289 @@
+{
+  "ports": [
+    {
+      "name": "oobatch_to_ccbatch",
+      "source": ".claude/skills/oobatch",
+      "target": "ccbatch"
+    },
+    {
+      "name": "oobook_to_ccbook",
+      "source": ".claude/skills/oobook",
+      "target": "ccbook"
+    },
+    {
+      "name": "ooc_to_ccc",
+      "source": ".claude/skills/ooc",
+      "target": "ccc"
+    },
+    {
+      "name": "oocapture_to_cccapture",
+      "source": ".claude/skills/oocapture",
+      "target": "cccapture"
+    },
+    {
+      "name": "oocheck_to_cccheck",
+      "source": ".claude/skills/oocheck",
+      "target": "cccheck"
+    },
+    {
+      "name": "oocommit_to_cccommit",
+      "source": ".claude/skills/oocommit",
+      "target": "cccommit"
+    },
+    {
+      "name": "oocontext_to_cccontext",
+      "source": ".claude/skills/oocontext",
+      "target": "cccontext"
+    },
+    {
+      "name": "ood_to_ccd",
+      "source": ".claude/skills/ood",
+      "target": "ccd"
+    },
+    {
+      "name": "oodata_to_ccdata",
+      "source": ".claude/skills/oodata",
+      "target": "ccdata"
+    },
+    {
+      "name": "oodb_to_ccdb",
+      "source": ".claude/skills/oodb",
+      "target": "ccdb"
+    },
+    {
+      "name": "oodeep_to_ccdeep",
+      "source": ".claude/skills/oodeep",
+      "target": "ccdeep"
+    },
+    {
+      "name": "oodesign_to_ccdesign",
+      "source": ".claude/skills/oodesign",
+      "target": "ccdesign"
+    },
+    {
+      "name": "oodev_to_ccdev",
+      "source": ".claude/skills/oodev",
+      "target": "ccdev"
+    },
+    {
+      "name": "oodoc_to_ccdoc",
+      "source": ".claude/skills/oodoc",
+      "target": "ccdoc"
+    },
+    {
+      "name": "oof_to_ccf",
+      "source": ".claude/skills/oof",
+      "target": "ccf"
+    },
+    {
+      "name": "oofeature_to_ccfeature",
+      "source": ".claude/skills/oofeature",
+      "target": "ccfeature"
+    },
+    {
+      "name": "oofix_to_ccfix",
+      "source": ".claude/skills/oofix",
+      "target": "ccfix"
+    },
+    {
+      "name": "ooflow_to_ccflow",
+      "source": ".claude/skills/ooflow",
+      "target": "ccflow"
+    },
+    {
+      "name": "oohelp_to_cchelp",
+      "source": ".claude/skills/oohelp",
+      "target": "cchelp"
+    },
+    {
+      "name": "oohistory_to_cchistory",
+      "source": ".claude/skills/oohistory",
+      "target": "cchistory"
+    },
+    {
+      "name": "oohwp_to_cchwp",
+      "source": ".claude/skills/oohwp",
+      "target": "cchwp"
+    },
+    {
+      "name": "ook_to_cck",
+      "source": ".claude/skills/ook",
+      "target": "cck"
+    },
+    {
+      "name": "oolib_to_cclib",
+      "source": ".claude/skills/oolib",
+      "target": "cclib"
+    },
+    {
+      "name": "oomemo_to_ccmemo",
+      "source": ".claude/skills/oomemo",
+      "target": "ccmemo"
+    },
+    {
+      "name": "oonext_to_ccnext",
+      "source": ".claude/skills/oonext",
+      "target": "ccnext"
+    },
+    {
+      "name": "oonote_to_ccnote",
+      "source": ".claude/skills/oonote",
+      "target": "ccnote"
+    },
+    {
+      "name": "oonow_to_ccnow",
+      "source": ".claude/skills/oonow",
+      "target": "ccnow"
+    },
+    {
+      "name": "ooopti_to_ccopti",
+      "source": ".claude/skills/ooopti",
+      "target": "ccopti"
+    },
+    {
+      "name": "oopaper_to_ccpaper",
+      "source": ".claude/skills/oopaper",
+      "target": "ccpaper"
+    },
+    {
+      "name": "oopdf_to_ccpdf",
+      "source": ".claude/skills/oopdf",
+      "target": "ccpdf"
+    },
+    {
+      "name": "ooplan_to_ccplan",
+      "source": ".claude/skills/ooplan",
+      "target": "ccplan"
+    },
+    {
+      "name": "ooppt_to_ccppt",
+      "source": ".claude/skills/ooppt",
+      "target": "ccppt"
+    },
+    {
+      "name": "ooprd_to_ccprd",
+      "source": ".claude/skills/ooprd",
+      "target": "ccprd"
+    },
+    {
+      "name": "ooprevious_to_ccprevious",
+      "source": ".claude/skills/ooprevious",
+      "target": "ccprevious"
+    },
+    {
+      "name": "ooref_to_ccref",
+      "source": ".claude/skills/ooref",
+      "target": "ccref"
+    },
+    {
+      "name": "ooreport_to_ccreport",
+      "source": ".claude/skills/ooreport",
+      "target": "ccreport"
+    },
+    {
+      "name": "ooresearch_to_ccresearch",
+      "source": ".claude/skills/ooresearch",
+      "target": "ccresearch"
+    },
+    {
+      "name": "ooreview_to_ccreview",
+      "source": ".claude/skills/ooreview",
+      "target": "ccreview"
+    },
+    {
+      "name": "oorun_to_ccrun",
+      "source": ".claude/skills/oorun",
+      "target": "ccrun"
+    },
+    {
+      "name": "oos_to_ccs",
+      "source": ".claude/skills/oos",
+      "target": "ccs"
+    },
+    {
+      "name": "ooscrap_to_ccscrap",
+      "source": ".claude/skills/ooscrap",
+      "target": "ccscrap"
+    },
+    {
+      "name": "oosidi_to_ccsidi",
+      "source": ".claude/skills/oosidi",
+      "target": "ccsidi"
+    },
+    {
+      "name": "ooskill_to_ccskill",
+      "source": ".claude/skills/ooskill",
+      "target": "ccskill"
+    },
+    {
+      "name": "oosota_to_ccsota",
+      "source": ".claude/skills/oosota",
+      "target": "ccsota"
+    },
+    {
+      "name": "oostart_to_ccstart",
+      "source": ".claude/skills/oostart",
+      "target": "ccstart"
+    },
+    {
+      "name": "oostop_to_ccstop",
+      "source": ".claude/skills/oostop",
+      "target": "ccstop"
+    },
+    {
+      "name": "oosurvey_to_ccsurvey",
+      "source": ".claude/skills/oosurvey",
+      "target": "ccsurvey"
+    },
+    {
+      "name": "oosync_to_ccsync",
+      "source": ".claude/skills/oosync",
+      "target": "ccsync"
+    },
+    {
+      "name": "ootest_to_cctest",
+      "source": ".claude/skills/ootest",
+      "target": "cctest"
+    },
+    {
+      "name": "ootodo_to_cctodo",
+      "source": ".claude/skills/ootodo",
+      "target": "cctodo"
+    },
+    {
+      "name": "ootoken_to_cctoken",
+      "source": ".claude/skills/ootoken",
+      "target": "cctoken"
+    },
+    {
+      "name": "ootutorial_to_cctutorial",
+      "source": ".claude/skills/ootutorial",
+      "target": "cctutorial"
+    },
+    {
+      "name": "oouser_to_ccuser",
+      "source": ".claude/skills/oouser",
+      "target": "ccuser"
+    },
+    {
+      "name": "oouv_to_ccuv",
+      "source": ".claude/skills/oouv",
+      "target": "ccuv"
+    },
+    {
+      "name": "oowiki_to_ccwiki",
+      "source": ".claude/skills/oowiki",
+      "target": "ccwiki"
+    },
+    {
+      "name": "ooword_to_ccword",
+      "source": ".claude/skills/ooword",
+      "target": "ccword"
+    },
+    {
+      "name": "oowork_to_ccwork",
+      "source": ".claude/skills/oowork",
+      "target": "ccwork"
+    }
+  ]
+}

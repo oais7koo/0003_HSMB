@@ -1,0 +1,11 @@
+{
+  "name": "oopdf_to_ccpdf",
+  "source": ".claude/skills/oopdf",
+  "target": "ccpdf",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oopdf_run.py"
+  ]
+}

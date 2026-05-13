@@ -1,0 +1,54 @@
+{
+  "description": "프로젝트 테마 색상 토큰 — 값을 채워 사용",
+  "version": "1.0.0",
+
+  "brand": {
+    "primary": {
+      "default": { "value": "#0d6efd", "comment": "메인 색상" },
+      "hover":   { "value": "#0b5ed7", "comment": "hover 상태" },
+      "light":   { "value": "#cfe2ff", "comment": "연한 배경" }
+    },
+    "secondary": {
+      "default": { "value": "#6c757d", "comment": "보조 색상" },
+      "hover":   { "value": "#5c636a", "comment": "" },
+      "light":   { "value": "#e2e3e5", "comment": "" }
+    }
+  },
+
+  "semantic": {
+    "success": {
+      "default": { "value": "#198754", "comment": "성공, 완료" },
+      "light":   { "value": "#d1e7dd" }
+    },
+    "danger": {
+      "default": { "value": "#dc3545", "comment": "오류, 삭제" },
+      "light":   { "value": "#f8d7da" }
+    },
+    "warning": {
+      "default": { "value": "#ffc107", "comment": "주의" },
+      "light":   { "value": "#fff3cd" }
+    },
+    "info": {
+      "default": { "value": "#0dcaf0", "comment": "정보" },
+      "light":   { "value": "#cff4fc" }
+    }
+  },
+
+  "neutral": {
+    "white":    { "value": "#ffffff" },
+    "gray-50":  { "value": "#f8f9fa" },
+    "gray-100": { "value": "#f8f9fa" },
+    "gray-300": { "value": "#dee2e6" },
+    "gray-500": { "value": "#adb5bd" },
+    "gray-600": { "value": "#6c757d" },
+    "gray-800": { "value": "#343a40" },
+    "gray-900": { "value": "#212529" },
+    "black":    { "value": "#000000" }
+  },
+
+  "surface": {
+    "page":    { "value": "#f8f9fa", "comment": "페이지 배경" },
+    "section": { "value": "#ffffff", "comment": "섹션 배경" },
+    "card":    { "value": "#ffffff", "comment": "카드 배경" }
+  }
+}

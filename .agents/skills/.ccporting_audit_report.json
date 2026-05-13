@@ -1,0 +1,52 @@
+{
+  "total_findings": 9,
+  "report": {
+    "ccscrap": [
+      {
+        "code": "CLAUDE_TOOL_READ",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_add.py",
+        "snippet": "read()"
+      },
+      {
+        "code": "CLAUDE_TOOL_WRITE",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_add.py",
+        "snippet": "write(content)"
+      },
+      {
+        "code": "CLAUDE_TOOL_WRITE",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_factory.py",
+        "snippet": "write(\"\\n\".join(lines))"
+      },
+      {
+        "code": "CLAUDE_TOOL_READ",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_run.py",
+        "snippet": "read()"
+      },
+      {
+        "code": "CLAUDE_TOOL_READ",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_search.py",
+        "snippet": "read()"
+      },
+      {
+        "code": "CLAUDE_TOOL_READ",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_summary.py",
+        "snippet": "read()"
+      },
+      {
+        "code": "CLAUDE_TOOL_WRITE",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_summary.py",
+        "snippet": "write(f\"# {video_title}\\n\\n\")"
+      },
+      {
+        "code": "CLAUDE_TOOL_READ",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_sync.py",
+        "snippet": "read()"
+      },
+      {
+        "code": "CLAUDE_TOOL_WRITE",
+        "file": ".agents\\skills\\ccscrap\\scripts\\ooscrap_sync.py",
+        "snippet": "write(\"\".join(result))"
+      }
+    ]
+  }
+}

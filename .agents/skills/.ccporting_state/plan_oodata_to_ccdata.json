@@ -1,0 +1,11 @@
+{
+  "name": "oodata_to_ccdata",
+  "source": ".claude/skills/oodata",
+  "target": "ccdata",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oodata_run.py"
+  ]
+}

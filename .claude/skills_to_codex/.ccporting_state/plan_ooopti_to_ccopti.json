@@ -1,0 +1,11 @@
+{
+  "name": "ooopti_to_ccopti",
+  "source": ".claude/skills/ooopti",
+  "target": "ccopti",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/ooopti_run.py"
+  ]
+}

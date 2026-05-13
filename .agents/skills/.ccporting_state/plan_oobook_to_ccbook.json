@@ -1,0 +1,12 @@
+{
+  "name": "oobook_to_ccbook",
+  "source": ".claude/skills/oobook",
+  "target": "ccbook",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/oobook_backup.py",
+    "scripts/oobook_run.py"
+  ]
+}

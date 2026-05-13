@@ -1,0 +1,20 @@
+{
+  "name": "oocheck_to_cccheck",
+  "source": ".claude/skills/oocheck",
+  "target": "cccheck",
+  "files": [
+    "SKILL.md",
+    "references/checklist.md",
+    "references/guide.md",
+    "scripts/check_inner_imports.py",
+    "scripts/oo_usage_validator.py",
+    "scripts/oocheck_all.py",
+    "scripts/oocheck_refs.py",
+    "scripts/oocheck_refs_debug.py",
+    "scripts/oocheck_refs_doc.py",
+    "scripts/oocheck_refs_file.py",
+    "scripts/oocheck_run.py",
+    "templates/oaischeck_standard_word.md",
+    "templates/oaischeck_workflow.md"
+  ]
+}
