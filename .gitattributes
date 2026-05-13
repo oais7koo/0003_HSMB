@@ -1,4 +1,0 @@
-08_RRag/ps/**/chunking/**/*.json filter=lfs diff=lfs merge=lfs -text
-08_RRag/ps/**/output/chunks/**/*.json filter=lfs diff=lfs merge=lfs -text
-08_RRag/ps/**/output/chunks/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
-02_pycode/**/*.ipynb filter=lfs diff=lfs merge=lfs -text

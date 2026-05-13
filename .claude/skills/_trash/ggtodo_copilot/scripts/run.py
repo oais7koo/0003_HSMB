@@ -1,1 +1,0 @@
-(이전 ggtodo_copilot/scripts/run.py 파일)

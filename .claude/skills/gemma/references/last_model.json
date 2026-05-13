@@ -1,8 +1,0 @@
-{
-  "OAISBLACK": "gemma4:e2b",
-  "oais300": "mlx-community/gemma-4-e4b-it-4bit",
-  "KOOWIN2": "gemma4:e2b",
-  "KOODESK": "gemma4:e2b",
-  "KOOHP3": "gemma4:e2b",
-  "OAISAI": "gemma4:26b"
-}

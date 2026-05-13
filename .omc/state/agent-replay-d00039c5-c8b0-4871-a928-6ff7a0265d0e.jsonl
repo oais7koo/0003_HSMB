@@ -1,6 +1,0 @@
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oostart"}
-{"t":0,"agent":"a8f2344","agent_type":"unknown","event":"agent_stop","success":true}
-{"t":0,"agent":"ac1ece4","agent_type":"unknown","event":"agent_stop","success":true}
-{"t":0,"agent":"a145fa0","agent_type":"unknown","event":"agent_stop","success":true}
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oomemo"}
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oostop"}

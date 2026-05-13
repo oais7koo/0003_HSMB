@@ -1,19 +1,11 @@
-# Python-generated files
-__pycache__/
+# Track only project documents and source code.
+*
+!/.gitignore
+!/00_doc/
+!/00_doc/**
+!/src/
+!/src/**
+
+# Generated files inside allowed folders
+**/__pycache__/
 *.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
-
-# Virtual environments
-.venv
-
-# Environment variables (secrets)
-.env
-
-# Temporary files
-tmp/
-
-# Data (large binary files)
-data/

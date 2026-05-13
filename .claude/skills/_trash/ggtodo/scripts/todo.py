@@ -1,1 +1,0 @@
-(이전 ggtodo/scripts/todo.py 파일)

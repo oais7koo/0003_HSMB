@@ -1,1 +1,0 @@
-(이전 ggrun/scripts/ggrun_run.py 파일)

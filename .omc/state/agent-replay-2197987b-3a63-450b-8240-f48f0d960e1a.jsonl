@@ -1,4 +1,0 @@
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oostart"}
-{"t":0,"agent":"a03b944","agent_type":"unknown","event":"agent_stop","success":true}
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oostop"}
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oocommit"}
