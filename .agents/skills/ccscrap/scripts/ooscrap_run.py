@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ooscrap_run.py - ooscrap 스킬 스크립트 (스크래핑/유튜브 STT/처리)
-Usage: uv run python .codex/skills/ooscrap/scripts/ooscrap_run.py [help|version|status]
+Usage: uv run python .agents/skills/ccscrap/scripts/ooscrap_run.py [help|version|status]
 """
 import os
 import sys
@@ -16,7 +16,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .codex/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -38,7 +38,7 @@ if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
 if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-SKILL_NAME = "ooscrap"
+SKILL_NAME = "ccscrap"
 VERSION = "v10"
 
 

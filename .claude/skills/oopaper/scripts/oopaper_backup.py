@@ -171,12 +171,12 @@ def cmd_restore(args):
         if args.dry_run:
             print(f"  [복원예정] {rel}")
         else:
-            shutil.move(str(src), str(dst))
+            shutil.copy2(str(src), str(dst))
             print(f"  [복원] {rel}")
             moved += 1
 
     if not args.dry_run:
-        print(f"\n[완료] {moved}개 PDF 복원 완료.")
+        print(f"\n[완료] {moved}개 PDF 복원 완료. (백업본 유지)")
 
 
 def cmd_status(args):

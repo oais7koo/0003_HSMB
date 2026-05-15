@@ -1,0 +1,170 @@
+# 청송 MTF 데이터셋 상세기획
+
+> 문서번호: d1010 | 단계: 기획 | SP: 00 | 생성일: 2026-05-13
+> 연결 Feature: F002 (E1 NR-IQA 측정·상관 분석 입력) | plan.md §3 E002 참조
+
+## 변경 이력
+
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| v01 | 2026-05-13 | 초기 작성 (stub) |
+| v02 | 2026-05-13 | 상세기획 단계 전환 — 데이터셋 구조·통계·활용 명세 |
+
+---
+
+## 1. 문서 관리
+
+| 항목 | 내용 |
+|------|------|
+| 문서번호 | `d1010` |
+| 대상 데이터셋 | 청송 터널 area-scan MTF 현장 측정 데이터 (`ps1010_chungsong_MTF`) |
+| 데이터 위치 | `data/ps1010_chungsong_MTF/` |
+| 측정 도구 | Imatest 24.1.1 Master (SFR multi-ROI) |
+| 측정일자 | 2026-03-09 (CSV `Run date` 기준) |
+| 버전 | v02 |
+| 작성일 | 2026-05-13 |
+| 관련 문서 | `00_doc/sp00/d0001_prd.md` §2.5·§2.6, `data/02_260422_HSMB논문 수정안/` |
+
+---
+
+## 2. 데이터셋 개요
+
+청송 터널 현장에서 area-scan 8K 카메라로 촬영한 slant-edge MTF 측정용 데이터셋. PRD §2.5 터널표준영상(KICT 표준)과 §2.6 의도적 defocus 조건을 포함한 50조건 3-factor factorial 설계의 실측 자료. Imatest로 SFR(Spatial Frequency Response)을 추출해 MTF50·BEW 산출의 원본 입력으로 사용한다.
+
+---
+
+## 3. 요구사항
+
+| ID | 요구사항 | 우선순위 | 출처 |
+|----|---------|---------|------|
+| R01 | 50조건 (2속도×5거리×5ISO) factorial 데이터를 모두 확보 | Must | PRD §2 3-factor 설계 |
+| R02 | 조건별 다중 frame(7~13장) slant-edge ROI 이미지 보유 | Must | PRD §2 통계 검정력 |
+| R03 | Imatest SFR multi-ROI 측정 결과(Y_multi.csv) 동일 위치 보유 | Must | E1-1 NR-IQA·BEW 측정 입력 |
+| R04 | ISO=400, d=4.5m 의도적 defocus 조건 포함 (complex-blur stress) | Must | PRD §2.6 |
+| R05 | 파일명 컨벤션 일관성(조건 폴더·frame·ROI sfr) 유지 | Should | 자동화 파이프라인 |
+
+---
+
+## 4. 입출력 정의
+
+### 4.1 입력 (원시·후처리 자료)
+
+| 항목 | 타입 | 설명 | 필수 |
+|------|------|------|------|
+| 조건 폴더 | 폴더 (50개) | `low_{거리}_{속도}_{거리}_{ISO}/` 명명 (예: `low_2.5m_60km_2.5m_ISO100/`) | ✅ |
+| frame 이미지 | PNG | 조건 폴더 직속 `frame_*.png` (총 507장) | ✅ |
+| MTF 측정 CSV | CSV | `Results/frame_*_Y_multi.csv` (Imatest multi-ROI 출력, 총 479개) | ✅ |
+| ROI SFR 시각화 | PNG | `Results/frame_*_Y{T/B/L/R} {각도}_{인덱스}_sfr.png` (총 1,763개) | Should |
+| ROI 위치 시각화 | PNG | `Results/frame_*_Y_multi_cpp.png` (조성 ROI 위치 표시) | Should |
+
+### 4.2 출력 (이 데이터셋이 공급하는 대상)
+
+| 항목 | 타입 | 설명 |
+|------|------|------|
+| Ground truth (BEW/MTF50) | CSV | `data/ground_truth.csv` 50조건 기준값 (조건당 평균 BEW_H/V, MTF50_H/V) |
+| NR-IQA 측정 입력 | image set | F002-1 (`d2040`) 입력으로 사용 |
+| BEW 상관 분석 입력 | 측정값 | F002-2 (`d2050`) HSMB×BEW 상관 산출 입력 |
+| Complex-blur stress test | 서브셋 | F003-2 (`d3020`) ISO=400, d=4.5m 조건 (정상 대비 BEW +1.5~2.5px 증가) |
+
+---
+
+## 5. 데이터셋 구조
+
+### 5.1 폴더 트리
+
+```
+data/ps1010_chungsong_MTF/
+├── low_2.5m_60km_2.5m_ISO100/
+│   ├── frame_000102.png
+│   ├── frame_000103.png
+│   ├── ...                            # 조건당 7~13장
+│   └── Results/
+│       ├── frame_000102_Y_multi.csv        # Imatest SFR multi-ROI 결과
+│       ├── frame_000102_Y_multi_cpp.png    # ROI 위치 표시
+│       ├── frame_000102_YB 25_02_sfr.png   # ROI Bottom, 25°, 인덱스 02
+│       ├── frame_000102_YL 26_03_sfr.png   # ROI Left
+│       ├── frame_000102_YR 30_04_sfr.png   # ROI Right
+│       ├── frame_000102_YT 26_01_sfr.png   # ROI Top
+│       └── ...                              # frame당 평균 3.7개 ROI sfr.png
+├── low_2.5m_60km_2.5m_ISO200/
+├── ...                                # 총 50개 조건 폴더
+└── low_6.5m_80km_6.5m_ISO1600/
+```
+
+### 5.2 3-factor Factorial 설계
+
+| 인자 | 수준 | 비고 |
+|------|------|------|
+| 차량 속도 | 60, 80 km/h | 2 수준 |
+| 카메라-벽 거리 | 2.5, 3.5, 4.5, 5.5, 6.5 m | 5 수준 |
+| ISO 감도 | 100, 200, 400, 800, 1600 | 5 수준 (ISO=400은 의도적 defocus) |
+| **조건 수** | **2 × 5 × 5 = 50** | 누락 없음 |
+
+### 5.3 정량 통계
+
+| 항목 | 수량 | 비고 |
+|------|------|------|
+| 조건 폴더 | 50개 | PRD §2 설계와 일치 |
+| frame 이미지 총합 | 507장 | 조건당 평균 10.1 (범위 7~13) |
+| Y_multi.csv | 479개 | 일부 frame은 측정 미수행 (∆=28장) |
+| sfr.png (ROI 단위) | 1,763개 | frame당 평균 3.7개 ROI (T/B/L/R + 각도 변형) |
+| ROI cpp.png | ≈479개 | Y_multi.csv 1:1 매핑 |
+
+### 5.4 파일명 컨벤션
+
+- 조건 폴더: `low_{거리A}_{속도}_{거리B}_ISO{값}/` — 거리 A·B 동일값으로 중복 표기 (현장 메타데이터 보존용)
+- frame: `frame_{6자리}.png` (예: `frame_000102.png`)
+- ROI sfr: `frame_{NNNNNN}_Y{T|B|L|R} {각도}_{인덱스:02d}_sfr.png` — Y채널 슬랜트엣지, T/B/L/R = 상/하/좌/우 방향, 각도 = slant 각도(°)
+
+---
+
+## 6. 의도적 defocus 조건 (PRD §2.6 연계)
+
+| 조건 | 거리 | 속도 | ISO | 특성 |
+|------|------|------|-----|------|
+| `low_4.5m_60km_4.5m_ISO400` | 4.5 m | 60 km/h | 400 | BEW_H ≈ 7.78 px, MTF50_H ≈ 0.065 cy/px |
+| `low_4.5m_80km_4.5m_ISO400` | 4.5 m | 80 km/h | 400 | BEW_H ≈ 8.20 px, MTF50_H ≈ 0.061 cy/px |
+
+- **설계 의도**: motion blur + defocus 복합 블러로 HSMB 강건성 stress test 입력
+- BEW_H − BEW_V 이방성이 정상 조건(+0.37~+1.07 px) 대비 작음(+0.38~+0.55 px) → defocus 등방성 특징
+- **활용**: F003-2 (`d3020_상세기획_complex_blur_stress_test.md`) stress test 핵심 서브셋
+
+---
+
+## 7. 제약조건 / 예외처리
+
+| 상황 | 처리 방식 |
+|------|----------|
+| frame 이미지에 대응 Y_multi.csv 부재 (∆=28) | 측정 미완료 frame 식별 → Imatest 재측정 또는 분석 제외 |
+| 조건 폴더 내 ROI 수 가변 (frame당 평균 3.7) | NR-IQA 측정 시 frame 단위로 평균/대표값 집계 |
+| Imatest 출력 CSV 헤더 5줄 (메타) | 파서에서 6행부터 데이터 읽기 시작 |
+| 한글 폴더명 "MTF 추출" 흔적 (제거됨) | 현재 구조는 평탄화 완료 (`MTF 추출` 서브폴더 없음) |
+
+---
+
+## 8. 관련 Feature (plan.md 연결)
+
+- **공급 Feature**:
+  - F002-1 (`d2040`) E1-1 NR-IQA 측정 — 1,500장 입력 중 본 데이터셋 frame 활용
+  - F002-2 (`d2050`) E1-2 BEW 상관 분석 — Y_multi.csv 측정값 사용
+  - F003-1 (`d3010`) v1 50조건 벤치마크 — 50조건 ground truth 기반
+  - F003-2 (`d3020`) Complex-blur stress test — ISO=400, d=4.5m 서브셋
+
+- **선행 의존**: 없음 (원본 자료)
+
+---
+
+## 9. 참고 자료
+
+- PRD: `00_doc/sp00/d0001_prd.md` §2.5 (터널표준영상), §2.6 (의도적 defocus 설계)
+- 계획: `00_doc/sp00/d0002_plan.md` E002·E003
+- 협업 패키지: `data/02_260422_HSMB논문 수정안/`
+- 측정 도구 문서: Imatest 24.1.1 Master SFR multi-ROI 매뉴얼
+
+---
+
+## 10. 이슈
+
+| 날짜 | 내용 | 상태 |
+|------|------|------|
+| 2026-05-13 | frame.png(507) 대비 Y_multi.csv(479) 차이 28 — 측정 미완료 frame 식별 필요 | 🔴 미해결 |

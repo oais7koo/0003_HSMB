@@ -1,387 +1,312 @@
-# oodesign Tutorial
+# oodesign Tutorial — 웹 디자인 적용편
 
-> 디자인 시스템 통합 스킬 — 토큰·컴포넌트·테마 생성 및 AI 디자인·코드 변환 | 버전: v03 | 카테고리: content
+> SP04 웹 페이지에 표준 디자인을 적용·관리하는 oodesign 스킬 사용법 | 버전: v11 | 카테고리: content
 
 ## 1. 이 스킬은 왜 필요한가?
 
-웹(Bootstrap) + 모바일 앱(Flutter) 공유 토큰 아키텍처로 디자인 시스템을 통합 관리할 수 있습니다. Pencil MCP 기반 AI 디자인 생성, URL 레퍼런스 분석, 자동 코드 변환이 가능합니다.
+SP04 표준웹은 31개 페이지에 일관된 비주얼·UX를 유지해야 한다. 각 페이지마다 색상·여백·카드 스타일을 재작성하면 디자인이 흐트러진다. oodesign은 **표준 디자인 시스템(d42500)**을 SSOT로 두고, 새 페이지를 만들거나 기존 페이지를 마이그레이션할 때 같은 토큰·컴포넌트를 자동 적용한다.
 
-**이런 상황에서 사용합니다:**
-- **디자인 시스템**: 토큰 정의/변환, 컴포넌트 구축, 테마 관리
-- **크로스플랫폼**: 웹(Bootstrap) + 앱(Flutter) 공유 토큰 아키텍처
-- **실제 디자인**: 레퍼런스 분석, AI 보조 생성(Pencil MCP 채택), 디자인→코드 변환
+핵심 효과:
+- **신규 페이지**: 처음부터 표준 디자인으로 작성 (체크리스트 + 컴포넌트 재사용)
+- **기존 페이지**: 점진 마이그레이션 (Bootstrap 기본 → 표준 토큰)
+- **디자인 변경**: tokens.css 한 곳만 수정해도 전체 페이지 반영
+
+---
 
 ## 2. 빠른 시작 (5분 가이드)
 
 ```bash
-# 기본 실행
-oodesign run
+# 표준 디자인 적용 (가장 자주 쓰는 명령)
+oodesign d42500 적용 — stamp/create.html
 
-# 상태 확인
+# 디자인 시스템 상태 확인
 oodesign status
 
 # 도움말
 oodesign help
 ```
 
-## 3. 전체 서브명령어
+명령 하나로 Claude가:
+1. d42500 SSOT 문서를 자동 참조
+2. 대상 페이지 분석 후 변경 계획 제시
+3. 승인 후 토큰·컴포넌트 적용
+4. 회귀 테스트 + 커밋
+
+---
+
+## 3. 자주 쓰는 명령 요약
+
+> 이것만 기억하면 됩니다.
+
+| # | 명령어 | 언제 쓰나 |
+|---|--------|----------|
+| 1 | `oodesign d42500 적용 — {페이지}` | **단일 페이지 표준 디자인 마이그레이션** (가장 자주 사용) |
+| 2 | `oodesign d42500 패턴으로 새 페이지 — {URL}` | 신규 페이지를 표준 컴포넌트로 작성 |
+| 3 | `oodesign status` | 디자인 시스템 자산(토큰·테마·컴포넌트) 현황 |
+| 4 | `oodesign token` | JSON 토큰 → CSS 변환 파이프라인 실행 |
+| 5 | `oodesign analyze --url {URL}` | 외부 사이트 디자인 분석 → 토큰 제안 |
+| 6 | `oodesign check` | 컴포넌트 정합성 감사 (넘버링·구조 불일치 검출) |
+
+---
+
+## 4. 권장 흐름 (이렇게 쓰세요)
+
+### 4.1 신규 페이지 작성 흐름
+
+```
+1. d42500 §7 체크리스트 확인          ← 표준 진입점
+2. oodesign d42500 패턴으로 새 페이지 — /web/tax/data/coupang
+   → routes.py + templates/tax/coupang.html (extra_css/extra_js 분리)
+3. 페이지 고유 스타일만 extra_css 블록에
+4. 컴포넌트 클래스 사용 (.page-wrap, .step-card, .stats-grid 등)
+5. 회귀 테스트 PASS 확인
+6. oocommit run                          ← 커밋
+```
+
+### 4.2 기존 페이지 마이그레이션 흐름
+
+```
+1. oodesign d42500 적용 — {페이지}
+   → Claude가 inline :root 제거 + Bootstrap 클래스 → 표준 클래스 치환 계획 제시
+2. 사용자 승인
+3. 자동 적용 + 회귀 테스트
+4. 시각 동등성 확인 (Playwright 또는 수동)
+5. oocommit run
+```
+
+> 핵심: `d42500` 키워드가 있으면 Claude가 자동으로 SSOT 문서 → §7 체크리스트 → §6 DO/DON'T 순으로 참조.
+
+### 4.3 디자인 토큰 변경 흐름 (글로벌 영향)
+
+```
+1. tokens.css 변경 (예: --primary 색상 교체)
+2. oodesign check          ← 컴포넌트 정합성 확인
+3. card_slip_map 등 reference 페이지 시각 확인
+4. 회귀 테스트 (시각 변경만 — 기능 영향 없음 확인)
+5. oocommit run
+```
+
+---
+
+## 5. 전체 명령어
 
 | 명령어 | 설명 |
 |--------|------|
-| `oodesign help` | 서브명령어 목록 표시 |
-| `oodesign version` | 스킬 버전 정보 (v03) |
-| `oodesign status` | 현재 디자인 시스템 상태 (토큰/테마/컴포넌트 현황) |
-| `oodesign token [--theme 테마명\|--all-themes]` | 토큰 파이프라인 실행 (JSON → CSS/SCSS/pen) |
-| `oodesign analyze [이미지경로\|--url URL] [--sample 샘플명]` | 레퍼런스 분석 → 토큰 추출 제안 (이미지 또는 URL) |
-| `oodesign theme [테마명] [--new\|--apply\|--list]` | 테마 생성/적용/목록 |
-| `oodesign component [컴포넌트명] [--platform web\|flutter] [--tool pencil\|code]` | 컴포넌트 생성 |
-| `oodesign generate [화면명] [--theme 테마명]` | 컴포넌트 조합으로 화면 생성 |
-| `oodesign compbuild [컴포넌트\|--all] [--platform web\|flutter]` | 컴포넌트 엘리먼트 넘버링 + 구성요소 라벨링 |
-| `oodesign check [--platform web\|flutter\|senior_world\|all]` | 컴포넌트 정합성 감사 (넘버링·구조·인덱스 불일치 검출) |
-| `oodesign export [pen파일] [--format png\|dart\|both] [--output 경로]` | pen 파일 → PNG 이미지 / Dart 코드 변환 |
-| `oodesign pencil [--theme 테마명] [--file 경로]` | Pencil 새 파일 생성 + 테마 변수 자동 등록 |
-| `oodesign init [--root 경로]` | 새 프로젝트에 디자인 시스템 폴더 구조 + 빈 템플릿 생성 |
-| `oodesign run [--theme 테마명]` | 전체 프로세스 실행 (analyze → token → component) |
-
-실행:
-- token: `uv run python .claude/skills/oodesign/scripts/token_sync.py [--theme 테마명|--all-themes]`
-- check: `uv run python .claude/skills/oodesign/scripts/audit_script.py [--platform web|flutter|senior_world|all]`
-- 나머지: Claude Code 직접 수행 (AI 분석/생성)
-
-### check 워크플로우
-
-```
-oodesign check [--platform web|flutter|senior_world|all]
-        │
-        ▼
-[1] audit_script.py 실행 (대상 플랫폼 폴더)
-        │
-        ▼
-[2] section-title 넘버링 범위 표기 누락 검출
-        │
-        ▼
-[3] elem-box 구조 무결성 검사 (elem-id / elem-preview / elem-code)
-        │
-        ▼
-[4] 00_index.html ↔ 실제 파일 불일치 검출
-    - 사이드바 링크 ↔ 카드 목록 불일치
-    - 사이드바 ↔ 디스크 파일 불일치
-        │
-        ▼
-[5] 이슈 목록 출력 (없으면 NO ISSUES FOUND)
-```
-
-### analyze 워크플로우
-
-```
-oodesign analyze [이미지경로|--url URL] [--sample 샘플명]
-        │
-        ▼
-[1] 소스 수집 (이미지 Read 또는 WebFetch)
-        │
-        ▼
-[2] 색상/타이포/간격/레이아웃 추출
-        │
-        ▼
-[3] 토큰 JSON 초안 생성
-    - 02_tokens/{NN}_{샘플명}/ 에 저장
-        │
-        ▼
-[4] token_sync.py --theme {샘플명} 실행
-        │
-        ▼
-[5] 분석 결과 리포트 출력
-```
+| `oodesign help` | 서브명령어 목록 |
+| `oodesign version` | 스킬 버전 (v11) |
+| `oodesign status` | 디자인 시스템 상태 (토큰/테마/컴포넌트 현황) |
+| `oodesign token [--theme N]` | JSON 토큰 → CSS/SCSS/pen 변환 |
+| `oodesign analyze [경로|--url URL]` | 레퍼런스 분석 → 토큰 추출 제안 |
+| `oodesign theme [N] [--new|--apply|--list]` | 테마 생성/적용/목록 |
+| `oodesign component [이름] [--platform web|flutter]` | 컴포넌트 생성 |
+| `oodesign generate [화면명]` | 컴포넌트 조합으로 화면 생성 |
+| `oodesign compbuild [컴포넌트|--all]` | 엘리먼트 넘버링 + 라벨링 |
+| `oodesign check [--platform web|flutter|all]` | 정합성 감사 |
+| `oodesign export [pen파일] [--format png|dart]` | pen → PNG/Dart 변환 |
+| `oodesign pencil [--theme N] [--file 경로]` | Pencil 새 파일 생성 |
+| `oodesign init [--root 경로]` | 새 프로젝트 디자인 시스템 부트스트랩 |
+| `oodesign run` | 전체 프로세스 (analyze → token → component) |
+| **`oodesign d42500 적용 — {페이지}`** | **SP04 web 표준 디자인 마이그레이션 (자연어 명령)** |
 
 ---
 
-## 4. 상세 사용법
+## 6. 상세 사용법
 
-### 스킬 요약
+### 6.1 디자인 시스템 자산 위치
 
-| 항목 | 내용 |
-|------|------|
-| **핵심 역할** | 디자인 시스템 통합 스킬 — 토큰·컴포넌트·테마 생성 및 AI 디자인·코드 변환 |
-| **하는 것** | 디자인 토큰 생성, 컴포넌트 파일 생성, 테마 관리, URL 레퍼런스 분석, 디자인→코드 변환 |
-| **하지 않는 것** | 앱 코드 구현(→oodev), 문서 작성(→oodoc), 스크린샷 캡처(→oocapture) |
-| **참조 범위** | 현재 프로젝트 내부 파일 + 지정 URL 레퍼런스 / 외부 프로젝트 자동 포함 안 함 |
-| **수정 대상** | `07_designsystem/` 하위 파일 (03_vars/, 04_components/, 05_themes/ 등) |
-| **실행 레벨** | [반자동] — 생성 계획 확인 후 실행 |
-| **에이전트 호환** | 범용 — URL 레퍼런스 분석 시 웹 접근 필요 |
-
-### 토큰-테마 아키텍처
-
-> **원칙**: 브랜드 정체성은 테마 단위로 관리, 플랫폼 구분은 산출물 포맷으로 분리
-
-```
-02_tokens/                     원본 토큰 (JSON)
-├── 00_shared/                 색상, 간격(px), 라운딩 → 공유
-├── 01_web/                    타이포(rem), 레이아웃, 그림자 → 웹 전용
-├── 11~15_{테마}/              테마 오버라이드
-
-03_vars/                       산출물 (CSS/SCSS/pen)
-├── 11_bootstrap_official/     기본 Bootstrap 테마
-├── 12_chuckchuck/             척척 테마
-├── 13_galaxy_oneui/           Galaxy One UI 테마
-├── 14_senior_world/           시니어월드 테마
-└── 15_wello/                  웰로 테마
-```
-
-| 번호 | 용도 |
-|------|------|
-| 11~15 | 테마별 산출물 (CSS/SCSS/pen) |
-
-> 플랫폼별 포맷(Dart 등)이 필요하면 테마 폴더 하위에 `dart/` 등으로 추가
-
----
-
-### 디자인 프로세스 매핑
-
-| 단계 | 명령어 | 방법론 참조 |
-|------|--------|------------|
-| STEP 1 레퍼런스 분석 | `oodesign analyze` | d70210_방법론_AI디자인.md |
-| STEP 2 토큰 정의/변환 | `oodesign token` | d70200_방법론_토큰파이프라인.md |
-| STEP 3 컴포넌트 생성 | `oodesign component` | d70210_방법론_AI디자인.md |
-| STEP 4 라이브러리 편입 | `oodesign component --save` | d70220_아토믹디자인.md |
-| STEP 5 테마 패키징 | `oodesign theme --new` | d70230_방법론_테마시스템.md |
-| STEP 5.5 테마 컴포넌트 생성 | `oodesign theme --apply` | 05_components_theme/ |
-| STEP 6 화면 생성 | `oodesign generate` | d70240_방법론_디자인투코드.md |
-
-### 테마 적용 방식
-
-`04_components/00_index.html`의 **테마 스위처**(dropdown)가 iframe 내 CSS `<link>`를 동적으로 교체하여 테마 적용.
-별도의 `05_components_theme/` 폴더 복사 불필요.
-
----
-
-### 폴더 구조 (v2.0 넘버링)
-
-| 경로 | 용도 |
-|------|------|
-| `07_designsystem/01_references/` | 레퍼런스 이미지/템플릿 |
-| `07_designsystem/02_tokens/00_shared/` | 공유 토큰 (색상, 간격) |
-| `07_designsystem/02_tokens/01_web/` | 웹 전용 토큰 (타이포, 레이아웃) |
-| `07_designsystem/02_tokens/11_~15_{테마}/` | 테마 오버라이드 |
-| `07_designsystem/03_vars/11_~15_{테마}/` | 테마별 산출물 (CSS/SCSS/pen) |
-| `07_designsystem/04_components/atoms/` | Atom 컴포넌트 (Bootstrap + Flutter 통합) |
-| `07_designsystem/04_components/molecules/` | Molecule 컴포넌트 |
-| `07_designsystem/04_components/organisms/` | Organism 컴포넌트 |
-| `07_designsystem/04_components/templates/` | Template (T/P — 플랫폼 접미사 bw/fm) |
-| `07_designsystem/04_components/pages/` | Page (T/P — 플랫폼 접미사 bw/fm) |
-| `07_designsystem/05_components_theme/` | (미사용 — 테마 스위처로 대체) |
-| `07_designsystem/06_pencil/` | Pencil MCP 프로토타입 (.pen) |
-| `.claude/skills/oodesign/scripts/token_sync.py` | 토큰 변환 스크립트 v2.0 |
-
-### 컴포넌트 규칙
-
-- **테마 독립**: 색상은 CSS 변수(`var(--ds-xxx, fallback)`)로 참조
-- **플랫 구조**: `04_components/{atoms|molecules|organisms|templates|pages}/` — 플랫폼 구분 없이 통합
-- **T/P 접미사**: Template/Page는 파일명에 플랫폼 접미사 부여 (e.g. `T101bw_`, `P101fm_`)
-- **AMOTP 넘버링**: `{단계}{그룹}{순번}_{컴포넌트명}.html`
-- **`00_index.html` 필수**: 04_components 및 05_components_theme 하위 모든 폴더에 카탈로그 인덱스 필수
-
-### AMOTP 넘버링 체계
-
-#### 요소번호 형식
-
-| 계층 | 파일명 | 요소번호 | 비고 |
-|------|--------|---------|------|
-| A (Atom) | `A501_card.html` | `A501-001` | 접미사 없음 |
-| M (Molecule) | `M401_carousel.html` | `M401-001` | 접미사 없음 |
-| O (Organism) | `O201_news-card.html` | `O201-001` | 접미사 없음 |
-| T (Template) | `T101_tpl-auth.html` | `T101-001bw` | **접미사 필수** |
-| P (Page) | `P101_page-login.html` | `P101-001fm` | **접미사 필수** |
-
-#### 플랫폼 공유 원칙
-
-| 계층 | 번호 공유 | 이유 |
-|------|---------|------|
-| A/M/O | 플랫폼 간 공유 | 컴포넌트 개념 동일, 구현만 다름 |
-| T/P | 플랫폼별 독립 | 레이아웃·구성이 근본적으로 다름 |
-
-#### T/P 플랫폼 접미사 (2자리)
-
-요소번호 맨 뒤에 프레임워크 + 타겟 접미사 부여:
-
-| 접미사 | 프레임워크 + 타겟 | 예시 |
-|:------:|-----------------|------|
-| **bw** | Bootstrap + Web | `P101-001bw` |
-| **rw** | React + Web | `P101-001rw` |
-| **fw** | Flutter + Web | `P101-001fw` |
-| **fm** | Flutter + Mobile | `P101-001fm` |
-| **fd** | Flutter + Desktop | `P101-001fd` |
-| **rn** | React Native | `P101-001rn` |
-| **si** | Swift + iOS | `P101-001si` |
-| **ka** | Kotlin + Android | `P101-001ka` |
-
-#### 현재 프로젝트 매핑
-
-| 폴더 | 해당 파일 |
-|------|----------|
-| `04_components/atoms/` ~ `organisms/` | A/M/O — 접미사 없음 |
-| `04_components/templates/` | `T{NNN}bw_*.html`, `T{NNN}fm_*.html` |
-| `04_components/pages/` | `P{NNN}bw_*.html`, `P{NNN}fm_*.html` |
-
-### 00_index.html 필수 규칙
-
-컴포넌트 **생성/삭제/리네이밍** 시 해당 폴더의 `00_index.html`을 반드시 업데이트:
-
-| 폴더 | 00_index.html | 업데이트 시점 |
-|------|:-------------:|-------------|
-| `04_components/` | 필수 | 컴포넌트 추가/삭제 시 |
-| `05_components_theme/{NN}_{테마}/` | 필수 | 테마 컴포넌트 생성 시 |
-
-**포함 내용**:
-1. AMOTP 그룹별 사이드바 네비게이션
-2. 각 항목에 AMOTP 코드 표시 (모노스페이스)
-3. 컴포넌트 총 수 + 그룹 수 통계
-4. iframe 미리보기 기능
-5. 다른 카탈로그 링크 (컴포넌트↔테마 상호 참조)
-- **인덱스**: 각 플랫폼 폴더에 `00_index.html`로 전체 컴포넌트 브라우징
-
-### 테마 현황
-
-| 테마 | 토큰 | CSS/SCSS | 데모 |
-|------|:---:|:---:|:---:|
-| bootstrap_official | ✅ | ✅ | 테마 스위처 |
-| chuckchuck | ✅ | ✅ | 테마 스위처 |
-| galaxy_oneui | ✅ | ✅ | 테마 스위처 |
-| senior_world | ✅ | ✅ | 테마 스위처 |
-| wello | ✅ | ✅ | 테마 스위처 |
-
----
-
-### ai 도구 연동
-
-| 도구 | 상태 | 특징 |
+| 자산 | 경로 | 역할 |
 |------|------|------|
-| Pencil Dev MCP | **채택** | 로컬 .pen 파일 기반, 23/25점 |
-| Figma MCP | 미채택 | 14/25점 (Phase 3 비교 결과) |
-| Claude Code | 보조 | 직접 HTML/CSS 생성 |
+| 토큰 CSS | `04_api_server/web/static/css/tokens.css` | 색상·여백·그림자 CSS 변수 SSOT (--primary, --border 등) |
+| 컴포넌트 CSS | `04_api_server/web/static/css/components.css` | 재사용 클래스 (.step-card, .stat-card 등 13종) |
+| Jinja 매크로 | `04_api_server/web/templates/_components.html` | `step_card(num, title)`, `stats_grid(...)` |
+| **표준 문서 SSOT** | **`00_doc/sp04/d42500_상세설계_web_base_표준디자인시스템.md`** | 토큰 카탈로그·컴포넌트 가이드·체크리스트·DO/DON'T |
+| 참조 페이지 | `04_api_server/web/templates/tax/card_slip_map.html` | 표준 디자인 적용 reference |
 
-> 도구 비교 결과: `00_doc/sp07/d70300_ai_comparison.md`
+### 6.2 표준 토큰 카탈로그
 
-### 6.1 Pencil MCP 사전 체크 (필수)
+```css
+:root {
+  /* Primary */
+  --primary: #265cdc;
+  --primary-700: #1e48b0;
+  --primary-soft: rgba(38, 92, 220, 0.1);
 
-> **⚠️ Pencil 작업을 요청받으면 반드시 먼저 MCP 상태를 확인한 뒤 진행한다.**
+  /* Text */
+  --body: #444;
+  --navy: #1a2036;          /* main.css 정의 */
 
-#### 체크 절차
+  /* Surface */
+  --border: #e6eaf2;
+  --surface-alt: #f5f6ff;
+  --surface-pale: #f8fafc;
 
-```
-[1] get_editor_state 호출
-        │
-        ├─ 성공 + activeFile 존재 → 정상, 바로 작업 진행
-        │
-        ├─ 성공 + activeFile 없음 → open_document('new') 또는 기존 .pen 경로로 열기
-        │
-        └─ 오류 / MCP 응답 없음  → 사용자에게 알리고 중단
-                                   (Pencil Dev 앱 실행 여부 확인 요청)
-```
+  /* Status */
+  --success: #1a7a4a;       --success-soft: #e8f5ef;
+  --warn: #b97817;          --warn-soft: #fff4e3;
+  --danger: #dc2626;        --danger-soft: #fee2e2;
 
-#### 확인 항목
-
-| 확인 항목 | 방법 | 정상 조건 |
-|----------|------|----------|
-| MCP 연결 | `get_editor_state()` 호출 | 오류 없이 응답 반환 |
-| 활성 문서 | 응답의 `activeFile` 필드 | 경로가 존재하고 `.pen` 파일 |
-| 가이드라인 로드 | `get_guidelines()` 호출 | 스타일/레이아웃 가이드 반환 |
-
-#### 코드 패턴
-
-```
-# Pencil 작업 시작 전 항상 실행
-state = mcp__pencil__get_editor_state()
-
-if state.activeFile:
-    # 정상 → 작업 진행
-    guidelines = mcp__pencil__get_guidelines()
-else:
-    # 문서 없음 → 열기
-    mcp__pencil__open_document('new')  # 또는 기존 경로
+  /* Shadow */
+  --shadow: 0 6px 24px rgba(35, 61, 99, 0.08);
+  --shadow-lg: 0 30px 60px rgba(35, 61, 99, 0.12);
+}
 ```
 
-#### 오류 대응
+### 6.3 표준 컴포넌트 13종
 
-| 상황 | 원인 | 대응 |
+| 클래스 | 용도 |
+|--------|------|
+| `.page-wrap` | 페이지 공통 컨테이너 (max-width, padding) |
+| `.page-header` + `.sec-num` | 페이지 제목 영역 (라벨 + 제목 + 설명) |
+| `.step-card` + `.step-num` + `.step-head/body` | 단계 카드 (`.is-disabled`로 비활성) |
+| `.alert-error` | 빨간색 오류 배너 |
+| `.spinner-inline` | 로딩 인디케이터 |
+| `.btn-primary-cta` | 주요 CTA 버튼 |
+| `.btn-action` + `.btn-action.danger` | 보조 버튼 |
+| `.stats-grid` + `.stat-card.success/.warn` | 결과 통계 카드 (3개) |
+| `.preview-tabs` | 결과 미리보기 탭 |
+| `.preview-table` | 미리보기 테이블 (sticky thead, 가로 스크롤) |
+| `.btn-download` | 다운로드 버튼 (green) |
+
+### 6.4 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `--platform web\|flutter` | 컴포넌트/체크 대상 플랫폼 |
+| `--theme {번호}` | 특정 테마 대상 (11=bootstrap_official ~ 15=wello) |
+| `--all-themes` | 모든 테마 일괄 처리 |
+| `--dry-run` | 미리보기 (실제 수정 안 함, 일부 서브명령) |
+
+---
+
+## 7. 실전 예시
+
+### 7.1 기존 페이지 마이그레이션 (단일)
+
+```bash
+사용자: oodesign d42500 적용 — stamp/create.html
+```
+
+Claude 동작:
+1. `00_doc/sp04/d42500_상세설계_web_base_표준디자인시스템.md` 로드
+2. `04_api_server/web/templates/stamp/create.html` 분석
+3. 변경 계획 제시:
+   - inline `:root` 블록 제거 (tokens.css가 자동 로드)
+   - Bootstrap `card` → `.step-card` 치환
+   - Bootstrap `btn-primary` → `.btn-primary-cta`
+4. 사용자 승인 → 적용
+5. `pytest tests/sp04/test_stamp_*.py` 회귀 확인
+6. `git commit -m "style(sp04): stamp/create.html 표준 디자인 적용"`
+
+### 7.2 신규 페이지 작성
+
+```bash
+사용자: oodesign d42500 패턴으로 새 페이지 — /web/tax/data/coupang, 단계 3개 (업로드/실행/결과)
+```
+
+Claude 동작:
+1. d42500 §7 체크리스트 따라:
+   - `routes.py`에 라우트 5개 추가 (GET 페이지, AJAX 2개, GET download/sample)
+   - `templates/tax/coupang.html` 작성:
+     - `{% extends "base.html" %}`
+     - `extra_css` 블록: 페이지 고유 스타일만
+     - `.page-wrap` → `.page-header` → 3개 `.step-card` → `.stats-grid`
+     - `extra_js` 블록: fetch + CSRF + 결과 렌더링
+2. 테스트 스켈레톤 생성 (TC1~TC8)
+3. 회귀 확인 후 커밋
+
+### 7.3 도메인 단위 마이그레이션
+
+```bash
+사용자: oodesign d42500 적용 — auth/login·signup·find-id
+```
+
+Claude 동작:
+1. task-executor 위임 (3개 파일 병렬 분석)
+2. 각 페이지별 변경 계획 통합 제시
+3. 일괄 적용 + 페이지별 회귀 PASS 확인
+4. 단일 커밋: `style(sp04): auth 페이지 3건 표준 디자인 적용`
+
+### 7.4 디자인 토큰 변경 (글로벌)
+
+```bash
+사용자: --primary 색상을 #1a73e8로 바꿔줘
+```
+
+Claude 동작:
+1. `04_api_server/web/static/css/tokens.css` `--primary` 값 수정
+2. `oodesign check` — 컴포넌트 정합성 자동 검증
+3. card_slip_map 시각 동등성 확인 (Playwright 또는 가이드 안내)
+4. 커밋
+
+---
+
+## 8. 입출력
+
+### 입력
+| 항목 | 타입 | 필수 | 설명 |
+|------|------|:----:|------|
+| 페이지 경로 | str | ✅ | `stamp/create.html` 형태 또는 URL `/web/tax/data/coupang` |
+| 도메인 | str | | 도메인 단위 적용 시 (`auth`, `work` 등) |
+| --theme N | int | | 테마 지정 (기본 11_bootstrap_official) |
+
+### 출력
+| 출력 | 형식 | 설명 |
 |------|------|------|
-| MCP 도구 자체가 없음 | Pencil Dev 앱 미실행 | 사용자에게 Pencil Dev 앱 실행 요청 |
-| `activeFile` 없음 | 열린 문서 없음 | `open_document('new')` 또는 경로 지정 |
-| 응답 지연/타임아웃 | 앱 응답 불가 | Pencil Dev 재시작 요청 |
+| 변경 계획 | console | 적용 전 미리보기 (Before/After 요약) |
+| 마이그레이션 결과 | 수정된 파일 | routes/templates/css/test 갱신 |
+| 회귀 결과 | console | pytest 통과 여부 |
+| 커밋 | git | `style(sp04): {페이지} 표준 디자인 적용` |
 
 ---
 
-### elem-box 분리 원칙
+## 9. 자주 묻는 질문 (FAQ)
 
-컴포넌트 카탈로그에서 elem-box를 분리할지 유지할지 판단하는 기준.
+**Q: `oodesign d42500 적용`과 `d42500 적용` 차이는?**
+A: 동일합니다. 둘 다 d42500 SSOT를 자동 참조합니다. `oodesign` 키워드를 붙이면 스킬 트리거가 명확해집니다.
 
-### 분리 O (Split)
+**Q: 기존 인트로/랜딩 페이지에도 적용해도 되나요?**
+A: ⚠️ 권장하지 않음. `landing/intro_*`, `landing/home.html`은 hero·gradient 등 독자 디자인을 가집니다. d42500은 일반 콘텐츠 페이지(form·data·dashboard) 대상이며 랜딩 페이지는 별건.
 
-| 조건 | 예시 |
-|------|------|
-| 독립적으로 사용 가능한 다른 CSS 클래스 조합 | `.oo-link-icon` vs `.oo-link-icon.oo-link-danger` |
-| 상태/색상 변형 (variant) | Primary / Success / Danger / Secondary |
-| 밑줄 방식 변형 | 항상 밑줄 / 호버 밑줄 / 연한 밑줄 |
-| 아이콘 위치 변형 | 아이콘 앞 / 아이콘 뒤 |
+**Q: components.css 클래스와 Bootstrap 클래스를 같이 써도 되나요?**
+A: ❌ 금지. d42500 §6 DO/DON'T에 명시. 같은 컴포넌트에 `.card`(Bootstrap)와 `.step-card`(표준)를 혼용하면 스타일 충돌. 한 페이지는 한 시스템만.
 
-### 유지 O (Keep Together)
+**Q: 신규 페이지를 만들 때 매크로(`_components.html`)를 써야 하나요?**
+A: 선택 사항. 단계 3개 이상 페이지면 `step_card` 매크로가 가독성 ↑. 단순 페이지면 클래스 직접 사용도 OK.
 
-| 조건 | 예시 |
-|------|------|
-| 복합 패턴 (여러 요소 조합 표현) | Disabled — `<span>` + `<a>` 두 가지 표현 |
-| 그룹/목록 패턴 | 리스트 아이템 그룹, 버튼 그룹 |
-| 레이아웃 컨텍스트 필요 | 인라인 텍스트 속 링크 예시 |
-| 구조적으로 분리 불가한 UI | 탭/아코디언 등 상태 기반 컴포넌트 |
+**Q: 토큰 색상이 변경되면 기존 페이지도 자동 반영되나요?**
+A: ✅ 자동. `tokens.css`는 `:root`에 정의되어 모든 페이지가 var(--*)로 참조. 단, inline 색상값(예: `color: #265cdc`)이 남아있다면 수동 마이그레이션 필요.
 
-### 번호 부여 규칙
+**Q: `oodesign d42500 적용` 후 회귀 실패하면?**
+A: Claude가 자동 롤백하지 않음. 사용자가 `git diff`로 변경 확인 후 부분 수정 또는 `git restore`로 되돌림. 디자인 마이그레이션은 시각 변경이라 기능 회귀가 발생하면 매핑 실수 가능성 큼 — 보고 후 재시도.
 
-- 분리 후 빈 번호 없이 순차 재번호 부여
-- 섹션 제목: `섹션명 (A{xxx}-{시작} ~ {끝})` 형식
-- `comp-count` 총 수 업데이트 필수
-- 이후 섹션 번호도 연쇄 업데이트
+**Q: oodesign과 d42500은 무슨 관계?**
+A: d42500은 SP04 web 한정 표준 디자인 SSOT. oodesign은 SP07 디자인 통합 스킬(멀티플랫폼·테마). 현재는 양방향 참조로 느슨하게 결합. R159에서 점진적으로 oodesign 파이프라인에 d42500 통합 예정.
+
+> `ootutorial add-faq oodesign "질문" "답변"` 으로 추가 가능
 
 ---
 
-## 5. 워크플로우
+## 10. 서브에이전트
 
-(워크플로우 정보는 SKILL.md 참조)
-
-## 6. 실전 예시
-
-### 기본 사용
-```bash
-# 전체 실행
-oodesign run
-```
-
-### 스크립트 직접 실행
-```bash
-uv run python .claude/skills/oodesign/scripts/token_sync.py
-```
-
-## 7. 입출력
-
-(입출력 정보는 SKILL.md 참조)
-
-## 8. 자주 묻는 질문 (FAQ)
-
-> 실전 사용 중 FAQ가 축적되면 이 섹션에 추가됩니다.
->
-> `ootutorial add-faq {skill_name} "질문" "답변"` 으로 추가 가능
-
-## 9. 서브에이전트
-
-| 단계 | 에이전트 | 모델 | 용도 | 병렬 |
-|------|----------|------|------|:----:|
-| 분석 | Explore | haiku | 레퍼런스 이미지 구조 파악 | - |
-| 생성 | oh-my-claudecode:designer | sonnet | 컴포넌트/화면 디자인 | - |
-| 검증 | oh-my-claudecode:verifier | sonnet | 디자인 원칙 준수 확인 | - |
+| 단계 | 에이전트 | 모델 | 용도 |
+|------|----------|------|------|
+| 페이지 분석 | Explore | haiku | 대상 페이지 + 기존 디자인 패턴 파악 |
+| 마이그레이션 | task-executor | sonnet | 다중 파일 일괄 변경 (도메인 단위) |
+| 시각 검증 | webapp-testing (Playwright) | sonnet | Before/After 스크린샷 비교 (선택) |
+| 정합성 감사 | task-checker | sonnet | components.css 클래스 사용 검증 |
 
 ---
 
-## 10. 관련 스킬
+## 11. 관련 스킬
 
-(관련 스킬 정보 없음)
+| 스킬/문서 | 역할 |
+|----------|------|
+| `d42500_상세설계_web_base_표준디자인시스템.md` | **SP04 web 표준 디자인 SSOT** — 토큰 카탈로그·체크리스트·DO/DON'T |
+| `oocapture` | 페이지 스크린샷 (시각 동등성 비교용) |
+| `ooreview` | 코드 리뷰 (디자인 적용 시 패턴 검증) |
+| `oocommit` | 마이그레이션 결과 커밋 + 이력 정리 |
+| `oodoc` | 디자인 가이드 문서 갱신 |
 
 ---
 
-> 생성일: 2026-04-14 11:32 | ootutorial v03
+> 생성일: 2026-05-11 | ootutorial v01

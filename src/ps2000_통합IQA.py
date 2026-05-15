@@ -96,9 +96,9 @@ CONFIG = {
         "include_hsmb": True,
         "hsmb": {
             "block_size": 64,
-            "threshold_ratio": 0.3,
-            "beta": 1.8,
-            "edge_weight": 0.8,
+            "threshold_ratio": 0.1,
+            "beta": 2.0,
+            "edge_weight": 1.5,
             "direction": "four",
         },
     },
@@ -511,14 +511,14 @@ class _HSMBCalculator:
                     profile = self._edge_profile(blk, r_loc, c_loc, dr, dc)
                     ew = self._edge_width(profile)
                     if ew is not None:
-                        p_blur = 1 - np.exp(-(abs(ew / 2.5) ** self.beta))
+                        p_blur = 1 - np.exp(-(abs(ew / 3.0) ** self.beta))
                         idx = min(int(round(float(p_blur) * 100)), 100)
                         hist[idx] += 1
                         total_edges += 1
 
         n_blks = n_row * n_col or 1
         pdf = hist / total_edges if total_edges > 0 else np.zeros(101)
-        base_hsmb = float(np.cumsum(pdf)[45])
+        base_hsmb = float(np.cumsum(pdf)[63])
         lap_score = min(1.0, (total_lap / n_blks) / self.LAPLACIAN_NORM)
         fft_score = min(1.0, (total_fft / n_blks) / self.FFT_NORM)
 

@@ -1,93 +1,66 @@
 # oodoc Tutorial
 
-> d0001~d0010 문서 생성, 최적화, 검증 자동화 | 버전: v13 | 카테고리: doc-env
+> d0001~d0010 문서 생성·업데이트·최적화·검증 자동화 | 최종 업데이트: 2026-04-29
 
-## §1 이유 (Reason)
+## 개요
 
-프로젝트 문서(PRD, 계획, 테스트, TODO, 이력 등)를 체계적으로 관리합니다.
+프로젝트의 핵심 문서(PRD·계획·테스트·TODO·이력 등) d0001~d0010을 체계적으로 생성·현행화·최적화하는 오케스트레이터 스킬. SP별 문서 현황 조회, 이력 초과 행 자동 제거, 정합성 검사까지 포함한다.
 
-## §2 빠른 시작 (Quick Start)
-
-```bash
-oodoc generate
-```
-
-현재 SP의 d0001~d0010 문서 자동 생성
-
-## §3 자주 쓰는 명령 (Frequent Commands)
+## 명령어
 
 | 명령어 | 설명 |
 |--------|------|
-| `oodoc generate` | 문서 생성 |
-| `oodoc optimize` | 최적화 |
-| `oodoc check` | 검증 |
-| `oodoc update` | 자동 갱신 |
-| `oodoc list` | 목록 |
+| `oodoc run` | d0001~d0010 문서 생성/업데이트 |
+| `oodoc run --doc [문서ID]` | 특정 문서만 생성/업데이트 |
+| `oodoc run --dry-run` | 실제 수정 없이 예정 변경 출력 |
+| `oodoc create [문서ID]` | 특정 문서 신규 생성 |
+| `oodoc update this` | 직전 작업 영향 문서 자동 업데이트 |
+| `oodoc update [--scope 범위]` | 코드 작업 후 관련 문서 자동 탐지·업데이트 |
+| `oodoc check [SP번호]` | 품질+정합성 통합 검사 |
+| `oodoc check --fix [문서ID]` | 문서 최적화 (구 optimize) |
+| `oodoc clear` | 이력 초과 행 제거 (기본 5개 유지) |
+| `oodoc clear --keep N` | N개 유지하며 이력 정리 |
+| `oodoc list [--sp N]` | SP별 문서 현황 조회 (존재/미생성 상태) |
+| `oodoc gen [--sp N]` | SP별 미생성 문서를 빈 템플릿으로 일괄 생성 |
+| `oodoc numbering` | 문서 번호 체계(SSOT) 조회 |
+| `oodoc explain [대상]` | 코드/함수/모듈 설명 생성 |
+| `oodoc status` | 서브명령어 리스트 및 현재 상태 |
 
-## §4 권장 흐름 (Recommended Flow)
-
-1. `oodoc generate` → d0001~d0010 생성
-2. 각 문서 수동 입력
-3. 코드 변경 시 `oodoc update`
-4. `oodoc check --quality` → 품질 검증
-
-## §5 전체 명령어 (All Commands)
-
-```
-oodoc help
-oodoc version
-oodoc generate [OPTIONS]
-oodoc optimize [OPTIONS]
-oodoc check [OPTIONS]
-oodoc update [--auto]
-oodoc list
-oodoc clear
-oodoc std
-```
-
-## §6 상세 사용법 (Detailed Usage)
-
-**10개 문서:**
-- d{SP}0001 — PRD
-- d{SP}0002 — 구현 계획
-- d{SP}0003 — 테스트
-- d{SP}0004 — TODO/이슈
-- d{SP}0005 — 라이브러리
-- d{SP}0006 — DB
-- d{SP}0008 — 사용자
-- d{SP}0009 — 환경
-- d{SP}0010 — 이력
-
-## §7 실전 예시 (Real Examples)
+## 주요 사용 예시
 
 ```bash
-oocontext set 02
-oodoc generate
-oodoc check --quality
-oodoc update --auto
+# 현재 SP의 전체 문서 생성/업데이트
+oodoc run
+
+# 코드 변경 후 관련 문서 자동 업데이트
+oodoc update this
+
+# 이력 5개 초과 행 정리 (전체 범위: 00_doc + skills + guides)
+oodoc clear
+
+# SP04 문서 현황 확인
+oodoc list --sp 4
+
+# PRD 문서 품질 최적화
+oodoc check --fix d40001
+
+# SP 전체 정합성 검사
+oodoc check 4
 ```
 
-## §8 입출력 (Input/Output)
+## 워크플로우
 
-**입력:** 코드 파일, 기존 문서
-**출력:** 생성된 문서, 검증 리포트
+1. `oodoc run` — PRD 로드 → 10개 문서 존재 확인 → 없는 것 생성, 있는 것 현행화
+2. `oodoc update this` — 직전 수정 파일 감지 → 영향받는 문서 자동 탐지 → 업데이트
+3. `oodoc check` — 품질 검사(구조·크기·내용) + 정합성 검사(교차 비교) → 이슈 리포트
+4. `oodoc clear` — `00_doc/**/d*.md` + skills + guides 전체에서 이력 5개 초과 행 제거
 
-## §9 FAQ
+**관련 문서 10종**: d{SP}0001 PRD / 0002 구현계획 / 0003 테스트 / 0004 TODO / 0005 라이브러리 / 0006 DB / 0008 사용자 / 0009 환경 / 0010 이력
 
-**Q: 문서가 중복되면?**
-A: 최신 버전 유지. 이전 버전은 아카이브.
+## 관련 스킬
 
-**Q: 자동 갱신이 실수할 수 있나?**
-A: 가능. `--dry-run` 으로 미리 확인.
-
-## §10 서브에이전트 (Sub-agents)
-
-- document-generator, code-analyzer, document-validator
-
-## §11 관련 스킬 (Related Skills)
-
-- `ooplan`, `ootest`, `ootodo`, `oohistory`
-
----
-
-**버전**: v13 | **카테고리**: doc-env | **업데이트**: 2026-04-14
+- `ooprd` — PRD 전담 생성/검증
+- `ooplan` — 구현 계획 전담
+- `ootodo` — TODO 관리
+- `oohistory` — 이력 아카이브
+- `ooenv` — 환경 현황(d0009)

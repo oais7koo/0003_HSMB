@@ -43,6 +43,7 @@ d  {SP 2자리}  {문서번호 4자리}  _  {문서명}.md
 | 0004 | `d{SP}0004_todo.md` | TODO / 이슈 추적 | `ootodo` |
 | 0005 | `d{SP}0005_lib.md` | 라이브러리 정보 | `oolib` |
 | 0006 | `d{SP}0006_db.md` | DB 구조 | `oodb` |
+| 0007 | `d{SP}0007_data.md` | data/ 폴더 구조·설명 | `oodata` |
 | 0008 | `d{SP}0008_user.md` | 사용자 관리 | `oouser` |
 | 0009 | `d{SP}0009_env.md` | 환경 현황 | `ooenv` |
 | 0010 | `d{SP}0010_history.md` | 변경 이력 | `oohistory` |

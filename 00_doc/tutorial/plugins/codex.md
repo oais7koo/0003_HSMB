@@ -27,15 +27,24 @@ npm install -g @openai/codex
 # 3. 플러그인 설치
 /plugin install codex@openai-codex
 
-# 4. 리로드
+# 4. 플러그인 활성화 (필수, 누락 시 명령어 안 보임)
+/plugin
+#  → Installed 메뉴 진입
+#  → 'codex' 항목이 [disabled] 상태로 표시됨
+#  → Enter 또는 Space로 토글 → [✓] enabled 변경
+#  → "✓ Enabled codex. Run /reload-plugins to apply." 메시지 확인
+
+# 5. 리로드
 /reload-plugins
 
-# 5. 셋업 확인
+# 6. 셋업 확인
 /codex:setup
 
-# 6. 로그인
+# 7. 로그인
 ! codex login
 ```
+
+> **중요**: `/plugin install` 만으로는 플러그인이 활성화되지 않는다. 설치된 플러그인은 기본 **disabled** 상태로 등록되므로 반드시 4단계 활성화 토글을 거쳐야 `/codex:*` 명령어가 자동완성에 노출된다.
 
 로그인 대안:
 ```bash
@@ -109,6 +118,40 @@ Claude가 멈출 때마다 Codex 리뷰를 자동 실행하는 기능.
 | 보안 리뷰 | - | `/codex:adversarial-review` |
 | 버그 수정 위임 | - | `/codex:rescue` |
 | 커밋 | `oocommit run` | - |
+
+## 트러블슈팅
+
+### `/codex:*` 명령어가 자동완성에 안 보임
+
+**원인**: 설치 후 플러그인이 **disabled 상태**로 등록되어 있음.
+
+**확인**:
+```bash
+# enabledPlugins 확인 (비어있으면 비활성)
+python -c "import json; d=json.load(open(r'C:/Users/USERNAME/.claude.json',encoding='utf-8')); p=d.get('projects',{}).get('현재프로젝트경로',{}); print(p.get('enabledPlugins',{}))"
+```
+
+**해결**:
+1. `/plugin` 진입 → Installed 메뉴
+2. `codex` 항목 찾기 (disabled로 표시됨)
+3. Enter/Space로 활성화 토글
+4. `/reload-plugins` 실행
+5. `/codex:setup` 자동완성 확인
+
+### 로드 시 에러 (`2 errors during load`)
+
+`/reload-plugins` 출력의 에러는 codex와 무관한 다른 플러그인 이슈일 수 있다. `/doctor` 명령으로 세부 내용 확인.
+
+### 인증 실패
+
+`/codex:setup` 결과의 `auth.loggedIn`이 `false`라면:
+```bash
+! codex login                # 브라우저 인증
+! codex login --device-auth  # 브라우저 불가 시
+! codex login --with-api-key # API 키 방식
+```
+
+---
 
 ## 주의사항
 

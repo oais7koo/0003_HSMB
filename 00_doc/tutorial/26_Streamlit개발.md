@@ -95,4 +95,4 @@ A: `oodb run`으로 DB 설계 후 Streamlit에서 연결.
 
 ---
 
-> 관련: [기본 워크플로우](11_기본개발워크플로우.md) | [DB 개발](00_doc/tutorial/14_DB포함개발.md)
+> 관련: [기본 워크플로우](11_기본개발워크플로우.md) | [DB 개발](.claude/tutorial/14_DB포함개발.md)

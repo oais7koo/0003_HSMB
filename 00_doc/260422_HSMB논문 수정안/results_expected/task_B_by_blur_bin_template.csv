@@ -1,4 +1,0 @@
-bin,bew_low,bew_high,n_images,precision_mean,recall_mean,f1_mean,f1_sd
-Low,0.0,4.0,,,,,
-Mid,4.0,5.5,,,,,
-High,5.5,10.0,,,,,

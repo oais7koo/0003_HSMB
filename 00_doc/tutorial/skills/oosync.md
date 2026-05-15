@@ -108,7 +108,7 @@ oosync help
 | `.mcp.json` | MCP 서버 설정 파일 |
 | `.omc/project-memory.json` | OMC 프로젝트 메모리 (세션 간 누적) |
 | `pyproject.toml` | uv 의존성/프로젝트 설정 |
-| `00_doc/tutorial/` | 튜토리얼 문서 (ootutorial 생성) |
+| `.claude/tutorial/` | 튜토리얼 문서 (ootutorial 생성) |
 | `cclaude.bat` | Windows Claude 실행 스크립트 |
 | `cclaude.sh` | Linux/Mac Claude 실행 스크립트 |
 | `qqlaude.bat` | Windows Ollama qwen3.5 Claude 실행 스크립트 |
@@ -150,7 +150,7 @@ YYMMDD-HHMMSS.zip
 
 **루트 설정**: CLAUDE.md, .mcp.json, .claudeignore, cclaude.bat, cclaude.sh
 
-**문서**: 00_doc/tutorial/
+**문서**: .claude/tutorial/
 
 **참고**: `v/`는 레거시 폴더로, 최초 삭제 후 동기화 대상에서 제외
 

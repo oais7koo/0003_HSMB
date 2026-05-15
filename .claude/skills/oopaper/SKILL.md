@@ -28,6 +28,9 @@ metadata:
 - v06 2026-04-29 — 문서 템플릿 신설, 한글 번역 2단계(Gemma 1차 → Claude 검수)
 - v05 2026-04-29 — `oopaper_auto.py` 신설 (organize/dedup/meta/ref-match-fuzzy)
 - v04 2026-04-29 — Phase 순서 변경, 5단계 상태 체계 도입
+- v03 2026-04-18 — `--gemma` 플래그
+- v02 2026-03-29 — extend 명령어 추가
+- v01 2026-03-24 — 문서이력 섹션 추가
 
 ---
 

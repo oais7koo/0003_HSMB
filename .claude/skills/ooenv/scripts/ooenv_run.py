@@ -126,13 +126,13 @@ PLUGIN_NAMES = [
     "code-review", "commit-commands", "frontend-design", "feature-dev",
     "context7", "serena", "claude-mem", "playwright", "typescript-lsp",
     "pyright-lsp", "security-guidance", "paper-search-tools", "oh-my-claudecode", "pencil",
-    "codex", "andrej-karpathy-skills"
+    "codex", "andrej-karpathy-skills", "superpowers"
 ]
 
 # 필수 플러그인 목록 (나머지는 선택)
 PLUGIN_REQUIRED = {
     "code-review", "commit-commands", "oh-my-claudecode", "context7", "pyright-lsp",
-    "andrej-karpathy-skills"
+    "andrej-karpathy-skills", "superpowers", "codex"
 }
 
 # 플러그인 설치 명령어 (§11 누락 시 안내용)
@@ -152,6 +152,7 @@ PLUGIN_INSTALL_CMDS = {
     "oh-my-claudecode": "/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode → /plugin install oh-my-claudecode → /oh-my-claudecode:omc-setup",
     "codex": "/plugin marketplace add openai/codex-plugin-cc → /plugin install codex@openai-codex → /codex:setup → ! codex login",
     "andrej-karpathy-skills": "/plugin marketplace add forrestchang/andrej-karpathy-skills → /plugin install andrej-karpathy-skills@forrestchang-andrej-karpathy-skills",
+    "superpowers": "/plugin marketplace add obra/superpowers-marketplace → /plugin install superpowers@superpowers-marketplace",
 }
 
 # Claude skill names for O/X status check (details in template)
@@ -2276,6 +2277,23 @@ def run_full_check(args: list) -> int:
             print(f"  - {p}")
             print(f"      → {cmd}")
         issues_found += len(missing_plugins)
+
+        # 첫 번째 미설치 플러그인의 설치 명령을 클립보드에 복사 (Windows clip.exe)
+        first = missing_plugins[0]
+        first_cmd = PLUGIN_INSTALL_CMDS.get(first, "")
+        if first_cmd:
+            try:
+                proc = subprocess.run(
+                    ["clip.exe"], input=first_cmd, text=True, encoding="utf-8",
+                    timeout=5, check=False,
+                )
+                if proc.returncode == 0:
+                    print(f"\n[CLIPBOARD] '{first}' 설치 명령 클립보드 복사 완료")
+                    print(f"  → Claude Code 입력창에 붙여넣기(Ctrl+V) 후 실행하세요.")
+                else:
+                    print(f"[INFO] 클립보드 복사 실패 (clip.exe rc={proc.returncode}) — 위 명령을 직접 복사하세요.")
+            except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+                print(f"[INFO] 클립보드 복사 건너뜀 ({type(e).__name__}) — 위 명령을 직접 복사하세요.")
     else:
         print(f"[OK] 필수 플러그인 {len(PLUGIN_REQUIRED)}개 모두 설치됨")
 

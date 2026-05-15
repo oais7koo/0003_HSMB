@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "cpbd>=1.0.7",
     "matplotlib>=3.10.8",
     "opencv-python-headless>=4.13.0.92",
     "openpyxl>=3.1.5",

@@ -45,10 +45,10 @@ ootutorial help
 | 항목 | 내용 |
 |------|------|
 | **핵심 역할** | OAIS 환경(스킬·명령어·플러그인)에 대한 튜토리얼 문서 생성·관리 |
-| **하는 것** | `00_doc/tutorial/` 튜토리얼 MD 파일 생성, 기존 튜토리얼 현행화 |
+| **하는 것** | `.claude/tutorial/` 튜토리얼 MD 파일 생성, 기존 튜토리얼 현행화 |
 | **하지 않는 것** | 사용자 가이드(→oouser), API 문서(→oodoc), 코드 수정(→oodev) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (스킬 문서, 가이드) / 외부 프로젝트 자동 포함 안 함 |
-| **수정 대상** | `00_doc/tutorial/*.md` |
+| **수정 대상** | `.claude/tutorial/*.md` |
 | **실행 레벨** | [반자동] — 튜토리얼 주제 확인 후 작성 |
 | **에이전트 호환** | Claude Code 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
 
@@ -72,7 +72,7 @@ ootutorial help
 ## 7. 입출력
 
 ```
-00_doc/tutorial/
+.claude/tutorial/
 ├── README.md                    # 전체 목차 (인덱스)
 ├── 00_overview.md               # 프로젝트 전체 사용법
 ├── skills/                      # oo 스킬 튜토리얼
@@ -105,7 +105,7 @@ ootutorial help
 
 ## 10. 관련 스킬
 
-`.claude/skills/ootutorial/scripts/ootutorial_run.py` | `.claude/skills/oohelp/SKILL.md` | `00_doc/tutorial/README.md`
+`.claude/skills/ootutorial/scripts/ootutorial_run.py` | `.claude/skills/oohelp/SKILL.md` | `.claude/tutorial/README.md`
 
 ---
 

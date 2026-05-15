@@ -28,6 +28,7 @@
 ## ccporting 운영 규칙
 
 - `ccporting` 포팅/업데이트 기본 경로는 `.agents/skills/`를 사용한다.
+- `.claude/skills_to_codex/`는 권한/환경 이슈 시에만 임시 우회 경로로 사용한다.
 - 포팅 후 확인/검토/검증 기준 경로는 `.agents/skills/`로 고정한다.
 
 ## 문서 규칙

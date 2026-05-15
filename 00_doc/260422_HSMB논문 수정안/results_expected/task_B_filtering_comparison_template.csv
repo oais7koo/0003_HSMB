@@ -1,4 +1,0 @@
-scheme,threshold,n_images,pass_ratio,precision,recall,f1
-unfiltered,,,1.0,,,
-T=0.63,0.63,,,,,
-T=optimal,,,,,,

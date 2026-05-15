@@ -68,6 +68,8 @@ class EnvironmentInfo:
 REQUIRED_PLUGINS = [
     'oh-my-claudecode',
     'context7',
+    'superpowers',
+    'codex',
 ]
 
 

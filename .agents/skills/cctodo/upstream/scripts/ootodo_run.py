@@ -94,6 +94,82 @@ def get_history_file(sp: str = "00") -> Path:
     return doc_dir / f"d{doc_num}_history.md"
 
 
+def get_todo_dir(sp: str = "00") -> Path:
+    """ToDo 상세 폴더 경로 반환 (00_doc/sp{NN}/todo/). 존재 여부와 무관하게 경로 반환."""
+    return get_sp_doc_dir(sp) / "todo"
+
+
+def get_todo_detail_file(sp: str, todo_id: str) -> Path:
+    """ToDo ID에 대응하는 상세 파일 경로 (todo/{ID}.md)."""
+    return get_todo_dir(sp) / f"{todo_id}.md"
+
+
+def create_todo_detail_file(sp: str, todo_id: str, title: str, priority: str = "medium") -> Path | None:
+    """todo/{ID}.md 상세 파일을 _template.md 기반으로 생성.
+
+    이미 파일이 존재하거나 todo 폴더가 없으면 None 반환.
+    템플릿 부재 시 최소 헤더만 작성.
+    """
+    todo_dir = get_todo_dir(sp)
+    if not todo_dir.exists():
+        return None  # 폴더 미도입 SP는 건너뜀 (인덱스만 사용)
+
+    detail_path = todo_dir / f"{todo_id}.md"
+    if detail_path.exists():
+        return detail_path  # 이미 존재하면 그대로 반환 (idempotent)
+
+    template_path = todo_dir / "_template.md"
+    if template_path.exists():
+        body = template_path.read_text(encoding="utf-8")
+        # 템플릿의 플레이스홀더 치환
+        body = body.replace("{ID}", todo_id, 1)
+        body = body.replace("{제목}", title, 1)
+        body = body.replace("{HIGH/MED/LOW/WARNING/ERROR/CRITICAL}", priority, 1)
+        body = body.replace("{OPEN/IN_PROGRESS/HOLD/DONE}", "OPEN", 1)
+        body = body.replace("{YYYY-MM-DD}", get_today(), 1)
+    else:
+        body = (
+            f"# {todo_id} — {title}\n\n"
+            f"> 우선순위: {priority} | 상태: OPEN | 등록: {get_today()}\n\n"
+            f"## 1. 배경 / 문제\n\n(작성 필요)\n\n"
+            f"## 2. 작업 범위\n\n(작성 필요)\n\n"
+            f"## 6. 완료 기준 (DoD)\n\n- [ ] (작성 필요)\n"
+        )
+
+    detail_path.write_text(body, encoding="utf-8")
+    return detail_path
+
+
+def mark_todo_detail_done(sp: str, todo_id: str, commit_hash: str = "") -> bool:
+    """todo/{ID}.md 헤더의 `상태: OPEN/IN_PROGRESS` 표기를 DONE으로 갱신.
+
+    파일 없거나 헤더 패턴 미일치 시 False 반환.
+    """
+    detail_path = get_todo_detail_file(sp, todo_id)
+    if not detail_path.exists():
+        return False
+
+    content = detail_path.read_text(encoding="utf-8")
+    today = get_today()
+    commit_part = f" | 완료 커밋: {commit_hash}" if commit_hash else ""
+
+    # 헤더 패턴: `> 우선순위: ... | 상태: ... | 등록: YYYY-MM-DD` (등록일 이후 기존 완료 표기는 group 4로 캡쳐 후 폐기 → 중복 방지)
+    pattern = re.compile(
+        r"^(>\s*우선순위:\s*[^|]+\|\s*상태:\s*)([^|]+?)(\s*\|\s*등록:\s*\d{4}-\d{2}-\d{2})[^\n]*$",
+        re.MULTILINE,
+    )
+    new_content, n = pattern.subn(
+        lambda m: f"{m.group(1)}DONE{m.group(3)} | 완료일: {today}{commit_part}",
+        content,
+        count=1,
+    )
+    if n == 0:
+        return False
+
+    detail_path.write_text(new_content, encoding="utf-8")
+    return True
+
+
 def get_today() -> str:
     return datetime.now().strftime("%Y-%m-%d")
 
@@ -667,11 +743,16 @@ def cmd_add(text: str, priority: str = "medium", note: str = "-", sp: str = "00"
     new_content, new_id = add_todo_to_waiting(content, text, priority, note)
     todo_file.write_text(new_content, encoding="utf-8")
 
+    # todo/ 폴더가 존재하면 상세 파일 자동 생성 (idempotent)
+    detail_path = create_todo_detail_file(sp, new_id, text, priority)
+
     print("# ootodo add - Todo 추가 완료\n")
     print(f"[OK] {new_id} 추가됨\n")
     print(f"### {new_id} {text}")
     print(f"등록일: {get_today()} | 우선순위: {priority}")
-    print(f"\n파일: {todo_file.relative_to(PROJECT_ROOT)}")
+    print(f"\n인덱스: {todo_file.relative_to(PROJECT_ROOT)}")
+    if detail_path is not None:
+        print(f"상세  : {detail_path.relative_to(PROJECT_ROOT)} (편집 권장)")
 
 
 def cmd_add_and_run(text: str, priority: str = "medium", note: str = "-", sp: str = "00"):
@@ -1148,7 +1229,13 @@ def main():
             print(f"[ERROR] {todo_id} 항목을 찾을 수 없습니다.")
             return
         todo_file.write_text(new_content, encoding="utf-8")
+
+        # 상세 파일이 있으면 헤더에 DONE 표기
+        detail_marked = mark_todo_detail_done(sp_val, todo_id)
+        detail_msg = "상세 파일 DONE 표기 완료" if detail_marked else "상세 파일 없음 (스킵)"
+
         print(f"# ootodo complete\n\n[OK] {todo_id} → 완료 ToDo 섹션으로 이동됨")
+        print(f"     {detail_msg}")
         return
 
     if subcommand == "add":

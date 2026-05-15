@@ -44,7 +44,7 @@ STAGE_ICON = {
     "기획": "⚪", "설계": "🔵", "개발": "🟡",
     "검증": "🟢", "완료": "✅", "미착수": "⬜",
 }
-LINKED_SKILLS = ["oofeature", "oodev", "oocheck", "oofix", "oodoc", "oohistory", "oocommit"]
+LINKED_SKILLS = ["oofeature", "oodev", "oocheck", "ooreview", "oofix", "oodoc", "oohistory", "oocommit"]
 
 
 # ── SP 유틸 ─────────────────────────────────────────────────────
@@ -264,7 +264,7 @@ def build_plan(sp: int, until: Optional[str], feature_id: Optional[str]) -> dict
     return {'targets': targets, 'sp': sp, 'until': until_stage}
 
 
-def print_run_instructions(plan: dict, interactive: bool = False):
+def print_run_instructions(plan: dict, interactive: bool = False, review_enabled: bool = True):
     """Claude 오케스트레이션용 실행 지시 출력"""
     sp = plan['sp']
     targets = plan['targets']
@@ -311,13 +311,19 @@ def print_run_instructions(plan: dict, interactive: bool = False):
         for s in remaining:
             if s == "기획":
                 print(f"  [{step:02d}] oofeature next {doc_id}   # 상세기획 생성")
+                step += 1
             elif s == "설계":
                 print(f"  [{step:02d}] oofeature next {doc_id}   # 기획→설계 전환")
+                step += 1
             elif s == "개발":
                 print(f"  [{step:02d}] oodev run {doc_id}")
+                step += 1
             elif s == "검증":
-                print(f"  [{step:02d}] oocheck run {doc_id}")
-            step += 1
+                print(f"  [{step:02d}] oocheck run {doc_id}   # 정적 분석")
+                step += 1
+                if review_enabled:
+                    print(f"  [{step:02d}] ooreview run {doc_id}   # AI 리뷰 (설계·보안·품질 + Codex 2차)")
+                    step += 1
 
         if until == "완료" or until not in STAGE_ORDER:
             print(f"  [{step:02d}] oofeature next {doc_id}   # 완료 처리")
@@ -334,11 +340,48 @@ def print_run_instructions(plan: dict, interactive: bool = False):
     print(f"  [{step:02d}] oocommit run   # 최종 커밋")
     print()
     if interactive:
-        print("  ※ CRITICAL 이슈 발생 시: oofix run → oocheck run 재검증 (최대 3회)")
+        print("  ※ oocheck CRITICAL 이슈 발생 시: oofix run → oocheck run 재검증 (최대 3회)")
+        if review_enabled:
+            print("  ※ ooreview CRITICAL/ERROR 발생 시: oofix run → ooreview run 재검증 (최대 2회)")
         print("  ※ --interactive 모드: CRITICAL 3회 실패 시 사용자에게 확인 요청")
     else:
-        print("  ※ CRITICAL/ERROR → oofix run 자동 실행 → 재검증 (최대 3회)")
+        print("  ※ oocheck CRITICAL/ERROR → oofix run 자동 실행 → 재검증 (최대 3회)")
+        if review_enabled:
+            print("  ※ ooreview CRITICAL/ERROR → oofix run 자동 실행 → 재검증 (최대 2회)")
         print("  ※ WARNING → d{SP}0004_todo.md 등록 후 계속 진행")
+    if not review_enabled:
+        print("  ※ --no-review: ooreview 단계 생략됨 (모든 Feature)")
+
+    # ── ooflow 완료 후 권장 사항 ─────────────────────────────────
+    print()
+    print("─" * 60)
+    print("[ooflow 완료 후 권장 — 수동 Codex 리뷰]")
+    print("─" * 60)
+    print("  [A] /codex:review              → 일반 리뷰 (설계·버그·개선)")
+    print("      • Codex 인터랙티브 UI에서 변경분 전체 종합 검토")
+    print("      • 자동 ooreview(codex:rescue read-only)와 별개")
+    print("      • 풍부한 UI: 인라인 코드 인용, 색상 표시")
+    print("      • 권장 시점: Phase/마일스톤 종료, PR 작성 전 self-review")
+    print("      • 옵션: --wait (작은 변경) / --background (큰 변경)")
+    print()
+    print("  [B] /codex:adversarial-review  → 보안 특화 (공격적 7개 면)")
+    print("      • 적대적 관점에서 7개 공격 면 체계적 검토")
+    print("        1) 인증/권한       2) 데이터 손실    3) 롤백 안전성")
+    print("        4) 레이스 컨디션   5) 빈 상태 엣지   6) 버전 스큐")
+    print("        7) 관찰성 갭(로깅·모니터링)")
+    print("      • 필수 적용 시점:")
+    print("        - 인증·세션·토큰 처리 변경")
+    print("        - 결제·금융·개인정보 처리 변경")
+    print("        - 외부 API 노출 (REST/GraphQL endpoint 추가)")
+    print("        - DB 스키마 마이그레이션")
+    print("        - 프로덕션 배포 직전")
+    print("      • 비용 주의: /codex:review 보다 토큰 소모 큼")
+    print()
+    print("  사용 가이드:")
+    print("    일반 기능       → [A] /codex:review")
+    print("    보안 민감       → [B] /codex:adversarial-review (필수)")
+    print("    Phase 종료      → [A] → [B] 둘 다 권장")
+    print("    상세 안내       → 00_doc/tutorial/11_SW개발워크플로우.md §6.5")
 
 
 def _print_skill_help():
@@ -404,6 +447,7 @@ def main():
         dry_run = "--dry-run" in args
         yes_mode = "--yes" in args
         interactive = "--interactive" in args
+        review_enabled = "--no-review" not in args
         sp_arg = args[args.index("--sp") + 1] if "--sp" in args else None
         until = args[args.index("--until") + 1] if "--until" in args else None
         feature_id = args[args.index("--feature") + 1] if "--feature" in args else None
@@ -424,7 +468,7 @@ def main():
                 print("실행 취소.")
                 return
 
-        print_run_instructions(plan, interactive=interactive)
+        print_run_instructions(plan, interactive=interactive, review_enabled=review_enabled)
         return
 
     print(f"알 수 없는 서브명령어: {args[0]}")
