@@ -1,0 +1,38 @@
+ps3010__e3_1_ps1010_iqa_2605171520
+
+============================================================
+설정 정보
+============================================================
+입력 디렉토리: D:\doom\3_code\0003_HSMB\data/ps1010_chungsong_MTF
+출력 디렉토리: D:\doom\3_code\0003_HSMB\data/ps3010
+디바이스: cpu
+pyiqa 가용: True / cpbd 가용: True
+============================================================
+
+조건 수: 50
+[RESUME] 완료된 이미지 94장 로드
+전체 이미지 수: 520
+============================================================
+IQA 산출 시작
+============================================================
+조건 처리:   0%|          | 0/50 [00:00<?, ?it/s]D:\doom\3_code\0003_HSMB\.venv\Lib\site-packages\pyiqa\api_helpers.py:65: ResourceWarning: unclosed file <_io.TextIOWrapper name='D:\\doom\\3_code\\0003_HSMB\\.venv\\Lib\\site-packages\\pyiqa/default_dataset_configs.yml' mode='r' encoding='cp949'>
+  dataset_info = yaml.safe_load(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+D:\doom\3_code\0003_HSMB\.venv\Lib\site-packages\torch\hub.py:898: UserWarning: 'torch.load' received a zip file that looks like a TorchScript archive dispatching to 'torch.jit.load' (call 'torch.jit.load' directly to silence this warning)
+  return torch.load(cached_file, map_location=map_location, weights_only=weights_only)
+D:\doom\3_code\0003_HSMB\.venv\Lib\site-packages\torch\jit\_serialization.py:176: DeprecationWarning: `torch.jit.load` is deprecated. Please switch to `torch.export`.
+  warnings.warn(
+조건 처리:  18%|#8        | 9/50 [00:23<01:45,  2.58s/it]
+Loading pretrained model SCNN from C:\Users\oaiskoo\.cache\torch\hub\pyiqa\DBCNN_scnn-7ea73d75.pth
+Loading pretrained model DBCNN from C:\Users\oaiskoo\.cache\torch\hub\pyiqa\DBCNN_KonIQ10k-2de81c0a.pth
+Traceback (most recent call last):
+  File "D:\doom\3_code\0003_HSMB\src\ps3010_e3_1_ps1010_iqa.py", line 350, in <module>
+    main()
+    ~~~~^^
+  File "D:\doom\3_code\0003_HSMB\src\ps3010_e3_1_ps1010_iqa.py", line 281, in main
+    save_checkpoint(all_rows, checkpoint_path)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\doom\3_code\0003_HSMB\src\ps3010_e3_1_ps1010_iqa.py", line 196, in save_checkpoint
+    os.replace(tmp_path, path)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] 액세스가 거부되었습니다: 'D:\\doom\\3_code\\0003_HSMB\\data/ps3010/_checkpoint.csv.tmp' -> 'D:\\doom\\3_code\\0003_HSMB\\data/ps3010/_checkpoint.csv'

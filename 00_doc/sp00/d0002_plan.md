@@ -20,13 +20,13 @@
 | 대상 트랙 | **Track 1만** (재투고) — Track 2(v2 알고리즘 개선)는 별도 plan으로 분리 |
 | 구현 관점 목적 | v1 알고리즘 동결 상태에서 **Reviewer C3·C4 대응 근거**와 **신규 실험 결과**를 산출하여 논문 재작성 가능 상태로 만든다 |
 | 우선순위 | Phase 1 (분석) ‖ Phase 1.5 (실험) → Phase 2 (보강) → Phase 3 (협업 통합, 외부 트리거) → Phase 4 (작성) |
-| Out-of-Scope | F04, F05 (v2 알고리즘) — Track 2 / F13 (추가 데이터셋) — TBD |
+| Out-of-Scope | HSMB v2 알고리즘 — 조건부 후속 (PRD TBD-4, v1 재투고 후 상관성 미달 시 검토) / F13 (추가 데이터셋) — TBD |
 
 ---
 
 ## 3. WBS — Epic / Feature / Task
 
-> PRD §5 기능요구사항(F01~F15) 기반 분해. F04, F05는 Track 2 이관으로 제외.
+> PRD §5 기능요구사항(F01~F16) 기반 분해. HSMB v2 알고리즘은 조건부 후속(PRD TBD-4)으로 본 plan 범위에서 제외.
 
 ### E001. v1 기반 분석 (Phase 1)
 
@@ -67,10 +67,10 @@
 | F002-1     | E1-1 NR-IQA 측정 (47조건) | F14a   | Must | ⚪ ← **다음 작업** |
 | F002-2     | E1-2 BEW 상관 분석        | F14b   | Must | ⚪             |
 | F002-3     | E2 HSMB-크랙검출 상관       | F15    | Must | ⚪             |
-| F002-4     | E3-1 ps1010 IQA 분석    | F16a   | Must | ⚪             |
-| F002-5     | E3-2 ps1301 IQA 분석    | F16b   | Must | ⚪             |
-| F002-6     | E3-3 ps1302 IQA 분석    | F16c   | Must | ⚪             |
-| F002-7     | E3-4 ps1010+ps1301 통합 풀 IQA | F16d | Must | ⚪          |
+| F002-4     | E3-1 ps1010 IQA 분석    | F16a   | Must | ✅             |
+| F002-5     | E3-2 ps1301 IQA 분석    | F16b   | Must | ✅             |
+| F002-6     | E3-3 ps1302 IQA 분석    | F16c   | Must | ✅             |
+| F002-7     | E3-4 ps1010+ps1301 통합 풀 IQA | F16d | Must | ✅          |
 
 #### F002-1. E1-1 NR-IQA 측정 (다음 작업)
 
@@ -344,10 +344,10 @@ tests/                            # pytest (신규)
 | F002-1 | E1-1 NR-IQA 측정 | E002 | Must | F14a | ⚪ ← 다음 |
 | F002-2 | E1-2 BEW 상관 분석 | E002 | Must | F14b | ⚪ |
 | F002-3 | E2 HSMB-크랙검출 상관 | E002 | Must | F15 | ⚪ |
-| F002-4 | E3-1 ps1010 IQA 분석 | E002 | Must | F16a | ⚪ |
-| F002-5 | E3-2 ps1301 IQA 분석 | E002 | Must | F16b | ⚪ |
-| F002-6 | E3-3 ps1302 IQA 분석 | E002 | Must | F16c | ⚪ |
-| F002-7 | E3-4 ps1010+ps1301 통합 풀 IQA | E002 | Must | F16d | ⚪ |
+| F002-4 | E3-1 ps1010 IQA 분석 | E002 | Must | F16a | ✅ |
+| F002-5 | E3-2 ps1301 IQA 분석 | E002 | Must | F16b | ✅ |
+| F002-6 | E3-3 ps1302 IQA 분석 | E002 | Must | F16c | ✅ |
+| F002-7 | E3-4 ps1010+ps1301 통합 풀 IQA | E002 | Must | F16d | ✅ |
 | F003-1 | v1 50조건 벤치마크 | E003 | Must | F06 | ⚪ |
 | F003-2 | Complex-blur stress test | E003 | Should | F11 | ⚪ |
 | F004-1 | downstream 분석 지원 | E004 | Must | F07 | ⚪ blocked |
@@ -371,10 +371,10 @@ tests/                            # pytest (신규)
 | d9040 | E1-1 NR-IQA 측정 | ⚪ | F002-1 | `d9040_상세기획_E1_1_NR_IQA_측정.md` |
 | d9050 | E1-2 BEW 상관 분석 | ⚪ | F002-2 | `d9050_상세기획_E1_2_BEW_상관_분석.md` |
 | d9060 | E2 HSMB-크랙검출 상관 | ⚪ | F002-3 | `d9060_상세기획_E2_HSMB_크랙검출_상관.md` |
-| d3010 | E3-1 ps1010 IQA 분석 | ⚪ | F002-4 | `d3010_상세기획_E3_1_ps1010_IQA.md` |
-| d2080 | E3-2 ps1301 IQA 분석 | ⚪ | F002-5 | `d2080_상세기획_E3_2_ps1301_IQA.md` (예정) |
-| d2090 | E3-3 ps1302 IQA 분석 | ⚪ | F002-6 | `d2090_상세기획_E3_3_ps1302_IQA.md` (예정) |
-| d2100 | E3-4 ps1010+ps1301 통합 풀 IQA | ⚪ | F002-7 | `d2100_상세기획_E3_4_pool_IQA.md` (예정) |
+| d3010 | E3-1 ps1010 IQA 분석 | ✅ | F002-4 | `d3010_상세구현_E3_1_ps1010_IQA.md` |
+| d3020 | E3-2 ps1301 IQA 분석 | ✅ | F002-5 | `d3020_상세구현_E3_2_ps1301_IQA.md` |
+| d3030 | E3-3 ps1302 IQA 분석 | ✅ | F002-6 | `d3030_상세구현_E3_3_ps1302_IQA.md` |
+| d3040 | E3-4 ps1010+ps1301 통합 풀 IQA | ✅ | F002-7 | `d3040_상세구현_E3_4_pool_IQA.md` |
 | d9070 | v1 50조건 벤치마크 | ⚪ | F003-1 | `d9070_상세기획_v1_50조건_벤치마크.md` |
 | d9080 | Complex-blur stress test | ⚪ | F003-2 | `d9080_상세기획_complex_blur_stress_test.md` |
 | d9090 | downstream 분석 지원 | ⚪ | F004-1 | `d9090_상세기획_downstream_분석_지원.md` |

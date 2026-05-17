@@ -26,6 +26,37 @@
 !/00_doc/**
 !/src/
 !/src/**
+!/scripts/
+!/scripts/**
+
+# E3 실험 결과 (ps3010~3040)
+!/data/
+!/data/ps3010/
+!/data/ps3010/**
+!/data/ps3020/
+!/data/ps3020/**
+!/data/ps3030/
+!/data/ps3030/**
+!/data/ps3040/
+!/data/ps3040/**
+# 체크포인트 파일 제외 (중간 파일)
+data/ps3010/_checkpoint*.csv
+data/ps3020/_checkpoint*.csv
+data/ps3030/_checkpoint*.csv
+data/ps3040/_checkpoint*.csv
+data/ps3040/_checkpoint*.json
+
+# 프로젝트 루트 파일 (전체)
+!/.env
+!/.gitattributes
+!/.python-version
+!/0003_HSMB.code-workspace
+!/GEMINI.md
+!/README.md
+!/ccodex.bat
+!/ps2010_v1_hsmb_recalc.py
+!/uv.lock
+!/verify_hsmb_d0900.py
 
 # Generated files (제외)
 **/__pycache__/
