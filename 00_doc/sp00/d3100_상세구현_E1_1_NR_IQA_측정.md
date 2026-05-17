@@ -143,12 +143,12 @@ condition | lux | iso | shutter_us | speed_kmh | is_defocus | frame
 
 | Task ID | 내용 | 산출물 | 우선순위 | 상태 |
 |---------|------|--------|---------|------|
-| T01 | `ps3100_e1_1_ps1204_iqa.py` 스크립트 작성 | `src/ps3100_e1_1_ps1204_iqa.py` | Must | ⬜ |
-| T02 | `.gitignore`에 `data/ps3100/` 화이트리스트 추가 | `.gitignore` | Must | ⬜ |
-| T03 | 스크립트 실행 (GPU 우선, 470장 예상 30~60분) | `data/ps3100/` 산출물 | Must | ⬜ |
-| T04 | 결과 검증 — 조건 수 47, 행 수 470 확인 | — | Must | ⬜ |
-| T05 | d0040 결과 리포트 문서 작성 | `00_doc/sp00/d0040_e1_scores.md` | Must | ⬜ |
-| T06 | d0002_plan.md F002-1 상태 ⚪→✅ 업데이트 | plan.md | Must | ⬜ |
+| T01 | `ps3100_e1_1_ps1204_iqa.py` 스크립트 작성 | `src/ps3100_e1_1_ps1204_iqa.py` | Must | ✅ |
+| T02 | `.gitignore`에 `data/ps3100/` 화이트리스트 추가 | `.gitignore` | Must | ✅ |
+| T03 | 스크립트 실행 (GPU 우선, 470장 ~20분) | `data/ps3100/` 산출물 | Must | ✅ dsr=2605180743 |
+| T04 | 결과 검증 — 조건 수 47, 행 수 470 확인 | — | Must | ✅ |
+| T05 | d0040 결과 리포트 문서 작성 | `00_doc/sp00/d0040_e1_1_ps1204_iqa_report.md` | Must | ✅ |
+| T06 | d0002_plan.md F002-1 상태 ⚪→✅ 업데이트 | plan.md | Must | ✅ |
 
 ---
 
@@ -193,7 +193,9 @@ condition | lux | iso | shutter_us | speed_kmh | is_defocus | frame
 
 | 항목 | 내용 |
 |------|------|
-| 현재 단계 | 🔵설계 완료 — 스크립트 작성 대기 |
+| 현재 단계 | ✅완료 — 470장 IQA 산출, dsr=2605180743 |
+| 실행시간 | 1,229초 (~20분), --resume 재개 포함 |
+| 비고 | 32번째 조건 완료 후 PermissionError 발생 → save_checkpoint 비치명적 처리로 수정 후 재개 |
 
 ---
 

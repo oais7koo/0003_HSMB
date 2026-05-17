@@ -10,11 +10,14 @@
 - [TODO] [medium] NIQE/PIQE/BRISQUE 정식 메트릭으로 교체 — `src/ps2000_통합IQA.py:316-345` 세 메트릭 모두 간이 구현(NSS·SVR·블록통계 미적용). `pyiqa.create_metric("niqe"|"brisque")` 도입, PIQE는 MATLAB 또는 대체 라이브러리 조사 필요 (2026-05-15 추가)
 - [TODO] [medium] 출력 CSV 컬럼명 d0100 §6.1 표준 헤더 매핑 — 현재 `niqe_simple`/`piqe_simple`/`dl_dbcnn`/`dl_arniqa` → 표준 `niqe`/`piqe`/`dbcnn`/`arniqa`로 통일. F002-1 산출물 호환성 확보 (2026-05-15 추가)
 - [TODO] [low] F002-1 산출 CSV 7종 선별 — v04는 23개 NR 메트릭 계산 중. `task_A_metrics_per_frame.csv`/`task_A_metrics_per_condition.csv` 산출 시 d0100 §6.1 헤더(hsmb,cpbd,niqe,piqe,brisque,dbcnn,arniqa) 7종만 추출하는 필터/리포터 구현 (2026-05-15 추가)
-- [TODO] [low] d3010 §9 결과 해석 및 d0043 리포트 작성 — ps3011 상관분석 완료. HSMB↔MTF50_H PLCC=-0.44 (방향 불일치 해석 필요), arniqa↔R1090_H PLCC=-0.69 가장 강함. IQA 51조건 중 SFR 50조건 매칭(1개 불일치 확인 필요). 산출: `e3_1_sfr_metrics.csv`/`e3_1_correlation.csv`/scatter 2종 (2026-05-17 추가)
+- [TODO] [medium] HSMB↔MTF50 방향 불일치 원인 분석 — d0043 §5.2.3 발견: HSMB(높을수록 선명)와 MTF50_H PLCC=-0.438로 이론적 기대와 반대 방향. ISO=400 defocus 102장 제외 부분집합(N≈40조건) 재분석 필요. 출처: d0043 §8 후속과제 (2026-05-18 추가)
 - [TODO] [low] [검토] DBCNN·ARNIQA 커스텀 IQA 모델(파인튜닝) 가능성 검토 — 현재 `common_iqa7.py`는 pyiqa pretrained(DBCNN=KonIQ10k, ARNIQA) 그대로 사용. 원 모델 backbone 다운로드 → 터널 모션블러 도메인 데이터로 파인튜닝 → 커스텀 IQA 모델로 지표 측정 가능 여부 검토. 검토 항목: ① MOS/품질 라벨 데이터 확보 방안 ② pyiqa 파인튜닝·재학습 지원 여부 ③ 논문 재투고 시 표준 pretrained 대비 커스텀 모델의 정당성·재현성 (2026-05-17 추가, 검토)
 
 ## 완료 (→ d0010_history.md)
 
+- [DONE] ps3100 E1-1 ps1204 터널표준영상 IQA 분석 완료 — 47조건 470장 9종 NR-IQA 산출(center_crop=False). hsmb 평균=0.8316. 산출물: `data/ps3100/01~04_*_2605180743.{xlsx,png}`. 실행시간 1,229초, PermissionError 발생 → save_checkpoint 비치명적 처리 후 --resume 재개 완료 (2026-05-18 완료)
+- [DONE] ps3020/ps3030 center crop 50% 적용 — ps1301/ps1302 대용량 대응. 전체 이미지 대신 가로·세로 가운데 50%(면적 25%) crop 후 IQA 산출. `common_iqa7.center_crop_half()` 추가 + `compute_all_from_path(center_crop=True)`. ps3040은 concat이라 코드 불변. d3020·d3030·d3040(v04~v05)·d0002_plan(v03) 반영 (2026-05-18 완료)
+- [DONE] d3010 §9 SFR↔IQA 결과 해석 및 d0043 리포트 작성 완료 — ps3011 상관분석 → d0043 통합 리포트(IQA 분포 + SFR 상관 N=50). 핵심: arniqa↔MTF50_H PLCC=+0.84(최강), HSMB↔MTF50 방향 불일치 발견 → 후속 분석 별도 TODO 등록 (2026-05-18 완료)
 - [DONE] ps3040 E3-4 ps1010+ps1301 통합 풀 IQA 완료 — E3-1(520행)+E3-2(737행) concat → 1,257행. 산출물: `data/ps3040/01_통합풀데이터_2605180538.xlsx`, `02_source별통계_*.xlsx`, `04_histogram_*.png`. 실행시간 1.44초 (IQA 재산출 없음) (2026-05-18 완료)
 - [DONE] ps3020 E3-2 ps1301 실제크랙 IQA 분석 완료 — 737장/50조건 7종 NR-IQA 산출(center_crop=True). hsmb 평균=0.6132, defocus(ISO=400) 148프레임. 산출물: `data/ps3020/01~04_*_2605171829.{xlsx,png}`. 실행시간 4.9시간 (2026-05-17 완료)
 - [DONE] ps3030 E3-3 ps1302 인쇄크랙 IQA 분석 완료 — 50장 7종 NR-IQA 산출(center_crop=True). 산출물: `data/ps3030/01_전체데이터_2605171728.xlsx`, `04_histogram_2605171728.png`. d3030 F002-6 ✅ (2026-05-17 완료)

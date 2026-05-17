@@ -197,20 +197,24 @@ def process_frame(cond_name: str, fp: str, device) -> dict:
 
 
 def save_checkpoint(rows: list, path: str):
-    """체크포인트를 원자적으로 저장 — PermissionError 재시도 30회×1초."""
+    """체크포인트 저장 — 실패 시 경고 출력 후 스킵 (비치명적)."""
     tmp_path = f"{path}.tmp"
-    pd.DataFrame(rows).to_csv(
-        tmp_path, index=False, encoding="utf-8-sig", float_format="%.4f"
-    )
+    try:
+        pd.DataFrame(rows).to_csv(
+            tmp_path, index=False, encoding="utf-8-sig", float_format="%.4f"
+        )
+    except Exception as e:
+        print(f"  [WARN] 체크포인트 임시파일 쓰기 실패 (스킵): {e}")
+        return
     for attempt in range(30):
         try:
             os.replace(tmp_path, path)
-            break
+            return
         except PermissionError:
             if attempt < 29:
                 time.sleep(1.0)
             else:
-                raise
+                print(f"  [WARN] 체크포인트 replace 30회 실패 (스킵): {os.path.basename(path)}")
 
 
 def build_stats(df: pd.DataFrame, skip_cols: set) -> pd.DataFrame:
