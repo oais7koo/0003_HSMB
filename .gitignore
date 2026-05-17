@@ -39,12 +39,15 @@
 !/data/ps3030/**
 !/data/ps3040/
 !/data/ps3040/**
+!/data/ps3100/
+!/data/ps3100/**
 # 체크포인트 파일 제외 (중간 파일)
 data/ps3010/_checkpoint*.csv
 data/ps3020/_checkpoint*.csv
 data/ps3030/_checkpoint*.csv
 data/ps3040/_checkpoint*.csv
 data/ps3040/_checkpoint*.json
+data/ps3100/_checkpoint*.csv
 
 # 프로젝트 루트 파일 (전체)
 !/.env

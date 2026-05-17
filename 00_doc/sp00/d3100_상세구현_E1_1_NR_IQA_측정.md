@@ -1,0 +1,203 @@
+# E1-1 NR-IQA 측정 상세구현
+
+> 문서번호: d3100 | 단계: 🔵설계 | SP: flat | 생성일: 2026-04-26
+> 연결 Feature: F002-1 | plan.md §3 E002 | **S1 우선 작업**
+
+## 1. 문서 관리
+
+| 버전 | 날짜 | 변경 내용 |
+|------|------|----------|
+| v02 | 2026-05-18 | 입력 데이터 실측 분석 반영 — 폴더 47개·이미지 470장 확정, 스크립트 설계 추가 |
+| v01 | 2026-04-26 | 초기 작성 |
+
+| 항목 | 내용 |
+|------|------|
+| 문서번호 | `d3100` |
+| 대상 기능 | `F002-1 E1-1 NR-IQA 측정 (47조건)` |
+| 원본 데이터 | `data/ps1204_kict_eSFR/` (47조건 폴더, 470장) |
+| 참조 스크립트 | `src/ps3010_e3_1_ps1010_iqa.py` v01 (패턴 재사용) |
+| 버전 | v02 |
+| 작성일 | 2026-05-18 |
+
+---
+
+## 2. 기능 개요
+
+터널표준영상(`ps1204_kict_eSFR/`, eSFR 차트, 47조건) 전체에 대해 **HSMB v1 + 비교 NR-IQA 8종(9컬럼)** 스코어를 일괄 산출하여 E1-2 상관 분석의 입력 데이터를 생성한다.
+
+---
+
+## 3. 입력 데이터 분석 (실측)
+
+### 3.1 폴더 구조
+
+| 항목 | 내용 |
+|------|------|
+| 데이터 경로 | `data/ps1204_kict_eSFR/` |
+| 조건 폴더 수 | **47개** |
+| 제외 폴더 | `00_BEW, MTF50(해석값)` — 메타 데이터, 이미지 없음 |
+| 이미지/조건 | 10장 (`01.png`~`10.png`) |
+| 총 이미지 | **470장** |
+
+### 3.2 폴더명 형식
+
+```
+{lux}lx_{ISO}_{shutter}us_{speed}
+예) 15000lx_0640_500us_00
+    40000lx_1600_025us_90
+```
+
+| 파라미터 | 값 목록 |
+|----------|--------|
+| lux (조도) | 15000, 40000 |
+| ISO | 0640, 1250, 1600 |
+| shutter (셔터속도, us) | 025, 050, 100, 250, 500 |
+| speed (속도, km/h) | 00, 10, 30, 50, 70, 80, 90 |
+
+> **의도적 defocus(ISO=400) 없음** — ps1010(E3-1) 대비 차이점. is_defocus 컬럼은 항상 0.
+
+### 3.3 조건 분포 (47개)
+
+| 조도 | 조건 수 |
+|------|--------|
+| 15000lx | 20개 |
+| 40000lx | 27개 |
+
+---
+
+## 4. 요구사항
+
+| ID | 요구사항 | 우선순위 |
+|----|---------|---------|
+| R01 | `ps3010_e3_1_ps1010_iqa.py` 패턴 기반 신규 스크립트 작성 | Must |
+| R02 | 9컬럼 NR-IQA 산출: hsmb·cpbd·niqe·niqe_matlab·piqe·brisque·brisque_matlab·dbcnn·arniqa | Must |
+| R03 | 폴더명 파싱 `{lux}lx_{ISO}_{shutter}us_{speed}` → 메타 컬럼화 | Must |
+| R04 | center_crop=False — eSFR 차트 전체 이미지 사용 | Must |
+| R05 | 조건 단위 체크포인트 (Windows Defender 락 방지) | Must |
+| R06 | `--resume` 옵션으로 중단 재개 지원 | Must |
+| R07 | 01_전체데이터·02_그룹별통계·03_조건별평균·04_histogram XLSX/PNG 산출 | Must |
+
+---
+
+## 5. 설계 결정
+
+### 5.1 스크립트
+
+| 항목 | 결정값 | 근거 |
+|------|-------|------|
+| 파일명 | `src/ps3100_e1_1_ps1204_iqa.py` | E1-1 → ps2010 prefix |
+| 출력 디렉토리 | `data/ps3100/` | 시리즈 일관성 |
+| 체크포인트 | `data/ps3100/_checkpoint.csv` | 조건 단위 저장 |
+| 참조 스크립트 | `ps3010_e3_1_ps1010_iqa.py` | 동일 패턴 재사용 |
+
+### 5.2 폴더명 파싱 정규식
+
+```python
+_COND_RE = re.compile(
+    r"^(?P<lux>\d+)lx_(?P<iso>\d+)_(?P<shutter>\d+)us_(?P<speed>\d+)$"
+)
+
+def parse_condition(folder_name: str) -> dict:
+    m = _COND_RE.match(folder_name)
+    if not m:
+        return {"lux": None, "iso": None, "shutter_us": None, "speed_kmh": None, "is_defocus": None}
+    return {
+        "lux": int(m.group("lux")),
+        "iso": int(m.group("iso")),
+        "shutter_us": int(m.group("shutter")),
+        "speed_kmh": int(m.group("speed")),
+        "is_defocus": 0,  # ps1204에는 ISO=400 없음
+    }
+```
+
+### 5.3 출력 컬럼 구조
+
+```
+condition | lux | iso | shutter_us | speed_kmh | is_defocus | frame
+| hsmb | cpbd | niqe | niqe_matlab | piqe | brisque | brisque_matlab | dbcnn | arniqa
+```
+
+### 5.4 center_crop 설정
+
+| 비교 | ps3010 (ps1010) | ps2010 (ps1204) |
+|------|----------------|----------------|
+| center_crop | False | **False** |
+| 근거 | 현장 MTF 전체 사용 | eSFR 차트 전체 사용 |
+
+### 5.5 그룹 집계 설계
+
+| 집계 수준 | 컬럼 그룹 | 산출물 |
+|----------|----------|--------|
+| 전체 통계 | — | 02 XLSX §전체 |
+| 조도별 | lux | 02 XLSX |
+| ISO별 | iso | 02 XLSX |
+| 셔터속도별 | shutter_us | 02 XLSX |
+| 속도별 | speed_kmh | 02 XLSX |
+| 조건별 평균 | condition | 03 XLSX (47행) — E1-2 상관 분석 핵심 입력 |
+
+> **03 조건별 평균 XLSX가 E1-2(BEW 상관 분석) 직접 입력** — 47조건 × 9메트릭 행렬
+
+---
+
+## 6. Task 명세
+
+| Task ID | 내용 | 산출물 | 우선순위 | 상태 |
+|---------|------|--------|---------|------|
+| T01 | `ps3100_e1_1_ps1204_iqa.py` 스크립트 작성 | `src/ps3100_e1_1_ps1204_iqa.py` | Must | ⬜ |
+| T02 | `.gitignore`에 `data/ps3100/` 화이트리스트 추가 | `.gitignore` | Must | ⬜ |
+| T03 | 스크립트 실행 (GPU 우선, 470장 예상 30~60분) | `data/ps3100/` 산출물 | Must | ⬜ |
+| T04 | 결과 검증 — 조건 수 47, 행 수 470 확인 | — | Must | ⬜ |
+| T05 | d0040 결과 리포트 문서 작성 | `00_doc/sp00/d0040_e1_scores.md` | Must | ⬜ |
+| T06 | d0002_plan.md F002-1 상태 ⚪→✅ 업데이트 | plan.md | Must | ⬜ |
+
+---
+
+## 7. 산출물 정의
+
+| 파일 | 내용 |
+|------|------|
+| `data/ps3100/01_전체데이터_{dsr}.xlsx` | 470행 × (메타+9컬럼) |
+| `data/ps3100/02_그룹별통계_{dsr}.xlsx` | 조도·ISO·셔터·속도별 통계 |
+| `data/ps3100/03_조건별평균_{dsr}.xlsx` | 47행 × 9컬럼 — **E1-2 핵심 입력** |
+| `data/ps3100/04_histogram_{dsr}.png` | 9종 메트릭 히스토그램 |
+| `data/ps3100/_checkpoint.csv` | 조건 단위 중간 저장 (git 제외) |
+| `00_doc/sp00/d0040_e1_scores.md` | 결과 요약 리포트 |
+
+---
+
+## 8. 제약조건 / 예외처리
+
+| 상황 | 처리 방식 |
+|------|----------|
+| `00_BEW, MTF50(해석값)` 폴더 | 폴더명 파싱 실패 → 자동 스킵 |
+| 폴더명 파싱 실패 (기타) | 경고 로그 출력 + 스킵 목록 별도 수집 |
+| GPU OOM | 조건 단위 분할 + `torch.cuda.empty_cache()` |
+| 일부 NR-IQA 모델 실패 | 해당 메트릭 NaN 처리, 나머지 진행 |
+| Windows PermissionError | 조건 완료 후 1회 저장 + 30회×1초 재시도 |
+
+---
+
+## 9. 관련 문서
+
+| 문서 | 용도 |
+|------|------|
+| `d0001_prd.md` §2.5 | 터널표준영상 정의 |
+| `d0002_plan.md` E002 F002-1 | Feature 계획 |
+| `d9050_상세기획_E1_2_BEW_상관_분석.md` | 후속 Feature (03 XLSX 소비) |
+| `src/ps3010_e3_1_ps1010_iqa.py` | 참조 스크립트 패턴 |
+| `src/common_iqa7.py` | NR-IQA 공통 라이브러리 |
+
+---
+
+## 10. 진행현황
+
+| 항목 | 내용 |
+|------|------|
+| 현재 단계 | 🔵설계 완료 — 스크립트 작성 대기 |
+
+---
+
+## 11. 이슈
+
+| 날짜 | 내용 | 상태 |
+|------|------|------|
