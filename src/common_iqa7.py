@@ -21,6 +21,8 @@ from typing import Dict, Optional
 import cv2
 import numpy as np
 
+LIB_VERSION = "v01"
+
 # pyiqa 선택적 임포트 (torch/pyiqa 미설치 시 해당 메트릭만 비활성)
 try:
     import torch
@@ -52,6 +54,14 @@ def _to_gray(img: np.ndarray) -> np.ndarray:
     if img.ndim == 3:
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return img
+
+
+def center_crop_half(img: np.ndarray) -> np.ndarray:
+    """이미지 중앙에서 가로·세로 각 50% 영역을 크롭 (결과 면적 = 원본의 25%)."""
+    h, w = img.shape[:2]
+    ch, cw = h // 2, w // 2
+    r0, c0 = (h - ch) // 2, (w - cw) // 2
+    return img[r0:r0 + ch, c0:c0 + cw]
 
 
 # ################################################################################
@@ -160,9 +170,50 @@ class HSMBCalculator:
 _HSMB_DEFAULT = HSMBCalculator()
 
 
-def compute_hsmb(img: np.ndarray) -> float:
+def compute_hsmb_v1(img: np.ndarray) -> float:
     """HSMB 스코어 산출 (PRD §4.1 = ps5010 v1, d0900 검증). 높을수록 선명."""
     return _HSMB_DEFAULT.calculate(img)
+
+
+def compute_bew_hv(img: np.ndarray) -> tuple[float, float]:
+    """BEW-H / BEW-V 산출 (Blur Edge Width by direction).
+
+    HSMBCalculator (PRD §4.1 파라미터) 기반. four-direction 모드에서
+    수평 이동 방향(dr=0, dc=±1) → BEW-H,
+    수직 이동 방향(dr=±1, dc=0) → BEW-V 로 분리.
+    엣지가 없으면 nan 반환.
+
+    Returns
+    -------
+    (bew_h, bew_v) : 각 방향 edge width 평균 (픽셀 단위)
+    """
+    calc = _HSMB_DEFAULT
+    gray = _to_gray(img).astype(np.float32)
+    h, w = gray.shape
+    n_row = h // calc.block_size
+    n_col = w // calc.block_size
+    ews_h: list[float] = []
+    ews_v: list[float] = []
+    for br in range(n_row):
+        for bc in range(n_col):
+            rs = br * calc.block_size
+            cs = bc * calc.block_size
+            blk = gray[rs:rs + calc.block_size, cs:cs + calc.block_size]
+            mag = calc._gradient_magnitude(blk)
+            for r_loc, c_loc in calc._edge_pixels(mag):
+                dr, dc = calc._edge_dir(blk, r_loc, c_loc)
+                if (dr, dc) == (0, 0):
+                    continue
+                profile = calc._edge_profile(blk, r_loc, c_loc, dr, dc)
+                ew = calc._edge_width(profile)
+                if ew is not None:
+                    if dr == 0:
+                        ews_h.append(ew)
+                    else:
+                        ews_v.append(ew)
+    bew_h = round(float(np.mean(ews_h)), 4) if ews_h else float("nan")
+    bew_v = round(float(np.mean(ews_v)), 4) if ews_v else float("nan")
+    return bew_h, bew_v
 
 
 # ################################################################################
@@ -274,7 +325,7 @@ def compute_all(img: np.ndarray, device: Optional[str] = None) -> Dict[str, floa
     result: Dict[str, float] = {}
 
     for col, fn in (
-        ("hsmb", lambda: compute_hsmb(img)),
+        ("hsmb", lambda: compute_hsmb_v1(img)),
         ("cpbd", lambda: compute_cpbd(img)),
         ("niqe", lambda: compute_niqe(img, matlab=False, device=device)),
         ("niqe_matlab", lambda: compute_niqe(img, matlab=True, device=device)),
@@ -292,11 +343,17 @@ def compute_all(img: np.ndarray, device: Optional[str] = None) -> Dict[str, floa
     return result
 
 
-def compute_all_from_path(path: str, device: Optional[str] = None) -> Dict[str, float]:
-    """이미지 경로 입력 버전 (Windows 한글 경로 대응)."""
+def compute_all_from_path(path: str, device: Optional[str] = None,
+                          center_crop: bool = False) -> Dict[str, float]:
+    """이미지 경로 입력 버전 (Windows 한글 경로 대응).
+
+    center_crop=True 시 가로·세로 가운데 50%(면적 25%) 영역만 사용해 산출한다.
+    """
     img = imread_safe(path)
     if img is None:
         return {col: float("nan") for col in METRIC_COLUMNS}
+    if center_crop:
+        img = center_crop_half(img)
     return compute_all(img, device=device)
 
 
@@ -304,7 +361,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print("사용법: uv run python src/ps0010_new_iqa_lib.py <이미지경로>")
+        print("사용법: uv run python src/common_iqa7.py <이미지경로>")
         print(f"pyiqa 가용: {_PYIQA_AVAILABLE} / cpbd 가용: {_CPBD_AVAILABLE}")
         sys.exit(0)
 
