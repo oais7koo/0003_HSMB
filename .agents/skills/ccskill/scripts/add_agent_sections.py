@@ -16,44 +16,44 @@ SKILLS_DIR = Path(__file__).parent.parent.parent
 
 # 스킬별 에이전트 매핑
 AGENT_TABLES = {
-    "oocheck": [
+    "cccheck": [
         ("코드 탐색", "Explore", "haiku", "O"),
         ("에러 검사", "code-error-checker", "sonnet", "O"),
         ("품질 분석", "ooqa", "sonnet", "O"),
         ("결과 검증", "task-checker", "sonnet", "-"),
     ],
-    "oocontext": [
+    "cccontext": [
         ("SP 탐색", "Explore", "haiku", "-"),
         ("컨텍스트 검증", "task-checker", "sonnet", "-"),
     ],
-    "oodata": [
+    "ccdata": [
         ("백업/복원 실행", "task-executor", "sonnet", "O"),
         ("결과 검증", "task-checker", "sonnet", "-"),
     ],
-    "oodb": [
+    "ccdb": [
         ("스키마 분석", "Explore", "haiku", "O"),
         ("마이그레이션", "task-executor", "sonnet", "O"),
         ("DB 검증", "task-checker", "sonnet", "-"),
     ],
-    "oofix": [
+    "ccfix": [
         ("이슈 분석", "Explore", "haiku", "O"),
         ("에러 검사", "code-error-checker", "sonnet", "O"),
         ("자동 수정", "task-executor", "sonnet", "O"),
         ("결과 검증", "task-checker", "sonnet", "-"),
     ],
-    "oohwp": [
+    "cchwp": [
         ("문서 작성/편집", "task-executor", "sonnet", "-"),
         ("구조 검증", "task-checker", "sonnet", "-"),
     ],
-    "ooref": [
+    "ccref": [
         ("레퍼런스 탐색", "Explore", "haiku", "O"),
         ("적용 체크", "task-executor", "sonnet", "-"),
     ],
-    "ooscrap": [
+    "ccscrap": [
         ("스크래핑 실행", "task-executor", "sonnet", "O"),
         ("데이터 정제", "data-analyst", "sonnet", "-"),
     ],
-    "oouv": [
+    "ccuv": [
         ("의존성 분석", "Explore", "haiku", "O"),
         ("패키지 업데이트", "task-executor", "sonnet", "-"),
         ("검증", "task-checker", "sonnet", "-"),

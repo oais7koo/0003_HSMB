@@ -3,19 +3,19 @@
 """
 ccdoc numbering - 문서 번호 체계(SSOT) 조회/편집 스크립트
 
-SSOT 파일: .claude/skills/ccdoc/references/doc_numbering.md
+SSOT 파일: .agents/skills/ccdoc/references/doc_numbering.md
 
 사용법:
-    uv run .claude/skills/ccdoc/scripts/oodoc_numbering.py
+    uv run .agents/skills/ccdoc/scripts/oodoc_numbering.py
         → 전체 SSOT 출력
 
-    uv run .claude/skills/ccdoc/scripts/oodoc_numbering.py add 0500 "d{SP}0500_사업계획서.md" "사업계획서" "수동/oowork"
+    uv run .agents/skills/ccdoc/scripts/oodoc_numbering.py add 0500 "d{SP}0500_사업계획서.md" "사업계획서" "수동/ccwork"
         → §2.3 (0100~0999 범위) 표에 행 추가
 
-    uv run .claude/skills/ccdoc/scripts/oodoc_numbering.py remove 0500
+    uv run .agents/skills/ccdoc/scripts/oodoc_numbering.py remove 0500
         → §2.3 표에서 0500번 행 제거
 
-    uv run .claude/skills/ccdoc/scripts/oodoc_numbering.py edit
+    uv run .agents/skills/ccdoc/scripts/oodoc_numbering.py edit
         → SSOT 파일 경로 안내
 """
 
@@ -34,7 +34,7 @@ SSOT_PATH = SCRIPT_DIR.parent / "references" / "doc_numbering.md"
 
 # §2.3 (선택 문서 0100~0999) 표 식별 마커
 SEC_HEADER = "### 2.3 선택 문서 (0100~0999) — 특정 스킬 전용"
-NEXT_SEC_HEADER = "### 2.4 상세 문서 (1000~9999) — oofeature 전용"
+NEXT_SEC_HEADER = "### 2.4 상세 문서 (1000~9999) — ccfeature 전용"
 
 
 def read_ssot() -> str:
@@ -59,7 +59,7 @@ def cmd_edit() -> int:
     print("SSOT 파일을 직접 편집하세요:")
     print(f"  {SSOT_PATH}")
     print("\n편집 후 파생 튜토리얼도 동기화 권장:")
-    print("  .claude/tutorial/37_문서번호및파일명규칙.md")
+    print("  .codex/tutorial/37_문서번호및파일명규칙.md")
     print("  00_doc/sp03/tutorial/37_문서번호및파일명규칙.md")
     return 0
 

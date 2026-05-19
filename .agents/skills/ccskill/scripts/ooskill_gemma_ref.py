@@ -5,7 +5,7 @@
 
 제외 대상:
 - gemma 스킬 자신
-- alias 스킬 (ooc, ood, oof, ook, oos) — 본체 스킬을 참조할 뿐 실제 업무 수행 안 함
+- alias 스킬 (ccc, ccd, ccf, cck, ccs) — 본체 스킬을 참조할 뿐 실제 업무 수행 안 함
 """
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ import sys
 from pathlib import Path
 
 
-SKILL_ROOT = Path(__file__).resolve().parents[2]  # .claude/skills
-EXCLUDE_SKILLS = {"gemma", "ooc", "ood", "oof", "ook", "oos"}
+SKILL_ROOT = Path(__file__).resolve().parents[2]  # .codex/skills
+EXCLUDE_SKILLS = {"gemma", "ccc", "ccd", "ccf", "cck", "ccs"}
 MARKER_START = "<!-- GEMMA-REF:START -->"
 MARKER_END = "<!-- GEMMA-REF:END -->"
 
@@ -30,10 +30,10 @@ def build_block() -> str:
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 {MARKER_END}
 """

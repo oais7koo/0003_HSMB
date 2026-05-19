@@ -399,7 +399,7 @@ def main():
     import sys
 
     if len(sys.argv) < 2 or sys.argv[1] in ['-h', '--help']:
-        print("Usage: uv run .claude/skills/ccdoc/scripts/oodoc_md_to_docx.py <input.md> [output.docx]")
+        print("Usage: uv run .agents/skills/ccdoc/scripts/oodoc_md_to_docx.py <input.md> [output.docx]")
         print("       ccdoc run md <input.md>")
         print("")
         print("Markdown to DOCX 변환 (ccdoc 기본 스타일 적용)")

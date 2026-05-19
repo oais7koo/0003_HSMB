@@ -1,10 +1,10 @@
 ---
 name: ccrun
-description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다."
+description: "이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다."
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccrun - TDD 기반 자율 실행 스킬 (Builder)
 
@@ -14,14 +14,14 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 |------|------|
 | **핵심 역할** | TDD 기반 프로젝트 자율 실행 (Builder) — 빌드·테스트·배포 자동화 |
 | **하는 것** | 빌드 스크립트 실행, TDD 사이클 자율 진행, 실행 환경 설정 |
-| **하지 않는 것** | 코드 구현(→oodev), 정적 분석(→oocheck), 이슈 수정(→oofix) |
+| **하지 않는 것** | 코드 구현(→ccdev), 정적 분석(→cccheck), 이슈 수정(→ccfix) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 / 외부 서버 자동 배포 안 함 |
 | **수정 대상** | 빌드 산출물, 실행 환경 설정 |
 | **실행 레벨** | [자동] — 빌드·테스트 자동 실행 |
-| **에이전트 호환** | Claude Code 권장 — `uv run` 기반 자동 실행 / 다른 에이전트: 빌드 명령을 수동 실행 |
+| **에이전트 호환** | Codex 권장 — `uv run` 기반 자동 실행 / 다른 에이전트: 빌드 명령을 수동 실행 |
 
 ## 문서 이력 관리
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -42,10 +42,10 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 ## 개요
 
 **Architect vs Builder**:
-- **Architect (`ooplan`)**: 무엇을 어떻게 만들지 결정(상세 설계)하여 실행 큐에 등록
+- **Architect (`ccplan`)**: 무엇을 어떻게 만들지 결정(상세 설계)하여 실행 큐에 등록
 - **Builder (`ccrun`)**: 실행 큐의 작업을 고민 없이 수행하고 결과 도출
 
-**입력**: 실행 큐(Execution Queue) from `ooplan detail`, `00_doc/sp00/d0002_plan.md`
+**입력**: 실행 큐(Execution Queue) from `ccplan detail`, `00_doc/sp00/d0002_plan.md`
 
 **출력**: 구현된 소스 코드, 통과된 테스트 코드, 업데이트된 문서
 
@@ -58,7 +58,7 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 | GREEN (구현) | `task-executor` | sonnet | 테스트 통과를 위한 최소 구현 |
 | REFACTOR (개선) | `python-code-reviewer` | sonnet | 코드 품질 리뷰 및 개선 제안 |
 | 검증 | `task-checker` | sonnet | 태스크 완료 여부 검증 |
-| 품질 보증 | `ooqa` | sonnet | 중복 검사, 의존성 분석 |
+| 품질 보증 | `ccqa` | sonnet | 중복 검사, 의존성 분석 |
 | 에스컬레이션 | `codebase-investigator` | sonnet | TDD 실패 시 근본 원인 분석 |
 
 ## TDD 실행 사이클
@@ -105,16 +105,16 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 
 ## ccrun all (프로젝트 건강검진)
 
-1. **oocheck**: 정적 분석 및 에러 체크
-2. **oofix run**: 발견된 단순 에러 자동 수정
-3. **ootest**: 전체 테스트 스위트 실행
-4. **oolib**: 모듈 문서 현행화
-5. **oodb**: DB 스키마 문서 현행화
+1. **cccheck**: 정적 분석 및 에러 체크
+2. **ccfix run**: 발견된 단순 에러 자동 수정
+3. **cctest**: 전체 테스트 스위트 실행
+4. **cclib**: 모듈 문서 현행화
+5. **ccdb**: DB 스키마 문서 현행화
 
 ## 에스컬레이션 조건
 
 1. **반복 횟수 초과**: 10회 이상 시도해도 테스트 통과 실패
-2. **모호한 요구사항**: `ooplan` 정보로 구현 불가
+2. **모호한 요구사항**: `ccplan` 정보로 구현 불가
 3. **환경 문제**: 패키지 설치 실패, API 연결 불가
 
 ## 병렬 실행 권장 케이스
@@ -123,14 +123,14 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 |------|----------------|
 | 복잡한 태스크 사전 분석 | `codebase_investigator` + `Explore` |
 | 독립된 태스크 다수 | 여러 `task-executor` 동시 실행 |
-| REFACTOR 단계 | `python-code-reviewer` + `ooqa` |
+| REFACTOR 단계 | `python-code-reviewer` + `ccqa` |
 | 전체 점검 (all) | 각 스킬별 에이전트 병렬 |
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -146,7 +146,7 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 ## Karpathy 코딩 가이드라인 (필수 준수)
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|
@@ -168,10 +168,10 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -182,7 +182,7 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |
@@ -194,8 +194,8 @@ description: "이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 
 
 | 문서 | 용도 |
 |------|------|
-| `.claude/skills/ooplan/SKILL.md` | Architect - 상세 설계 및 태스크 공급 |
-| `.claude/skills/oocheck/SKILL.md` | 코드 품질 기준 정의 |
-| `.claude/skills/ootest/SKILL.md` | 테스트 실행 가이드 |
+| `.agents/skills/ccplan/SKILL.md` | Architect - 상세 설계 및 태스크 공급 |
+| `.agents/skills/cccheck/SKILL.md` | 코드 품질 기준 정의 |
+| `.agents/skills/cctest/SKILL.md` | 테스트 실행 가이드 |
 | `00_doc/sp00/d0002_plan.md` | 전체 구현 계획 |
 | `00_doc/sp00/d0004_todo.md` | 이슈 및 완료 처리 |

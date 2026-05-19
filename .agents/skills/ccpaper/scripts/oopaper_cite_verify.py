@@ -4,7 +4,7 @@
 ccpaper 인용검증 - 인용 검증 문서 자동 생성
 
 Usage:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_cite_verify.py [--input FILE] [--output FILE] [--paper-dir DIR]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_cite_verify.py [--input FILE] [--output FILE] [--paper-dir DIR]
 """
 
 import re

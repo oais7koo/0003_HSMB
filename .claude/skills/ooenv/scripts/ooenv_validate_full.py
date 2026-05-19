@@ -162,14 +162,18 @@ def load_environment(project_root: Path) -> EnvironmentInfo:
             if f.stem != 'README':
                 env.commands_claude.add(f.stem)
 
-    # .claude/settings.json enabledPlugins 로드
-    settings_json = project_root / '.claude' / 'settings.json'
-    if settings_json.exists():
-        try:
-            data = json.loads(settings_json.read_text(encoding='utf-8'))
-            env.enabled_plugins = data.get('enabledPlugins', {})
-        except (json.JSONDecodeError, KeyError):
-            pass
+    # enabledPlugins 로드: 전역(~/.claude) + 프로젝트(.claude) 병합
+    settings_paths = [
+        Path.home() / '.claude' / 'settings.json',
+        project_root / '.claude' / 'settings.json',
+    ]
+    for settings_json in settings_paths:
+        if settings_json.exists():
+            try:
+                data = json.loads(settings_json.read_text(encoding='utf-8'))
+                env.enabled_plugins.update(data.get('enabledPlugins', {}))
+            except (json.JSONDecodeError, KeyError):
+                pass
 
     # .mcp.json MCP 서버 로드
     mcp_json = project_root / '.mcp.json'
@@ -184,9 +188,30 @@ def load_environment(project_root: Path) -> EnvironmentInfo:
     return env
 
 
+def _strip_fenced_code(content: str) -> str:
+    """펜스 코드블록(``` 또는 ~~~)을 제거한 본문 반환."""
+    out = []
+    in_fence = False
+    fence_char = ''
+    for line in content.split('\n'):
+        stripped = line.lstrip()
+        if not in_fence and (stripped.startswith('```') or stripped.startswith('~~~')):
+            in_fence = True
+            fence_char = stripped[0]
+            continue
+        if in_fence and stripped.startswith(fence_char * 3):
+            in_fence = False
+            continue
+        if not in_fence:
+            out.append(line)
+    return '\n'.join(out)
+
+
 def extract_agents(content: str) -> set:
-    """스킬 파일에서 참조된 에이전트 추출"""
+    """스킬 파일에서 참조된 에이전트 추출 (코드블록·옵션 테이블 제외)"""
     agents = set()
+    # 코드블록 제거 — 예시 코드의 옵션·파라미터를 에이전트로 오탐하지 않도록
+    content = _strip_fenced_code(content)
 
     # 패턴 1: Task(subagent_type="xxx" or subagent_type='xxx')
     pattern1 = r'subagent_type\s*=\s*["\']([^"\']+)["\']'
@@ -196,10 +221,26 @@ def extract_agents(content: str) -> set:
     # 패턴 2: 테이블 첫 번째 컬럼에서 에이전트 추출 (행 시작 | 바로 다음 컬럼만)
     # 예: | task-executor | ... |  <- 첫 컬럼만 추출 (nvidia-smi 등 3번째 컬럼 오탐 방지)
     # 조건: 하이픈을 포함하고 영문 소문자/숫자/하이픈만으로 구성된 두 단어 이상
-    table_pattern = r'^\|\s*`?([a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)+)`?\s*\|'
-    for match in re.finditer(table_pattern, content, re.MULTILINE):
-        name = match.group(1)
-        agents.add(name)
+    # 단, 헤더가 옵션/명령/플래그/체크 테이블이면 첫 컬럼(예: doctor --check 값)은 제외
+    non_agent_header = re.compile(
+        r'옵션|option|명령|command|서브명령|subcommand|플래그|flag|'
+        r'파라미터|parameter|인자|argument|체크|check|--',
+        re.IGNORECASE,
+    )
+    sep_re = re.compile(r'^\s*\|[\s:|-]+\|\s*$')
+    row_re = re.compile(r'^\|\s*`?([a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)+)`?\s*\|')
+    lines = content.split('\n')
+    skip_table = False
+    for i, line in enumerate(lines):
+        if sep_re.match(line):
+            header = lines[i - 1] if i > 0 else ''
+            cells = header.split('|')
+            first_cell = cells[1] if len(cells) > 2 else ''
+            skip_table = bool(non_agent_header.search(first_cell))
+            continue
+        match = row_re.match(line)
+        if match and not skip_table:
+            agents.add(match.group(1))
 
     # 패턴 3: .claude/agents/xxx.md 참조
     pattern3 = r'.claude/agents/([^/\s\)]+)\.md'

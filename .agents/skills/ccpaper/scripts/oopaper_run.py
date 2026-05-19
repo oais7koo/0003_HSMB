@@ -3,12 +3,12 @@
 이 스크립트는 'ccpaper' 스킬의 핵심 실행 파일로, 논문 데이터의 정합성을 검사하고 관리합니다.
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run.py run [--limit N] [--dry-run] [--skip-organize]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run.py status
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run.py sync-list [--dry-run]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run.py fix [--folder ID]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run.py delete-broken [--dry-run]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run.py download [--dry-run] [--file FILE] [--force]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run.py run [--limit N] [--dry-run] [--skip-organize]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run.py status
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run.py sync-list [--dry-run]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run.py fix [--folder ID]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run.py delete-broken [--dry-run]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run.py download [--dry-run] [--file FILE] [--force]
 """
 
 import argparse
@@ -40,7 +40,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -60,7 +60,7 @@ def show_help_if_no_args(skill_name, args):
 # 공용 template_loader import
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _SKILL_DIR = _SCRIPT_DIR.parent
-_SKILLS_ROOT = _SKILL_DIR.parent  # .claude/skills/
+_SKILLS_ROOT = _SKILL_DIR.parent  # .agents/skills/
 if str(_SKILLS_ROOT) not in sys.path:
     sys.path.insert(0, str(_SKILLS_ROOT))
 try:
@@ -75,7 +75,7 @@ def _load_template(filename: str, block_name: str = "template") -> str:
 
 
 # 상수 정의 - 경로 (v39: OAIS=03_paper/ 하위, 독립 프로젝트=루트 직하 양쪽 호환)
-# scripts/ → ccpaper/ → skills/ → .claude/ → PROJECT_ROOT
+# scripts/ → ccpaper/ → skills/ → .codex/ → PROJECT_ROOT
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 PAPER_BASE = PROJECT_ROOT / "03_paper" if (PROJECT_ROOT / "03_paper").exists() else PROJECT_ROOT
 PAPER_DIR = PAPER_BASE / "11_paper_en"
@@ -268,15 +268,15 @@ def check_paper_completeness(folder_path):
 
 
 def _find_claude_exe() -> str | None:
-    """claude CLI 실행 파일 경로 탐색."""
+    """codex CLI 실행 파일 경로 탐색."""
     import shutil
-    claude_cmd = shutil.which("claude")
+    claude_cmd = shutil.which("codex")
     if not claude_cmd:
         candidates = [
-            os.path.expanduser("~/.local/bin/claude"),
-            os.path.expanduser("~/.local/bin/claude.EXE"),
-            r"C:\Users\oaiskoo\.local\bin\claude.EXE",
-            r"C:\Users\oaiskoo\.local\bin\claude",
+            os.path.expanduser("~/.local/bin/codex"),
+            os.path.expanduser("~/.local/bin/codex.EXE"),
+            r"C:\Users\oaiskoo\.local\bin\codex.EXE",
+            r"C:\Users\oaiskoo\.local\bin\codex",
         ]
         for c in candidates:
             if os.path.isfile(c):
@@ -350,7 +350,7 @@ def _run_trans_subprocess(command: str, folder_id: str, dry_run: bool, no_gemma:
 
 
 def _phase3_summary(folder_id: str, dry_run: bool) -> bool:
-    """Phase 3 (v05+): 영문 전문 기반 한글 서머리 생성 (Claude CLI).
+    """Phase 3 (v05+): 영문 전문 기반 한글 서머리 생성 (Codex CLI).
 
     v05 변경: 한글 전문 → 영문 전문 기반. 출력 언어는 한글 유지.
     번역(Phase 4) 전 단계에서 호출되므로 한글 전문이 없어도 동작해야 함.
@@ -374,7 +374,7 @@ def _phase3_summary(folder_id: str, dry_run: bool) -> bool:
 
     claude_cmd = _find_claude_exe()
     if not claude_cmd:
-        print(f"  [ERROR] {folder_id}: claude CLI 없음", flush=True)
+        print(f"  [ERROR] {folder_id}: codex CLI 없음", flush=True)
         return False
 
     eng_content = eng_files[0].read_text(encoding='utf-8')
@@ -442,7 +442,7 @@ def _phase3_summary(folder_id: str, dry_run: bool) -> bool:
                 fm_filled = fm_block.format(
                     folder_id=folder_id,
                     generated_at=now_str,
-                    engine="claude-cli",
+                    engine="codex-cli",
                     source_pdf=eng_fm.get("source_pdf", ""),
                     language="en",
                     translation_status="PENDING",
@@ -460,7 +460,7 @@ def _phase3_summary(folder_id: str, dry_run: bool) -> bool:
         if not fm_filled:
             fm_filled = (
                 f"---\ntype: summary\nfolder_id: {folder_id}\n"
-                f"generated_at: {now_str}\nengine: claude-cli\n"
+                f"generated_at: {now_str}\nengine: codex-cli\n"
                 f"language: en\nsource: english_fulltext\n"
                 f"---\n\n"
             )
@@ -479,7 +479,7 @@ def _phase3_summary(folder_id: str, dry_run: bool) -> bool:
 
 
 def _phase6_analysis(folder_id: str, dry_run: bool) -> bool:
-    """Phase 6: 정밀 분석 생성 (Claude CLI)."""
+    """Phase 6: 정밀 분석 생성 (Codex CLI)."""
     import subprocess
     folder_path = PAPER_DIR / folder_id
 
@@ -499,7 +499,7 @@ def _phase6_analysis(folder_id: str, dry_run: bool) -> bool:
 
     claude_cmd = _find_claude_exe()
     if not claude_cmd:
-        print(f"  [ERROR] {folder_id}: claude CLI 없음", flush=True)
+        print(f"  [ERROR] {folder_id}: codex CLI 없음", flush=True)
         return False
 
     summary_content = summary_files[0].read_text(encoding='utf-8')
@@ -1777,6 +1777,47 @@ def _try_fix_pdf_url(url):
     return None
 
 
+def _norm_title_for_dedup(title):
+    """중복 비교용 제목 정규화: 소문자 + 영숫자만 남김."""
+    import re as _r
+    return _r.sub(r"[^a-z0-9]+", "", (title or "").lower())
+
+
+def _collect_existing_paper_titles():
+    """11_paper_en 폴더 전체에서 기수집 논문의 정규화 제목 목록을 수집한다 (T015).
+
+    서머리 H1 제목 우선, 없으면 PDF(_01_) 파일명을 사용한다.
+    """
+    import re as _r
+    titles = []
+    if not PAPER_DIR.exists():
+        return titles
+    for d in PAPER_DIR.iterdir():
+        if not d.is_dir() or not _r.match(r"\d{6}-\d{4}", d.name):
+            continue
+        title = None
+        summ = list(d.glob("*_00_*서머리.md"))
+        if summ:
+            try:
+                content = summ[0].read_text(encoding="utf-8", errors="ignore")
+                m = _r.search(r"^#\s+(.+)$", content, _r.MULTILINE)
+                if m:
+                    title = m.group(1).strip()
+            except Exception:
+                pass
+        if not title:
+            pdfs = list(d.glob("*_01_*.pdf"))
+            if pdfs:
+                m = _r.match(r"\d{6}-\d{4}_01_(.+)\.pdf", pdfs[0].name)
+                if m:
+                    title = m.group(1).replace("_", " ")
+        if title:
+            norm = _norm_title_for_dedup(title)
+            if norm:
+                titles.append(norm)
+    return titles
+
+
 def do_download(args):
     """다운로드 리스트 기반 PDF 자동 다운로드."""
     sys.stdout.reconfigure(encoding='utf-8')
@@ -1806,6 +1847,19 @@ def do_download(args):
     total_success = 0
     total_fail = 0
     total_skip = 0
+    total_dup = 0
+
+    # 전역 중복 탐지 (T015): 11_paper_en 기수집 논문 제목 수집
+    existing_norm_titles = _collect_existing_paper_titles()
+    try:
+        from rapidfuzz import fuzz as _dfuzz
+        _dedup_fuzzy = True
+    except ImportError:
+        _dfuzz = None
+        _dedup_fuzzy = False
+    if existing_norm_titles:
+        _mode = "유사도 90%+" if _dedup_fuzzy else "정규화 완전일치"
+        print(f"전역 중복 탐지 활성: 기수집 {len(existing_norm_titles)}편 대비 검사 ({_mode})\n", flush=True)
 
     for list_file in list_files:
         print(f"## {list_file.name}\n", flush=True)
@@ -1827,6 +1881,18 @@ def do_download(args):
             if pdf_path.exists() and not args.force:
                 total_skip += 1
                 continue
+            # 전역 중복 탐지 (T015): 11_paper_en에 동일/유사 논문이 이미 있으면 스킵
+            if not args.force and existing_norm_titles:
+                norm = _norm_title_for_dedup(item['title'])
+                if norm:
+                    if _dedup_fuzzy:
+                        is_dup = any(_dfuzz.ratio(norm, et) >= 90 for et in existing_norm_titles)
+                    else:
+                        is_dup = norm in existing_norm_titles
+                    if is_dup:
+                        print(f"  [중복 스킵] 기수집 논문과 중복: {item['title']}", flush=True)
+                        total_dup += 1
+                        continue
             to_download.append(item)
 
         if not to_download:
@@ -1942,7 +2008,8 @@ def do_download(args):
     print(f"| 성공 | {total_success} |", flush=True)
     print(f"| 실패 | {total_fail} |", flush=True)
     print(f"| 스킵 | {total_skip} |", flush=True)
-    print(f"| **합계** | **{total_success + total_fail + total_skip}** |", flush=True)
+    print(f"| 중복 스킵 | {total_dup} |", flush=True)
+    print(f"| **합계** | **{total_success + total_fail + total_skip + total_dup}** |", flush=True)
     print("", flush=True)
 
     if total_success > 0:
@@ -1981,7 +2048,7 @@ def main():
     run_p.add_argument('--skip-organize', action='store_true', help="Phase 0 건너뛰기")
     run_p.add_argument('--gemma', action='store_true',
         help="Phase 3(번역) 초안을 로컬 Gemma에 위임. "
-             "상세: .claude/guides/gemma_delegation.md")
+             "상세: .codex/guides/gemma_delegation.md")
     run_p.add_argument('--no-gemma', action='store_true', dest='no_gemma',
         help="Phase 3(번역) Gemma 건너뛰기 — Claude가 직접 번역")
     run_p.add_argument('--phase', type=int, choices=[0,1,2,3,4,5,6,7],
@@ -2082,7 +2149,7 @@ def main():
         if getattr(args, 'gemma', False):
             os.environ['OOPAPER_USE_GEMMA'] = '1'
             print("[INFO] Gemma 위임 활성화 (Phase 2 서머리 · Phase 4 번역 초안)")
-            print("       경계: .claude/guides/gemma_delegation.md")
+            print("       경계: .codex/guides/gemma_delegation.md")
         do_run(args)
     elif args.command == 'status':
         do_status(args)

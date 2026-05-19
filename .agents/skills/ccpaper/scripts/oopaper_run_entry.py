@@ -4,9 +4,9 @@
 ccpaper 스킬 메인 진입점. --lang 옵션으로 EN/KO 분기.
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run_entry.py [--lang en|ko] [subcommand] [options]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run_entry.py status
-    uv run python .claude/skills/ccpaper/scripts/oopaper_run_entry.py --lang ko status
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run_entry.py [--lang en|ko] [subcommand] [options]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run_entry.py status
+    uv run python .agents/skills/ccpaper/scripts/oopaper_run_entry.py --lang ko status
 """
 
 import sys
@@ -36,9 +36,9 @@ def show_help():
         print("### 서브명령어\n")
         for _cc in _cmds:
             print(f"- `ccpaper {_cc}`")
-        print("\n**상세 문서**: `.claude/skills/ccpaper/SKILL.md`")
+        print("\n**상세 문서**: `.agents/skills/ccpaper/SKILL.md`")
     else:
-        print("[ERROR] .claude/skills/ccpaper/SKILL.md not found")
+        print("[ERROR] .agents/skills/ccpaper/SKILL.md not found")
 
 def main():
     args = sys.argv[1:]

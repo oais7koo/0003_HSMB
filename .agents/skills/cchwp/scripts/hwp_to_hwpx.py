@@ -6,7 +6,7 @@ HWP(구형 바이너리) → HWPX 변환 스크립트.
 pyhwpx (COM 자동화) 방식 사용 — 아래한글이 설치된 Windows에서만 동작.
 
 사용법:
-    uv run --with pyhwpx python .claude/skills/cchwp/scripts/hwp_to_hwpx.py <input.hwp> [output.hwpx]
+    uv run --with pyhwpx python .agents/skills/cchwp/scripts/hwp_to_hwpx.py <input.hwp> [output.hwpx]
 
 옵션:
     --visible       변환 중 한글 창 표시 (기본: 숨김)

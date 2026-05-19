@@ -3,7 +3,7 @@
 서머리 파일의 외부 참고문헌을 스캔하여 미보유 논문을 자동으로 검색·다운로드합니다.
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extend.py [--folder ID] [--dry-run] [--limit N] [--source all|arxiv|s2]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extend.py [--folder ID] [--dry-run] [--limit N] [--source all|arxiv|s2]
 """
 
 import argparse
@@ -40,7 +40,7 @@ def _glob_korean(folder: Path, pattern: str) -> list[Path]:
             matches.append(f)
     return matches
 
-# scripts/ → ccpaper/ → skills/ → .claude/ → PROJECT_ROOT
+# scripts/ → ccpaper/ → skills/ → .codex/ → PROJECT_ROOT
 # OAIS=03_paper/ 하위, 독립 프로젝트=루트 직하 양쪽 호환
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 PAPER_BASE = PROJECT_ROOT / "03_paper" if (PROJECT_ROOT / "03_paper").exists() else PROJECT_ROOT

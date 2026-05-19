@@ -13,6 +13,7 @@ oofeature_validate.py
     V06 플레이스홀더   {기능명} 등 미치환 값 감지
     V07 plan.md 연결   Feature ID가 plan.md에 등록되어 있는지
     V08 빈 섹션        내용이 없는 섹션 감지
+    V09 d43xxx 구조    d40001 §1.5 정책 — API/Web 분리 + §9 PoC 페이지 매핑 (d43xxx_상세검증_api_*.md만)
 
 사용법:
     uv run python .claude/skills/oofeature/scripts/oofeature_validate.py
@@ -107,7 +108,7 @@ def validate_doc(doc_path: Path, sp: str, plan_doc_nums: set) -> dict:
     result = {
         "file": doc_path.name,
         "V01": "OK", "V02": "OK", "V03": "OK", "V04": "OK",
-        "V05": "OK", "V06": "OK", "V07": "OK", "V08": "OK",
+        "V05": "OK", "V06": "OK", "V07": "OK", "V08": "OK", "V09": "OK",
         "messages": [],
     }
 
@@ -160,7 +161,10 @@ def validate_doc(doc_path: Path, sp: str, plan_doc_nums: set) -> dict:
         meta_issues = []
         if doc_num not in meta_line:
             meta_issues.append(f"문서번호({doc_num}) 불일치")
-        if f"단계: {stage}" not in meta_line and f"단계:{stage}" not in meta_line:
+        # "단계:" 다음에 stage 단어가 등장하면 OK (이모지·색상 마커 등 사이에 있어도 허용)
+        # 예: "단계: 검증", "단계: 🟢 검증", "단계:검증", "단계: ⚪ 기획"
+        stage_pattern = r'단계\s*:\s*[^|]*?\b' + re.escape(stage) + r'\b'
+        if not re.search(stage_pattern, meta_line):
             meta_issues.append(f"단계({stage}) 불일치")
         if meta_issues:
             result["V04"] = "WARN"
@@ -214,11 +218,42 @@ def validate_doc(doc_path: Path, sp: str, plan_doc_nums: set) -> dict:
         result["V08"] = "INFO"
         result["messages"].append(f"V08: 빈 섹션 {len(empty_sections)}개 — {', '.join(empty_sections[:3])}")
 
+    # V09: d43xxx API 검증 문서 구조 정책 (d40001 §1.5)
+    # 대상: d43NNN_상세검증_api_*.md 만 적용 (그 외에는 OK 유지)
+    if re.match(r'^d43\d{3}_상세검증_api_', filename):
+        v09_issues = []
+
+        # V09-1: §2 엔드포인트 목록의 표 행에 /web/* URL 포함 여부
+        # 표 셀(`| ... | `/web/...` | ... |`) 안의 URL만 검사. 안내 문구의 인용은 제외.
+        sec2_match = re.search(r'## 2\..+?(?=## 3\.|\Z)', content, re.DOTALL)
+        if sec2_match:
+            sec2_text = sec2_match.group(0)
+            # 표 행: 줄 시작이 `|`로 시작하고 셀 안에 `/web/`가 포함된 경우
+            for line in sec2_text.splitlines():
+                stripped = line.strip()
+                if stripped.startswith("|") and re.search(r'`/web/', stripped):
+                    v09_issues.append("§2 엔드포인트 표에 /web/* URL 포함 (API 전용 위배)")
+                    break
+
+        # V09-2: 메타 표에 "Web 라우트" 행 존재
+        if re.search(r'\|\s*Web\s*라우트\s*\|', content):
+            v09_issues.append("메타 표에 'Web 라우트' 행 존재")
+
+        # V09-3: §9 PoC 페이지 매핑 섹션 부재
+        if not re.search(r'^## 9\.\s*PoC\s*페이지\s*매핑', content, re.MULTILINE):
+            v09_issues.append("§9 PoC 페이지 매핑 섹션 부재")
+
+        if v09_issues:
+            result["V09"] = "ERROR"
+            result["messages"].append(
+                f"V09: d43xxx 구조 정책 위배 (d40001 §1.5) — {'; '.join(v09_issues)}"
+            )
+
     return result
 
 
 def overall_grade(result: dict) -> str:
-    vals = [result[f"V{i:02d}"] for i in range(1, 9)]
+    vals = [result[f"V{i:02d}"] for i in range(1, 10)]
     if "ERROR" in vals:
         return "ERROR"
     if "WARN" in vals:
@@ -239,7 +274,7 @@ def run_validate(sp: str, verbose: bool = False):
         return
 
     # 헤더
-    print("| 파일 | V01 | V02 | V03 | V04 | V05 | V06 | V07 | V08 | 결과 |")
+    print("| 파일 | V01 | V02 | V03 | V04 | V05 | V06 | V07 | V08 | V09 | 결과 |")
     print("|------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:----:|")
 
     counts = {"PASS": 0, "WARN": 0, "ERROR": 0, "INFO": 0}
@@ -253,7 +288,7 @@ def run_validate(sp: str, verbose: bool = False):
         row = (
             f"| {r['file']} "
             f"| {r['V01']} | {r['V02']} | {r['V03']} | {r['V04']} "
-            f"| {r['V05']} | {r['V06']} | {r['V07']} | {r['V08']} "
+            f"| {r['V05']} | {r['V06']} | {r['V07']} | {r['V08']} | {r['V09']} "
             f"| **{grade}** |"
         )
         print(row)
@@ -283,6 +318,7 @@ def run_dry_run(sp: str):
     if docs:
         print(f"\n검증 항목: V01(파일명형식) V02(단계유효성) V03(SP귀속) V04(헤더메타)")
         print(f"           V05(필수섹션) V06(플레이스홀더) V07(plan연결) V08(빈섹션)")
+        print(f"           V09(d43xxx구조 — d40001 §1.5)")
 
 
 def main():

@@ -11,22 +11,22 @@ import sys
 from pathlib import Path
 
 
-SKILL_ROOT = Path(__file__).resolve().parents[2]  # .claude/skills
+SKILL_ROOT = Path(__file__).resolve().parents[2]  # .codex/skills
 # 코딩 관련 스킬 (직접 코드 작성·수정·리뷰·테스트 수행)
 INCLUDE_SKILLS = {
-    "ooflow",     # 전체 워크플로우 오케스트레이터
-    "ooprd",      # PRD 생성
-    "ooplan",     # 구현 계획
-    "oofeature",  # 기능 문서 생명주기
-    "oodev",      # TDD 개발
-    "ootest",     # 테스트
-    "oocheck",    # 코드 체크
-    "oofix",      # 오류 수정
-    "oocommit",   # 커밋
-    "oolib",      # 모듈 최적화
-    "oorun",      # TDD 실행
-    "ooreview",   # 코드 리뷰
-    "ooopti",     # 알고리즘/코드 최적화
+    "ccflow",     # 전체 워크플로우 오케스트레이터
+    "ccprd",      # PRD 생성
+    "ccplan",     # 구현 계획
+    "ccfeature",  # 기능 문서 생명주기
+    "ccdev",      # TDD 개발
+    "cctest",     # 테스트
+    "cccheck",    # 코드 체크
+    "ccfix",      # 오류 수정
+    "cccommit",   # 커밋
+    "cclib",      # 모듈 최적화
+    "ccrun",      # TDD 실행
+    "ccreview",   # 코드 리뷰
+    "ccopti",     # 알고리즘/코드 최적화
 }
 MARKER_START = "<!-- KARPATHY-REF:START -->"
 MARKER_END = "<!-- KARPATHY-REF:END -->"
@@ -39,7 +39,7 @@ def build_block() -> str:
 ## Karpathy 코딩 가이드라인 (필수 준수)
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|

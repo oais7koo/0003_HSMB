@@ -1,12 +1,12 @@
 ---
 name: ccsota
-description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `agents.md`"
+description: "공통: `.codex/guides/common_guide.md` | 에이전트 참조: `agents.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통: `.claude/guides/common_guide.md` | 에이전트 참조: `agents.md`
+> 공통: `.codex/guides/common_guide.md` | 에이전트 참조: `agents.md`
 
 ## 0. 스킬 요약
 
@@ -14,14 +14,14 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 |------|------|
 | **핵심 역할** | 실험 결과 기반 SOTA급 저널 논문 초안 작성 (IEEE/Elsevier/Springer 포맷) |
 | **하는 것** | 실험 데이터 분석, 논문 구조 생성, Abstract·Introduction·Conclusion 작성 |
-| **하지 않는 것** | 연구 수행(→ooresearch), 문헌 수집(→oopaper), 서베이 작성(→oosurvey) |
+| **하지 않는 것** | 연구 수행(→ccresearch), 문헌 수집(→ccpaper), 서베이 작성(→ccsurvey) |
 | **참조 범위** | 현재 프로젝트 내부 파일 (실험 데이터) + 웹 참고문헌 검색 |
 | **수정 대상** | 논문 초안 MD 파일 |
 | **실행 레벨** | [반자동] — 실험 데이터 확인 후 작성 |
-| **에이전트 호환** | Claude Code 권장 — academic-researcher 에이전트 연동 / 다른 에이전트: 연구 컨텍스트를 직접 제공하여 논문 작성 |
+| **에이전트 호환** | Codex 권장 — academic-researcher 에이전트 연동 / 다른 에이전트: 연구 컨텍스트를 직접 제공하여 논문 작성 |
 
 ## 문서 이력 관리
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -33,16 +33,16 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 
 | 단계 | 스킬 | 역할 |
 |------|------|------|
-| 1 | `oopaper` | 참고 논문 수집/서머리/번역 |
-| 2 | `ooresearch` | SOTA 조사, 관련 연구 분석, 갭 파악 → `d{SP}0200_research_*.md` |
-| 3 | **`ccsota`** | **ooresearch 결과 + 실험 데이터 → 논문 초안 작성** |
-| 4 | `ooreport` | 논문 MD → PDF/DOCX 변환 (투고용) |
+| 1 | `ccpaper` | 참고 논문 수집/서머리/번역 |
+| 2 | `ccresearch` | SOTA 조사, 관련 연구 분석, 갭 파악 → `d{SP}0200_research_*.md` |
+| 3 | **`ccsota`** | **ccresearch 결과 + 실험 데이터 → 논문 초안 작성** |
+| 4 | `ccreport` | 논문 MD → PDF/DOCX 변환 (투고용) |
 
-> `ccsota`는 SOTA 조사를 직접 수행하지 않음. `ooresearch` 산출물을 related 섹션 입력으로 활용.
+> `ccsota`는 SOTA 조사를 직접 수행하지 않음. `ccresearch` 산출물을 related 섹션 입력으로 활용.
 
 **핵심 원칙:**
 - 실험 데이터(d3xxx/d4xxx)를 1차 소스로 활용
-- ooresearch 산출물(`d{SP}0200_research_*.md`)을 related/discussion 섹션에 직접 활용
+- ccresearch 산출물(`d{SP}0200_research_*.md`)을 related/discussion 섹션에 직접 활용
 - SOTA 대비 기여점 중심으로 논문 구성
 - 수치/테이블/수식은 실험 문서에서 직접 추출 (임의 생성 금지)
 
@@ -105,11 +105,11 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 ### 4.2 section — 섹션별 작성/수정
 ### 4.3 review — 논문 종합 교정
 
-> `ooreport review`(P01~P21) 기능을 통합. 기준 문서: `paper_quality_checklist.md` 전체 카테고리 적용.
+> `ccreport review`(P01~P21) 기능을 통합. 기준 문서: `paper_quality_checklist.md` 전체 카테고리 적용.
 
 ### 4.4 check — 논문 품질 체크
 
-> 체크 기준: `.claude/skills/ccsota/paper_quality_checklist.md` (S/M/N/A/C/R/T 7개 카테고리, Critical/Warning/Info 3등급)
+> 체크 기준: `.agents/skills/ccsota/paper_quality_checklist.md` (S/M/N/A/C/R/T 7개 카테고리, Critical/Warning/Info 3등급)
 
 ### 4.5 submit — 저널 투고 준비
 
@@ -145,13 +145,13 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 
 ## 7. 관련 문서
 
-`ooresearch`(SOTA 조사) | `oopaper`(문헌 수집) | `ooreport`(PDF 변환) | `d{SP}0001`(PRD) | `d{SP}0012`(실험결과)
+`ccresearch`(SOTA 조사) | `ccpaper`(문헌 수집) | `ccreport`(PDF 변환) | `d{SP}0001`(PRD) | `d{SP}0012`(실험결과)
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -171,10 +171,10 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -185,7 +185,7 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

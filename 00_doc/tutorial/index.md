@@ -43,7 +43,7 @@
 | **세션/메타** | oostart, oostop, oohelp, oocontext | `oostart run` |
 | **핵심 개발** | ooprd, ooplan, oodev, ootest, oocheck, oofix, oocommit | `oodev run` |
 | **모듈/DB** | oolib, oodb, oodeep | `oodb run` |
-| **문서/환경** | oodoc, ooenv, oohistory, oonote, ootodo, oouser | `oodoc run` |
+| **문서/환경** | oodoc, ooenv, oohistory, oonote, ootodo | `oodoc run` |
 | **실행/유틸** | oorun, oouv, oosync | `oorun run` |
 | **콘텐츠** | ooppt, ooword, oohwp, oobook, oopaper, ooreport, ooresearch, oosota, oosurvey, ooscrap | `oopaper run` |
 | **스킬 관리** | ooskill, oocommand, oopdf | `ooskill validate` |

@@ -4,12 +4,12 @@
 날짜/시간 기반으로 d{SP}0020_연구노트.md에 노트를 추가하고 조회합니다.
 
 사용법:
-    uv run python .claude/skills/ccnote/scripts/oonote_run.py add "내용" [--title "제목"] [--tag "태그"] [--ref "참조"] [--sp N]
-    uv run python .claude/skills/ccnote/scripts/oonote_run.py today [--sp N]
-    uv run python .claude/skills/ccnote/scripts/oonote_run.py list [날짜] [--all] [--sp N]
-    uv run python .claude/skills/ccnote/scripts/oonote_run.py search "키워드" [--tag "태그"] [--date "YYYY-MM"] [--limit N] [--sp N]
-    uv run python .claude/skills/ccnote/scripts/oonote_run.py status [--sp N]
-    uv run python .claude/skills/ccnote/scripts/oonote_run.py init [--sp N]
+    uv run python .agents/skills/ccnote/scripts/oonote_run.py add "내용" [--title "제목"] [--tag "태그"] [--ref "참조"] [--sp N]
+    uv run python .agents/skills/ccnote/scripts/oonote_run.py today [--sp N]
+    uv run python .agents/skills/ccnote/scripts/oonote_run.py list [날짜] [--all] [--sp N]
+    uv run python .agents/skills/ccnote/scripts/oonote_run.py search "키워드" [--tag "태그"] [--date "YYYY-MM"] [--limit N] [--sp N]
+    uv run python .agents/skills/ccnote/scripts/oonote_run.py status [--sp N]
+    uv run python .agents/skills/ccnote/scripts/oonote_run.py init [--sp N]
 """
 
 import argparse
@@ -26,7 +26,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -47,7 +47,7 @@ def show_help_if_no_args(skill_name, args):
 if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-# scripts/ → ccnote/ → skills/ → .claude/ → PROJECT_ROOT
+# scripts/ → ccnote/ → skills/ → .codex/ → PROJECT_ROOT
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 DOC_BASE = PROJECT_ROOT / "00_doc"
 

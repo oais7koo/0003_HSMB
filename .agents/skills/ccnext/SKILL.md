@@ -1,14 +1,14 @@
 ---
 name: ccnext
-description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 추천 | ref: `.claude/guides/common_guide.md`"
+description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 추천 | ref: `.codex/guides/common_guide.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccnext - 다음 작업 우선순위 추천
 
-> PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 추천 | ref: `.claude/guides/common_guide.md`
+> PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 추천 | ref: `.codex/guides/common_guide.md`
 
 ## 0. 스킬 요약
 
@@ -16,7 +16,7 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 |------|------|
 | **핵심 역할** | PRD·Plan·Todo 문서를 분석하여 다음에 진행할 작업 우선순위 추천 |
 | **하는 것** | 미완료 Feature/이슈 분석, 우선순위 정렬, 다음 작업 추천 목록 출력 |
-| **하지 않는 것** | 작업 실행(→ooflow/oodev), 이슈 수정(→oofix), 문서 수정(→oodoc) |
+| **하지 않는 것** | 작업 실행(→ccflow/ccdev), 이슈 수정(→ccfix), 문서 수정(→ccdoc) |
 | **참조 범위** | 현재 프로젝트 내부 문서 파일만 (d{SP}0001~0004) / 외부 시스템 자동 포함 안 함 |
 | **수정 대상** | 없음 (읽기·분석·출력만) |
 | **실행 레벨** | [수동] — 분석 결과 출력만, 파일 수정 없음 |
@@ -43,7 +43,7 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 | `ccnext run --all-sps` | 전체 서브프로젝트 대상으로 추천 |
 | `ccnext run --top N` | 상위 N개만 표시 (기본: 5) |
 
-실행: `uv run python .claude/skills/ccnext/scripts/oonext_run.py [args]`
+실행: `uv run python .agents/skills/ccnext/scripts/oonext_run.py [args]`
 
 ## 워크플로우
 
@@ -90,7 +90,7 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 | 2 | 80 | todo/이슈 | 00 | [ERROR] ... |
 | 3 | 70 | todo/커스텀 | 02 | ... |
 | 4 | 60 | plan | 00 | 불필요 스크립트 정리 |
-| 5 | 55 | plan/부채 | 00 | TD-01: oostart 스크립트 경로 수정 |
+| 5 | 55 | plan/부채 | 00 | TD-01: ccstart 스크립트 경로 수정 |
 
 ## 요약
 - 활성 이슈: N건 (CRITICAL: X, ERROR: Y, WARNING: Z)
@@ -126,13 +126,13 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 
 ## 관련
 
-`.claude/skills/ootodo/SKILL.md` | `.claude/skills/ooplan/SKILL.md` | `.claude/skills/ooprd/SKILL.md` | `00_doc/d{SP}0004_todo.md`
+`.agents/skills/cctodo/SKILL.md` | `.agents/skills/ccplan/SKILL.md` | `.agents/skills/ccprd/SKILL.md` | `00_doc/d{SP}0004_todo.md`
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -148,7 +148,7 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 ## QMD 마크다운 검색 (문서 내용 탐색 시)
 
 > 마크다운 문서 **내용**을 찾을 때는 Glob/Grep 대신 **`mcp__qmd__query`** 우선 사용.
-> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.claude/guides/common_guide.md §10`
+> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.codex/guides/common_guide.md §10`
 
 | 도구 | 적합한 상황 |
 |------|-----------|
@@ -157,7 +157,7 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 | `Glob` | 파일 경로 패턴 검색 |
 | `Grep` | 코드·특정 문자열 검색 |
 
-**인덱싱**: `oostart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {프로젝트명}`
+**인덱싱**: `ccstart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {프로젝트명}`
 
 <!-- QMD-REF:END -->
 
@@ -170,10 +170,10 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -184,7 +184,7 @@ description: "PRD·Plan·Todo 문서를 분석하여 우선 진행할 작업을 
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

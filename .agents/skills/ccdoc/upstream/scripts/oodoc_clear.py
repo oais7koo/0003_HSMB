@@ -44,6 +44,15 @@ TABLE_HEADER_RE = re.compile(
 # 이력 데이터 행 패턴: | v숫자 | ... |
 ROW_RE = re.compile(r'^\|\s*v\d[^\n]*\n', re.MULTILINE)
 
+# 불릿 리스트 이력 행 패턴: - v01/4.90/2.00 ... YYYY-MM-DD — ...
+BULLET_ROW_RE = re.compile(
+    r'^-\s+v?\d[\d.]*\s+\d{4}-\d{2}-\d{2}[^\n]*\n',
+    re.MULTILINE
+)
+
+# 섹션 헤더 인접 거리 (이 범위 안에 있는 첫 행만 같은 섹션으로 인정)
+SECTION_PROXIMITY = 200
+
 
 def load_text(path: Path) -> str:
     try:
@@ -62,9 +71,33 @@ def save_text(path: Path, content: str) -> bool:
         return False
 
 
+def _collect_consecutive(content: str, start: int, pattern) -> list:
+    """주어진 위치부터 연속된 행을 수집."""
+    rows = []
+    pos = start
+    for m in pattern.finditer(content, pos):
+        if m.start() == pos:
+            rows.append((m.start(), m.end()))
+            pos = m.end()
+        else:
+            break
+    return rows
+
+
+def _apply_keep(content: str, rows: list, keep: int) -> tuple:
+    """keep개 초과분 제거."""
+    if not rows or len(rows) <= keep:
+        return content, 0
+    removed_count = len(rows) - keep
+    delete_start = rows[keep][0]
+    delete_end = rows[-1][1]
+    new_content = content[:delete_start] + content[delete_end:]
+    return new_content, removed_count
+
+
 def process_history(content: str, keep: int) -> tuple:
     """
-    이력 테이블에서 keep개 초과 행 제거.
+    이력 섹션에서 keep개 초과 행 제거. 테이블 형식과 불릿 리스트 형식 모두 지원.
 
     Returns:
         (수정된 content, 제거된 행 수)
@@ -73,37 +106,23 @@ def process_history(content: str, keep: int) -> tuple:
     section_m = HISTORY_SECTION_RE.search(content)
     if not section_m:
         return content, 0
-
-    # Step 2: 섹션 이후에서 테이블 헤더(버전|날짜) 찾기
     after_section = section_m.end()
+
+    # Step 2-A: 테이블 형식 시도
     header_m = TABLE_HEADER_RE.search(content, after_section)
-    if not header_m:
-        return content, 0
+    if header_m and header_m.start() < after_section + SECTION_PROXIMITY:
+        rows = _collect_consecutive(content, header_m.end(), ROW_RE)
+        if rows:
+            return _apply_keep(content, rows, keep)
 
-    # 데이터 행 시작 위치 (헤더+구분자 바로 다음)
-    data_start = header_m.end()
+    # Step 2-B: 불릿 리스트 형식 시도
+    bullet_m = BULLET_ROW_RE.search(content, after_section)
+    if bullet_m and bullet_m.start() < after_section + SECTION_PROXIMITY:
+        rows = _collect_consecutive(content, bullet_m.start(), BULLET_ROW_RE)
+        if rows:
+            return _apply_keep(content, rows, keep)
 
-    # Step 3: 연속된 | v숫자 | 행 수집
-    rows = []   # (start, end) 리스트
-    pos = data_start
-
-    for m in ROW_RE.finditer(content, pos):
-        if m.start() == pos:
-            rows.append((m.start(), m.end()))
-            pos = m.end()
-        else:
-            break  # 연속되지 않으면 종료
-
-    if not rows or len(rows) <= keep:
-        return content, 0
-
-    # keep개 초과분 제거 (앞 = 최신, 뒤 = 오래된 순)
-    removed_count = len(rows) - keep
-    delete_start = rows[keep][0]     # (keep+1)번째 행 시작
-    delete_end   = rows[-1][1]       # 마지막 행 끝
-
-    new_content = content[:delete_start] + content[delete_end:]
-    return new_content, removed_count
+    return content, 0
 
 
 def collect_targets(scope: str) -> list:

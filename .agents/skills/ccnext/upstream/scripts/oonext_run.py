@@ -55,9 +55,9 @@ SCORE_MAP = {
     "WARNING": 40,
     "INFO": 10,
     # todo 커스텀 Todo
-    "high": 70, "높음": 70,
-    "medium": 50, "보통": 50,
-    "low": 30, "낮음": 30,
+    "high": 70, "높음": 70, "HIGH": 70,
+    "medium": 50, "보통": 50, "MEDIUM": 50, "MED": 50,
+    "low": 30, "낮음": 30, "LOW": 30,
     # plan 우선순위
     "High": 60,
     "Medium": 40,
@@ -120,6 +120,93 @@ def doc_path(sp: str, doc_type: str) -> Path:
     return DOC_DIR / names[doc_type]
 
 
+def get_todo_dir(sp: str) -> Path | None:
+    """SP의 상세 ToDo 폴더 경로 (`todo/`) 반환. 부재 시 None."""
+    sp_num = int(sp)
+    sp_folder = f"sp{sp_num:02d}"
+    todo_dir = DOC_DIR / sp_folder / "todo"
+    return todo_dir if todo_dir.exists() else None
+
+
+def extract_status_from_detail(detail_path: Path) -> str | None:
+    """todo/{ID}.md 헤더에서 상태 추출. (OPEN/IN_PROGRESS/HOLD/DONE)"""
+    if not detail_path.exists():
+        return None
+    try:
+        head = detail_path.read_text(encoding="utf-8")[:2000]
+    except Exception:
+        return None
+    m = re.search(r"상태:\s*(\w+)", head)
+    return m.group(1) if m else None
+
+
+def extract_meta_from_detail(detail_path: Path) -> dict | None:
+    """todo/{ID}.md 첫 헤더에서 우선순위·상태·제목 추출.
+
+    예: `# R160-2 — get_columns_for_mapping ...`
+        `> 우선순위: LOW | 상태: OPEN | 등록: 2026-05-11`
+    """
+    if not detail_path.exists():
+        return None
+    try:
+        head = detail_path.read_text(encoding="utf-8")[:3000]
+    except Exception:
+        return None
+
+    title_m = re.search(r"^#\s+\S+\s*(?:—|-)\s*(.+)$", head, re.MULTILINE)
+    title = title_m.group(1).strip() if title_m else ""
+
+    prio_m = re.search(r"우선순위:\s*(\w+)", head)
+    priority = prio_m.group(1) if prio_m else "medium"
+
+    status_m = re.search(r"상태:\s*(\w+)", head)
+    status = status_m.group(1) if status_m else "OPEN"
+
+    return {"title": title, "priority": priority, "status": status}
+
+
+def extract_todos_from_folder(sp: str) -> list:
+    """todo/ 폴더의 모든 {ID}.md를 스캔하여 항목 추출 (DONE 제외)."""
+    items = []
+    todo_dir = get_todo_dir(sp)
+    if todo_dir is None:
+        return items
+
+    for md in sorted(todo_dir.glob("*.md")):
+        # README·_template 같은 메타 파일 제외
+        if md.stem.startswith("_") or md.stem.upper() == "README":
+            continue
+        meta = extract_meta_from_detail(md)
+        if meta is None:
+            continue
+        if meta["status"] == "DONE":
+            continue
+
+        todo_id = md.stem
+        priority = meta["priority"]
+        score = SCORE_MAP.get(priority, SCORE_MAP.get(priority.upper(), 30))
+        if meta["status"] == "HOLD":
+            score = max(score // 2, 5)
+
+        prefix = todo_id[0]
+        if prefix in ("T", "A", "S", "W", "D"):
+            source = "todo/이슈"
+        elif prefix == "R":
+            source = "todo/리팩토링"
+        else:
+            source = "todo/커스텀"
+
+        items.append({
+            "score": score,
+            "source": source,
+            "sp": sp,
+            "desc": f"{todo_id}: {meta['title'][:60]}",
+            "priority": priority,
+            "status": meta["status"],
+        })
+    return items
+
+
 def read_file_safe(path: Path) -> str:
     if path.exists():
         return path.read_text(encoding="utf-8")
@@ -127,7 +214,18 @@ def read_file_safe(path: Path) -> str:
 
 
 def extract_todo_items(content: str, sp: str) -> list:
-    """## 대기 ToDo 섹션의 모든 ### ID 블록 항목 추출."""
+    """## 대기 ToDo 섹션의 모든 ### ID 블록 항목 추출.
+
+    지원 헤더 형식:
+      ### {ID} {title}                          (레거시, 등록일 라인 필요)
+      ### {ID} [{TYPE}][{PRIORITY}] {title}     (현재 SP04 형식)
+
+    우선순위 추출 순서:
+      1. 헤더의 [{PRIORITY}] 태그 (HIGH/MED/LOW/CRITICAL/ERROR/WARNING/INFO)
+      2. 블록 본문의 `- 우선순위: {LEVEL}` 라인
+      3. 블록 본문의 `등록일: ... 우선순위: ...` (레거시)
+      4. 기본값: medium
+    """
     items = []
     section_match = re.search(r"^## 대기 ToDo", content, re.MULTILINE)
     if not section_match:
@@ -137,29 +235,78 @@ def extract_todo_items(content: str, sp: str) -> list:
     section_end = section_match.end() + next_section.start() if next_section else len(content)
     section_content = content[section_match.end():section_end]
 
-    for block_match in re.finditer(
-        r"^### (\S+) (.+)\n(등록일: [^\n]+)",
-        section_content,
-        re.MULTILINE
-    ):
-        issue_id = block_match.group(1)
-        title = block_match.group(2)
-        meta = block_match.group(3)
+    # 모든 ### 헤더 위치 수집 후 각 블록을 다음 ### 또는 섹션 끝까지로 분할
+    headers = list(re.finditer(r"^### (\S+) (.+)$", section_content, re.MULTILINE))
+    if not headers:
+        return items
 
-        priority_m = re.search(r"우선순위: (\S+)", meta)
-        priority = priority_m.group(1) if priority_m else "medium"
+    for idx, hdr in enumerate(headers):
+        issue_id = hdr.group(1)
+        title_raw = hdr.group(2).strip()
+        block_start = hdr.end()
+        block_end = headers[idx + 1].start() if idx + 1 < len(headers) else len(section_content)
+        block = section_content[block_start:block_end]
+
+        # 1) 헤더의 [PRIORITY] 태그에서 추출 (마지막 대괄호 태그를 우선순위로 간주)
+        tags = re.findall(r"\[([A-Z가-힣]+)\]", title_raw)
+        priority = None
+        title_clean = title_raw
+        if tags:
+            # 마지막 태그가 우선순위일 가능성 높음. 알려진 키워드만 채택.
+            known_priorities = {"CRITICAL", "ERROR", "WARNING", "INFO",
+                                "HIGH", "MEDIUM", "MED", "LOW",
+                                "높음", "보통", "낮음"}
+            for tag in reversed(tags):
+                if tag in known_priorities:
+                    priority = tag
+                    break
+            # 제목에서 모든 대괄호 태그 제거하여 깔끔한 desc 생성
+            title_clean = re.sub(r"\[[A-Z가-힣]+\]", "", title_raw).strip()
+
+        # 2) `- 우선순위:` 라인
+        if priority is None:
+            m = re.search(r"^\s*-\s*우선순위[:：]\s*(\S+)", block, re.MULTILINE)
+            if m:
+                priority = m.group(1).rstrip("()[]")
+
+        # 3) 레거시 `등록일: ... 우선순위:` 라인
+        if priority is None:
+            m = re.search(r"등록일[:：][^\n]*우선순위[:：]\s*(\S+)", block)
+            if m:
+                priority = m.group(1)
+
+        # 4) 기본값
+        if priority is None:
+            priority = "medium"
+
         score = SCORE_MAP.get(priority, SCORE_MAP.get(priority.upper(), 30))
 
-        # ID 접두사로 소스 구분 (T/A/S/W = 이슈, C = 커스텀)
+        # ID 접두사로 소스 구분 (T/A/S/W/D = 이슈, R = 리팩토링/요구사항, C/기타 = 커스텀)
         prefix = issue_id[0] if issue_id else "C"
-        source = "todo/이슈" if prefix in ("T", "A", "S", "W", "D") else "todo/커스텀"
+        if prefix in ("T", "A", "S", "W", "D"):
+            source = "todo/이슈"
+        elif prefix == "R":
+            source = "todo/리팩토링"
+        else:
+            source = "todo/커스텀"
+
+        # 상세 파일 상태 확인 — todo/{ID}.md 가 있으면 우선 적용
+        todo_dir = get_todo_dir(sp)
+        detail_status = None
+        if todo_dir is not None:
+            detail_status = extract_status_from_detail(todo_dir / f"{issue_id}.md")
+            if detail_status == "DONE":
+                continue  # 완료 항목은 추천 제외
+            if detail_status == "HOLD":
+                score = max(score // 2, 5)  # 보류는 점수 절반 (최소 5)
 
         items.append({
             "score": score,
             "source": source,
             "sp": sp,
-            "desc": f"{issue_id}: {title[:60]}",
+            "desc": f"{issue_id}: {title_clean[:60]}",
             "priority": priority,
+            "status": detail_status or "OPEN",
         })
     return items
 
@@ -292,13 +439,22 @@ def extract_prd_unimplemented(content: str, sp: str) -> list:
 
 
 def analyze_sp(sp: str, sources: list) -> list:
-    """특정 SP의 문서를 분석하여 작업 항목을 추출."""
+    """특정 SP의 문서를 분석하여 작업 항목을 추출.
+
+    우선순위:
+    1. `todo/` 폴더 존재 시 → 폴더 스캔 (각 {ID}.md 헤더에서 메타 추출)
+    2. 인덱스 ### 헤더 형식 → 폴백
+    """
     all_items = []
 
     if "todo" in sources or "all" in sources:
-        todo_content = read_file_safe(doc_path(sp, "todo"))
-        if todo_content:
-            all_items.extend(extract_todo_items(todo_content, sp))
+        folder_items = extract_todos_from_folder(sp)
+        if folder_items:
+            all_items.extend(folder_items)
+        else:
+            todo_content = read_file_safe(doc_path(sp, "todo"))
+            if todo_content:
+                all_items.extend(extract_todo_items(todo_content, sp))
 
     if "plan" in sources or "all" in sources:
         plan_content = read_file_safe(doc_path(sp, "plan"))

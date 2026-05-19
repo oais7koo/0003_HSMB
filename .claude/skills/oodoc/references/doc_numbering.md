@@ -36,7 +36,7 @@ d  {SP 2자리}  {문서번호 4자리}  _  {문서명}.md
 
 | 번호 | 파일명 패턴 | 용도 | 생성 스킬 |
 |------|------------|------|----------|
-| 0000 | `d{SP}0000_manual.md` | 전체 사용 매뉴얼 | `oodoc manual` |
+| 0000 | `d0000_list.md` | 00_doc 문서 링크 인덱스 (SP00 단일) | `oodoc run/update` |
 | 0001 | `d{SP}0001_prd.md` | PRD — 요구사항 정의 | `ooprd` |
 | 0002 | `d{SP}0002_plan.md` | 구현 계획 (Feature/Task) | `ooplan` |
 | 0003 | `d{SP}0003_test.md` | 테스트 케이스 | `ootest` |
@@ -44,7 +44,7 @@ d  {SP 2자리}  {문서번호 4자리}  _  {문서명}.md
 | 0005 | `d{SP}0005_lib.md` | 라이브러리 정보 | `oolib` |
 | 0006 | `d{SP}0006_db.md` | DB 구조 | `oodb` |
 | 0007 | `d{SP}0007_data.md` | data/ 폴더 구조·설명 | `oodata` |
-| 0008 | `d{SP}0008_user.md` | 사용자 관리 | `oouser` |
+| 0008 | `d{SP}0008_checklist.md` | 프로젝트 체크리스트 | `oocheck` |
 | 0009 | `d{SP}0009_env.md` | 환경 현황 | `ooenv` |
 | 0010 | `d{SP}0010_history.md` | 변경 이력 | `oohistory` |
 | 0011~0019 | — | 미할당 (예약) | — |

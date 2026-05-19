@@ -2,7 +2,7 @@
 """
 oostart_run.py
 
-This script implements the session start workflow as defined in .claude/skills/oostart/SKILL.md.
+This script implements the session start workflow as defined in .agents/skills/ccstart/SKILL.md.
 It checks the status of key documentation files and prints a checklist for the user.
 """
 
@@ -26,7 +26,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -46,7 +46,7 @@ def show_help_if_no_args(skill_name, args):
 # Configuration
 DOC_DIR_SP00 = Path("00_doc/sp00")
 DOC_DIR_FLAT = Path("00_doc")
-GUIDE_DIR = Path(".claude/guides")
+GUIDE_DIR = Path(".codex/guides")
 COMMON_GUIDE = "common_guide.md"
 ENV_FILE = Path(".env")
 
@@ -229,7 +229,6 @@ def check_sync_target():
 # - 참고 문서는 on-demand로 Read 도구로 로드
 # - Context 효율성: 필수 2개 = ~6k tokens, 참고 6개 = ~24k tokens
 DOCS_TO_CHECK = [
-    "d0000_manual.md",   # 전체 사용 매뉴얼
     "d0001_prd.md",      # PRD - 프로젝트 요구사항
     "d0004_todo.md",     # TODO/디버깅 - 이슈 추적
 ]
@@ -240,7 +239,7 @@ PROJECT_ROOT = Path(".")
 
 
 def get_current_sp() -> str:
-    """oocontext 설정에서 현재 SP 번호를 읽는다.
+    """cccontext 설정에서 현재 SP 번호를 읽는다.
 
     Returns: SP 번호 문자열 (예: "00", "03"), 미설정 시 "00"
     """
@@ -383,6 +382,57 @@ def run_qmd_update() -> tuple[str, str]:
         return "WARN", str(e)[:80]
 
 
+def _check_todo_folder(sp_num: int) -> None:
+    """R163: SP별 `todo/` 폴더 점검 — 상태 카운트 + 인덱스↔상세 고아 검출."""
+    import re as _re_todo
+    todo_dir = PROJECT_ROOT / "00_doc" / f"sp{sp_num:02d}" / "todo"
+    print(f"## 1b. ToDo 폴더 점검 (`00_doc/sp{sp_num:02d}/todo/`)\n")
+    if not todo_dir.exists():
+        print(f"[INFO] todo/ 폴더 미도입 — 인덱스만 사용 중\n")
+        return
+    # 상세 파일 스캔 (예약 파일 제외)
+    detail_files = [p for p in todo_dir.glob("*.md") if p.stem not in ("_template", "README")]
+    counts = {"OPEN": 0, "IN_PROGRESS": 0, "HOLD": 0, "DONE": 0, "UNKNOWN": 0}
+    detail_ids: set[str] = set()
+    head_re = _re_todo.compile(r"^>\s*우선순위:[^|]+\|\s*상태:\s*([A-Z_]+)", _re_todo.MULTILINE)
+    for fp in detail_files:
+        detail_ids.add(fp.stem)
+        try:
+            text = fp.read_text(encoding="utf-8")
+            m = head_re.search(text)
+            state = m.group(1).strip() if m else "UNKNOWN"
+            counts[state if state in counts else "UNKNOWN"] += 1
+        except Exception:
+            counts["UNKNOWN"] += 1
+    # 인덱스 ID 추출 — 대기 ToDo 표(`| R### |`)만 대상. 완료 ToDo·문서이력은 옛 형식 R-ID가 많아 비교에서 제외.
+    index_file = PROJECT_ROOT / "00_doc" / f"sp{sp_num:02d}" / f"d{sp_num}0004_todo.md"
+    index_ids: set[str] = set()
+    if index_file.exists():
+        idx_text = index_file.read_text(encoding="utf-8")
+        for m in _re_todo.finditer(r"^\|\s*(R\d+(?:-\d+)?(?:\.\d+)?)\s*\|", idx_text, _re_todo.MULTILINE):
+            index_ids.add(m.group(1).strip())
+    # OPEN/IN_PROGRESS/HOLD인 상세 파일만 인덱스 미참조 후보 (DONE은 완료 ToDo 섹션에 있어 검출 안 됨이 정상)
+    open_detail_ids: set[str] = set()
+    open_re = _re_todo.compile(r"^>\s*우선순위:[^|]+\|\s*상태:\s*(OPEN|IN_PROGRESS|HOLD)\b", _re_todo.MULTILINE)
+    for fp in detail_files:
+        try:
+            if open_re.search(fp.read_text(encoding="utf-8")):
+                open_detail_ids.add(fp.stem)
+        except Exception:
+            pass
+    orphan_detail = open_detail_ids - index_ids  # 활성 상세이지만 인덱스 대기 미참조
+    orphan_index = index_ids - detail_ids  # 인덱스 대기 ToDo에 있지만 상세 파일 없음
+    total = sum(counts.values())
+    print(f"- 상세 파일: **{total}개** (OPEN {counts['OPEN']} · IN_PROGRESS {counts['IN_PROGRESS']} · HOLD {counts['HOLD']} · DONE {counts['DONE']}" + (f" · UNKNOWN {counts['UNKNOWN']}" if counts['UNKNOWN'] else "") + ")")
+    if orphan_detail:
+        print(f"- [WARN] 인덱스 미참조 상세 파일: {', '.join(sorted(orphan_detail))}")
+    if orphan_index:
+        print(f"- [WARN] 인덱스에만 있고 상세 파일 없음: {', '.join(sorted(orphan_index))}")
+    if not orphan_detail and not orphan_index:
+        print(f"- [OK] 인덱스 ↔ 상세 정합성 일치")
+    print()
+
+
 def cmd_show_checklist():
     """references/checklist.md 내용 출력"""
     checklist_path = Path(__file__).parent.parent / "references" / "checklist.md"
@@ -401,7 +451,7 @@ def main():
         sys.argv.append("run")
 
     if sys.argv[1:] and sys.argv[1] in ("help", "-h"):
-        _print_skill_help("oostart")
+        _print_skill_help("ccstart")
         return
 
     no_sp = is_no_sp_project()
@@ -411,7 +461,7 @@ def main():
     else:
         sp_label = f"SP{int(current_sp):02d}" if current_sp != "00" else "SP00 (공통)"
 
-    print("# oostart Session Start Workflow\n")
+    print("# ccstart Session Start Workflow\n")
     print(f"Current Time: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Current Context: **{sp_label}**\n")
 
@@ -429,7 +479,7 @@ def main():
     tag = {"OK": "[OK]   ", "FIXED": "[FIXED]", "SKIP": "[SKIP] ", "WARN": "[WARN] ", "ERROR": "[ERROR]"}.get(venv_status, "[?]    ")
     print(f"{tag} .venv OS compat: {venv_msg}")
 
-    # oosync 대상 경로 체크
+    # ccsync 대상 경로 체크
     sync_status, sync_path = check_sync_target()
     if sync_status == "OK":
         print(f"[OK]    OAIS_SYNC_TARGET={sync_path}")
@@ -511,6 +561,11 @@ def main():
             print(f"| {doc_name} | {sp_doc_label} | {status} | {mtime if mtime else '-'} |")
     print("\n")
 
+    # R163: todo/ 폴더 점검 (SP 모드, sp00 아닐 때만)
+    if not no_sp and current_sp != "00":
+        sp_num = int(current_sp)
+        _check_todo_folder(sp_num)
+
     print("## 2. Sync Checklist (Action Required)\n")
     print("### d0001_prd.md (Requirements)")
     print("- [ ] Check for new requirements")
@@ -534,11 +589,11 @@ def main():
     print("- [ ] Add recent change history")
     print("- [ ] Update version information\n")
 
-    print("## 3. oocheck Preparation\n")
-    print("- [ ] Run `oocheck run` to verify code quality")
+    print("## 3. cccheck Preparation\n")
+    print("- [ ] Run `cccheck run` to verify code quality")
     print("  - [ ] Check for CRITICAL issues (Must fix immediately)")
     print("  - [ ] Check for ERROR issues (Fix in this session)")
-    print("- [ ] Run `oocheck update` to organize documents\n")
+    print("- [ ] Run `cccheck update` to organize documents\n")
 
     print("## 4. Session Ready Report Template\n")
     print("Copy and fill this section when ready:\n")
@@ -550,7 +605,7 @@ def main():
     print("- d0004_todo.md: [변경없음/업데이트됨]")
     print("- d0010_history.md: [변경없음/업데이트됨]")
     print("")
-    print("### oocheck 결과")
+    print("### cccheck 결과")
     print("- CRITICAL: 0건")
     print("- ERROR: X건")
     print("- WARNING: Y건")
@@ -571,7 +626,7 @@ def print_context_setup(current_sp: str, subprojects: list, no_sp: bool = False)
     if no_sp:
         print("**독립 프로젝트**: SP 체계를 사용하지 않음 (common_guide §4.2.6)\n")
         print("- 문서 경로: `00_doc/d0001~d9999` (flat 구조)")
-        print("- oocontext: 기본값(SP00) 고정 — 별도 전환 불필요")
+        print("- cccontext: 기본값(SP00) 고정 — 별도 전환 불필요")
         print("- 마커: `.env`의 `OAIS_NO_SP=1` 또는 00_doc/ flat 구조 자동 감지\n")
         return
 
@@ -586,10 +641,10 @@ def print_context_setup(current_sp: str, subprojects: list, no_sp: bool = False)
             print(f"- SP{sp_num:02d}: {name}{marker}")
         print()
 
-    print("[ACTION] oocontext 실행: 작업할 서브프로젝트를 지정하세요.")
-    print("  예) oocontext 3  →  SP03으로 전환")
-    print("      oocontext 0  →  SP00 공통으로 초기화")
-    print("      oocontext    →  현재 컨텍스트 확인만")
+    print("[ACTION] cccontext 실행: 작업할 서브프로젝트를 지정하세요.")
+    print("  예) cccontext 3  →  SP03으로 전환")
+    print("      cccontext 0  →  SP00 공통으로 초기화")
+    print("      cccontext    →  현재 컨텍스트 확인만")
 
 
 if __name__ == "__main__":

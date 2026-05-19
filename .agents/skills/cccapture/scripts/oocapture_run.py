@@ -3,7 +3,7 @@
 cccapture - Flutter/Web 앱 화면 캡처 스크립트
 
 Usage:
-    uv run python .claude/skills/cccapture/scripts/oocapture_run.py [args]
+    uv run python .agents/skills/cccapture/scripts/oocapture_run.py [args]
 """
 
 import argparse

@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Constants (OAIS=03_paper/ 하위, 독립 프로젝트=루트 직하 양쪽 호환)
-# scripts/ → ccpaper/ → skills/ → .claude/ → PROJECT_ROOT (5 levels up)
+# scripts/ → ccpaper/ → skills/ → .codex/ → PROJECT_ROOT (5 levels up)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 PAPER_BASE = PROJECT_ROOT / "03_paper" if (PROJECT_ROOT / "03_paper").exists() else PROJECT_ROOT
 PAPER_DIR = PAPER_BASE / "11_paper_en"

@@ -12,17 +12,17 @@ import sys
 from pathlib import Path
 
 
-SKILL_ROOT = Path(__file__).resolve().parents[2]  # .claude/skills
+SKILL_ROOT = Path(__file__).resolve().parents[2]  # .codex/skills
 # 문서 검색을 수행하는 스킬
 INCLUDE_SKILLS = {
-    "oodoc",      # 문서 자동화 — 문서 탐색/생성
-    "oocontext",  # 서브프로젝트 컨텍스트 — 관련 문서 검색
-    "ooprd",      # PRD 생성 — 기존 문서 참조
-    "ooplan",     # 구현 계획 — 기존 계획/문서 참조
-    "oonext",     # 다음 작업 추천 — 컨텍스트 문서 검색
-    "oonow",      # 현재 상태 — 최근 문서 탐색
-    "ooresearch", # SOTA 연구 — 문서/논문 검색
-    "oowork",     # 작업 관리 — 관련 문서 탐색
+    "ccdoc",      # 문서 자동화 — 문서 탐색/생성
+    "cccontext",  # 서브프로젝트 컨텍스트 — 관련 문서 검색
+    "ccprd",      # PRD 생성 — 기존 문서 참조
+    "ccplan",     # 구현 계획 — 기존 계획/문서 참조
+    "ccnext",     # 다음 작업 추천 — 컨텍스트 문서 검색
+    "ccnow",      # 현재 상태 — 최근 문서 탐색
+    "ccresearch", # SOTA 연구 — 문서/논문 검색
+    "ccwork",     # 작업 관리 — 관련 문서 탐색
 }
 MARKER_START = "<!-- QMD-REF:START -->"
 MARKER_END = "<!-- QMD-REF:END -->"
@@ -35,7 +35,7 @@ def build_block() -> str:
 ## QMD 마크다운 검색 (문서 내용 탐색 시)
 
 > 마크다운 문서 **내용**을 찾을 때는 Glob/Grep 대신 **`mcp__qmd__query`** 우선 사용.
-> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.claude/guides/common_guide.md §10`
+> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.codex/guides/common_guide.md §10`
 
 | 도구 | 적합한 상황 |
 |------|-----------|
@@ -44,7 +44,7 @@ def build_block() -> str:
 | `Glob` | 파일 경로 패턴 검색 |
 | `Grep` | 코드·특정 문자열 검색 |
 
-**인덱싱**: `oostart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {{프로젝트명}}`
+**인덱싱**: `ccstart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {{프로젝트명}}`
 
 {MARKER_END}
 """

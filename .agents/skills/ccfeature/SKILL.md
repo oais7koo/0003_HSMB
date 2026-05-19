@@ -1,14 +1,14 @@
 ---
 name: ccfeature
-description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md"
+description: "공통 가이드: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md
+> 공통 가이드: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md
 
-> 연동: ooplan (plan.md 8.2절) | oodev (상세 문서 기반 개발) | oocheck (검증)
+> 연동: ccplan (plan.md 8.2절) | ccdev (상세 문서 기반 개발) | cccheck (검증)
 
 
 
@@ -24,7 +24,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 | **하는 것** | 문서 생성·rename 단계 전환·미착수 Feature 리스트업 |
 
-| **하지 않는 것** | 코드 구현(→oodev) / 테스트(→ootest) / 체크(→oocheck) |
+| **하지 않는 것** | 코드 구현(→ccdev) / 테스트(→cctest) / 체크(→cccheck) |
 
 | **대상** | `00_doc/sp{N}/dXXXX_상세*.md` |
 
@@ -40,9 +40,9 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 - v19 2026-04-19 — validate → check 통합
 
-- v17 2026-04-18 — rmdup 서브명령어 추가 — 같은 번호 복수 단계 파일 정리 (`oofeature_rmdup.py`)
+- v17 2026-04-18 — rmdup 서브명령어 추가 — 같은 번호 복수 단계 파일 정리 (`ccfeature_rmdup.py`)
 
-- v16 2026-04-16 — 설계→구현 전환 필수 체크리스트 추가 — `oodev run dXXXX` 건너뜀 방지 경고
+- v16 2026-04-16 — 설계→구현 전환 필수 체크리스트 추가 — `ccdev run dXXXX` 건너뜀 방지 경고
 
 
 
@@ -84,14 +84,14 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 | `ccfeature sync` | plan.md 8.2절 강제 갱신 |
 
-| `ccfeature update <doc_id> [--sp N]` | **문서↔코드 비교 → 현행화 → 미구현 배치** (oocommit 연동) |
+| `ccfeature update <doc_id> [--sp N]` | **문서↔코드 비교 → 현행화 → 미구현 배치** (cccommit 연동) |
 | `ccfeature update` | 변경 감지 → 상세기획 롤백 후보 표시 |
 
 | `ccfeature update --apply` / `--force` | 롤백 실행 (`--force`=`--apply` 별칭) |
 
 | `ccfeature update --dry` | 롤백 미리보기 |
 
-| `ccfeature update --from-plan` / `--from-doc` | (하위 호환) plan.md / 상세구현+oocheck 기반 롤백 |
+| `ccfeature update --from-plan` / `--from-doc` | (하위 호환) plan.md / 상세구현+cccheck 기반 롤백 |
 
 | `ccfeature note dXXXX "내용" [--sp N]` | ## 메모 섹션에 날짜+내용 추가 |
 
@@ -105,7 +105,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 
 
-실행(check): `uv run python .claude/skills/ccfeature/scripts/oofeature_validate.py [--sp N] [--verbose] [--dry-run]`
+실행(check): `uv run python .agents/skills/ccfeature/scripts/oofeature_validate.py [--sp N] [--verbose] [--dry-run]`
 
 
 
@@ -137,7 +137,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 |------|---------|
 
-| `new` | 템플릿 선택(공통/fastapi/streamlit) → 저장 → `ooplan sync` |
+| `new` | 템플릿 선택(공통/fastapi/streamlit) → 저장 → `ccplan sync` |
 
 | `next` | 파일 없으면 기획 생성 / 있으면 단계 감지 → rename → 연계 스킬 실행 |
 
@@ -151,7 +151,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 
 
-> ⚠️ 설계→구현 전환 직후 즉시 `oodev run dXXXX` 실행 필수 — 건너뛰면 TDD 사이클 누락
+> ⚠️ 설계→구현 전환 직후 즉시 `ccdev run dXXXX` 실행 필수 — 건너뛰면 TDD 사이클 누락
 
 > 단계별 상세 워크플로우: `references/guide.md §4`, `references/workflow-detail.md §4` 참조
 
@@ -221,7 +221,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 
 
-연동 스킬: `ooplan`(plan.md 8.2절) · `oodev run dXXXX` · `oocheck run dXXXX` · `d{SP}0002_plan.md` 8.2절 테이블. 템플릿은 §5 표 참조.
+연동 스킬: `ccplan`(plan.md 8.2절) · `ccdev run dXXXX` · `cccheck run dXXXX` · `d{SP}0002_plan.md` 8.2절 테이블. 템플릿은 §5 표 참조.
 
 
 
@@ -233,7 +233,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 
 
-> `.claude/guides/run_update_separation.md` 준수. `run`=일회성 배치 실행 / `update`=상태·설정 현행화(멱등). `run`이 `update`를 자동 호출하지 않음.
+> `.codex/guides/run_update_separation.md` 준수. `run`=일회성 배치 실행 / `update`=상태·설정 현행화(멱등). `run`이 `update`를 자동 호출하지 않음.
 
 
 
@@ -249,7 +249,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 
 
-> 이 스킬은 코딩 작업 수행 시 `.claude/rules/karpathy-guidelines.md`의 4원칙(Think Before Coding · Simplicity First · Surgical Changes · Goal-Driven Execution)을 준수한다. 속도보다 신중함.
+> 이 스킬은 코딩 작업 수행 시 `.codex/rules/karpathy-guidelines.md`의 4원칙(Think Before Coding · Simplicity First · Surgical Changes · Goal-Driven Execution)을 준수한다. 속도보다 신중함.
 
 
 
@@ -265,7 +265,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 
 
-> 단순/반복 작업(번역·요약·분류·Rephrase·포맷 변환)은 사용자 승인 후 `gemma` 스킬로 위임하여 API 토큰 절감. 위임 기준은 `.claude/guides/gemma_delegation.md`, 실행은 `uv run python .claude/skills/gemma/scripts/gemma_run.py`, 서버 미가동 시 Claude 본체로 폴백.
+> 단순/반복 작업(번역·요약·분류·Rephrase·포맷 변환)은 사용자 승인 후 `gemma` 스킬로 위임하여 API 토큰 절감. 위임 기준은 `.codex/guides/gemma_delegation.md`, 실행은 `uv run python .agents/skills/gemma/scripts/gemma_run.py`, 서버 미가동 시 Codex 본체로 폴백.
 
 
 
@@ -287,7 +287,7 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 
 |------|------|
 
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 

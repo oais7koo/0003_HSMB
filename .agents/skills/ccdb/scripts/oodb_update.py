@@ -40,9 +40,9 @@ def print_usage():
     print("    --export-words    표준용어집 내보내기")
     print()
     print("예시:")
-    print("    python .claude/skills/ccdb/scripts/oodb_update.py run")
-    print("    python .claude/skills/ccdb/scripts/oodb_update.py schema")
-    print("    python .claude/skills/ccdb/scripts/oodb_update.py update --export-words")
+    print("    python .agents/skills/ccdb/scripts/oodb_update.py run")
+    print("    python .agents/skills/ccdb/scripts/oodb_update.py schema")
+    print("    python .agents/skills/ccdb/scripts/oodb_update.py update --export-words")
 
 def get_schema(db_path):
     if not db_path.exists():

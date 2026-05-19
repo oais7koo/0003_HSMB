@@ -30,7 +30,7 @@ TABLE_SEP    = "|------|------|------|"
 
 
 def get_current_sp() -> str:
-    context_file = PROJECT_ROOT / ".claude" / "skills" / "oocontext" / "references" / "current_context.json"
+    context_file = PROJECT_ROOT / ".codex" / "skills" / "cccontext" / "references" / "current_context.json"
     if context_file.exists():
         try:
             data = json.loads(context_file.read_text(encoding="utf-8"))
@@ -133,9 +133,9 @@ def main():
 
     if not args or args[0] in ("help", "-h", "--help"):
         print("Usage:")
-        print('  oof issue dXXXX "이슈내용" [--sp N]   # 이슈 추가 (🔴 미해결)')
-        print("  oof issue dXXXX --find [--sp N]       # 파일 경로 출력")
-        print("  oof issue dXXXX --resolve [--sp N]    # 최신 미해결 → ✅ 해결")
+        print('  ccf issue dXXXX "이슈내용" [--sp N]   # 이슈 추가 (🔴 미해결)')
+        print("  ccf issue dXXXX --find [--sp N]       # 파일 경로 출력")
+        print("  ccf issue dXXXX --resolve [--sp N]    # 최신 미해결 → ✅ 해결")
         return
 
     doc_num = None

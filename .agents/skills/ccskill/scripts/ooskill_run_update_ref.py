@@ -5,7 +5,7 @@
 
 제외 대상:
 - gemma 스킬 자신 (위임 전용)
-- alias 스킬 (ooc, ood, oof, ook, oos) — 본체 스킬만 원칙 명시
+- alias 스킬 (ccc, ccd, ccf, cck, ccs) — 본체 스킬만 원칙 명시
 """
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ import sys
 from pathlib import Path
 
 
-SKILL_ROOT = Path(__file__).resolve().parents[2]  # .claude/skills
-EXCLUDE_SKILLS = {"gemma", "ooc", "ood", "oof", "ook", "oos"}
+SKILL_ROOT = Path(__file__).resolve().parents[2]  # .codex/skills
+EXCLUDE_SKILLS = {"gemma", "ccc", "ccd", "ccf", "cck", "ccs"}
 MARKER_START = "<!-- RUN-UPDATE-REF:START -->"
 MARKER_END = "<!-- RUN-UPDATE-REF:END -->"
 
@@ -25,7 +25,7 @@ def build_block() -> str:
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|

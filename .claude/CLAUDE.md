@@ -87,7 +87,7 @@ allways answer in Korean.
 `oolib` 모듈 최적화 | `oodb` DB 관리/마이그레이션 | `oodeep` 딥러닝 GPU 최적화 | `ooopti` 코드/문서 최적화
 
 ### 문서/환경 (doc-env)
-`oodoc` 문서 자동화 | `ooenv` 환경 현황(d0009) | `oohistory` 이력(d0010) | `oonote` 연구노트(d0011) | `ootodo` TODO(d0004) | `oouser` 사용자(d0008) | `oodesign` 디자인시스템(SP07) | `ootutorial` 튜토리얼 | `oowiki` LLM Wiki 지식체계(01_obsidian/0020_wiki)
+`oodoc` 문서 자동화 | `ooenv` 환경 현황(d0009) | `oohistory` 이력(d0010) | `oonote` 연구노트(d0011) | `ootodo` TODO(d0004) | `oodesign` 디자인시스템(SP07) | `ootutorial` 튜토리얼 | `oowiki` LLM Wiki 지식체계(01_obsidian/0020_wiki)
 
 ### 실행/유틸 (meta-util)
 `oorun` 실행 | `oouv` uv패키지 | `oocontext` 서브프로젝트 컨텍스트 | `oonext` 다음작업 추천 | `oonow` 현재상태 | `ooprevious` 이전세션 | `ootoken` 토큰 모니터링 | `oowork` 작업관리 | `oocapture` 화면캡처(Playwright) | `oodata` 데이터 관리 | `oobatch` 배치 실행 | `oomemo` 메모 | `ooref` 레퍼런스 체크

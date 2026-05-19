@@ -1,14 +1,14 @@
 ---
 name: ccref
-description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 적용 체크 | ref: `.claude/reference/development/README.md`"
+description: "`.codex/reference/development/` 레퍼런스 기반 기술스펙 적용 체크 | ref: `.codex/reference/development/README.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccref - 프레임워크 레퍼런스 관리
 
-> `.claude/reference/development/` 레퍼런스 기반 기술스펙 적용 체크 | ref: `.claude/reference/development/README.md`
+> `.codex/reference/development/` 레퍼런스 기반 기술스펙 적용 체크 | ref: `.codex/reference/development/README.md`
 
 ## 0. 스킬 요약
 
@@ -16,8 +16,8 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 |------|------|
 | **핵심 역할** | 프레임워크 레퍼런스 목록 조회 + 현재 프로젝트 적용 여부 체크 |
 | **하는 것** | 레퍼런스 목록 표시, 프레임워크 자동 감지, 구조/패턴 체크, 문제점 리스트업 |
-| **하지 않는 것** | 코드 수정(→oofix), 레퍼런스 문서 작성, 동기화(→oosync) |
-| **참조 범위** | `.claude/reference/development/` 폴더 전체 |
+| **하지 않는 것** | 코드 수정(→ccfix), 레퍼런스 문서 작성, 동기화(→ccsync) |
+| **참조 범위** | `.codex/reference/development/` 폴더 전체 |
 | **수정 대상** | 읽기 전용 (체크 결과만 출력) |
 | **실행 레벨** | [반자동] — 프로젝트 경로 자동 감지 후 체크 |
 | **에이전트 호환** | 범용 — 스크립트 실행 중심 |
@@ -40,7 +40,7 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 | `ccref run [path]` | 특정 프로젝트 경로 체크 |
 | `ccref run [framework]` | 특정 프레임워크 강제 지정 후 체크 |
 
-실행: `uv run python .claude/skills/ccref/scripts/ooref_run.py [subcommand] [args]`
+실행: `uv run python .agents/skills/ccref/scripts/ooref_run.py [subcommand] [args]`
 
 ---
 
@@ -51,7 +51,7 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 **`ccref run`**:
 1. 프로젝트 경로 결정 (기본: 현재 디렉토리)
 2. 프레임워크 자동 감지 (`pyproject.toml`, `requirements.txt`, `main.py` import 패턴)
-3. 해당 레퍼런스 폴더 로드 (`.claude/reference/development/{framework}/`)
+3. 해당 레퍼런스 폴더 로드 (`.codex/reference/development/{framework}/`)
 4. 체크 실행:
    - 디렉토리 구조 (`01_directory_structure.md` 기준)
    - 파일 크기 (권장 한도 초과 여부)
@@ -65,7 +65,7 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 ## 레퍼런스 구조
 
 ```
-.claude/reference/development/
+.codex/reference/development/
 ├── README.md                   # 프레임워크 목록 + 감지 규칙
 └── fast-api/                   # FastAPI 레퍼런스 (13개 문서)
     ├── 00_overview.md
@@ -108,7 +108,7 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 
 ## 관련 스킬
 
-`oosync` (레퍼런스 동기화) | `oocheck` (코드 체크) | `oodev` (개발) | `oofix` (이슈 수정)
+`ccsync` (레퍼런스 동기화) | `cccheck` (코드 체크) | `ccdev` (개발) | `ccfix` (이슈 수정)
 
 ## 서브에이전트
 
@@ -121,7 +121,7 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -141,10 +141,10 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -155,7 +155,7 @@ description: "`.claude/reference/development/` 레퍼런스 기반 기술스펙 
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

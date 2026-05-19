@@ -1,14 +1,14 @@
 ---
 name: cccommit
-description: "공통: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md"
+description: "공통: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md
+> 공통: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md
 
-> 상세 가이드: .claude/skills/cccommit/references/guide.md
+> 상세 가이드: .agents/skills/cccommit/references/guide.md
 
 
 
@@ -28,7 +28,7 @@ Git 커밋 + d{SP}0004 완료항목 -> d{SP}0010 이동 통합 워크플로우
 
 | **하는 것** | git commit, 기본 git push, d{SP}0004 완료 항목 아카이브, GitHub Issues 연동(선택) |
 
-| **하지 않는 것** | 코드 수정(→oofix), 이슈 발견(→oocheck) |
+| **하지 않는 것** | 코드 수정(→ccfix), 이슈 발견(→cccheck) |
 
 | **참조 범위** | 현재 프로젝트 내부 파일 + 연결된 Git remote |
 
@@ -42,10 +42,10 @@ Git 커밋 + d{SP}0004 완료항목 -> d{SP}0010 이동 통합 워크플로우
 
 ## 문서 이력 관리
 
-- v04 2026-05-07 — `cccommit run` 커밋 전 상세문서(oof) 업데이트 단계 추가 (항상 실행, 완료 후 cccommit commit으로 진행)
+- v04 2026-05-07 — `cccommit run` 커밋 전 상세문서(ccf) 업데이트 단계 추가 (항상 실행, 완료 후 cccommit commit으로 진행)
 - v03 2026-04-10 — `cccommit run/commit` 기본 동작을 commit + push로 변경, `--no-push` 유지
 
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 
 
@@ -93,7 +93,7 @@ Git 커밋 + d{SP}0004 완료항목 -> d{SP}0010 이동 통합 워크플로우
 
 ## 2. 워크플로우 (6단계)
 
-0. **상세문서 확인** -> SP 추론 → 상세문서 목록 제시 → 사용자 선택 → oof update 실행
+0. **상세문서 확인** -> SP 추론 → 상세문서 목록 제시 → 사용자 선택 → ccf update 실행
 1. **분석** -> git status/diff, 커밋 메시지 생성
 2. **커밋** -> 스테이징, 실행 (사용자 확인)
 3. **푸시** -> remote 반영 (upstream 없으면 `-u` 자동 처리)
@@ -106,17 +106,17 @@ Git 커밋 + d{SP}0004 완료항목 -> d{SP}0010 이동 통합 워크플로우
 
 **상세문서 있을 때 (ACTION=SELECT)**:
 1. 출력된 목록을 사용자에게 보여주며 번호 선택 요청
-2. 사용자 선택 → `oof update <doc_id> --sp N` 실행
+2. 사용자 선택 → `ccf update <doc_id> --sp N` 실행
 3. 성공 → `cccommit commit` 으로 커밋 진행
 4. 실패 → 커밋 중단 (오류 보고)
 
 **상세문서 없을 때 (ACTION=NEW)**:
 1. "상세문서가 없습니다. 새로 만드시겠어요?" 확인
-2. y → `oof new --sp N` → 성공 시 `cccommit commit`
+2. y → `ccf new --sp N` → 성공 시 `cccommit commit`
 3. s → `cccommit commit` (문서 없이 커밋)
-4. oof 실패 → 커밋 중단
+4. ccf 실패 → 커밋 중단
 
-> oof update/new 완료 후에는 `cccommit commit`을 사용한다 (run은 step 0을 다시 실행하므로).
+> ccf update/new 완료 후에는 `cccommit commit`을 사용한다 (run은 step 0을 다시 실행하므로).
 
 
 
@@ -324,7 +324,7 @@ cccommit github
 
 ```
 
-oocheck run                # 품질 검증
+cccheck run                # 품질 검증
 
   ↓
 
@@ -346,7 +346,7 @@ cccommit run               # 커밋 + push + OAIS 이력 정리(d0010)
 
 
 
-d{SP}0004_todo.md, d{SP}0010_history.md, .claude/skills/oocheck/SKILL.md, .claude/skills/oofix/SKILL.md
+d{SP}0004_todo.md, d{SP}0010_history.md, .agents/skills/cccheck/SKILL.md, .agents/skills/ccfix/SKILL.md
 
 
 
@@ -362,7 +362,7 @@ d{SP}0004_todo.md, d{SP}0010_history.md, .claude/skills/oocheck/SKILL.md, .claud
 
 
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 
 
@@ -394,7 +394,7 @@ d{SP}0004_todo.md, d{SP}0010_history.md, .claude/skills/oocheck/SKILL.md, .claud
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
 
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 
 
@@ -438,13 +438,13 @@ d{SP}0004_todo.md, d{SP}0010_history.md, .claude/skills/oocheck/SKILL.md, .claud
 
 |------|------|
 
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
 
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
 
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 
 
@@ -466,7 +466,7 @@ d{SP}0004_todo.md, d{SP}0010_history.md, .claude/skills/oocheck/SKILL.md, .claud
 
 |------|------|
 
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 

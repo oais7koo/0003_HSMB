@@ -63,6 +63,7 @@
 | d0003_test.md | 테스트 시나리오 | `Read("00_doc/sp00/d0003_test.md")` |
 | d0005_lib.md | 라이브러리 정보 | `Read("00_doc/sp00/d0005_lib.md")` |
 | d0006_db.md | DB 구조 | `Read("00_doc/sp00/d0006_db.md")` |
+| d0008_checklist.md | 프로젝트 체크리스트 (oocheck 관할) | `Read("00_doc/sp00/d0008_checklist.md")` |
 | d0009_env.md | 환경 현황 | `Read("00_doc/sp00/d0009_env.md")` |
 
 ## 디버깅 규칙

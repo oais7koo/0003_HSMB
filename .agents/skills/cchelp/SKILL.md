@@ -1,14 +1,14 @@
 ---
 name: cchelp
-description: "공통 가이드: `.claude/guides/common_guide.md`"
+description: "공통 가이드: `.codex/guides/common_guide.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # cchelp - 명령어/스킬 도움말
 
-> 공통 가이드: `.claude/guides/common_guide.md`
+> 공통 가이드: `.codex/guides/common_guide.md`
 
 ## 0. 스킬 요약
 
@@ -17,20 +17,20 @@ description: "공통 가이드: `.claude/guides/common_guide.md`"
 | **핵심 역할** | oo 스킬·명령어 목록 및 도움말 표시 |
 | **하는 것** | 스킬 목록 출력, 명령어 설명 표시, 카테고리별 안내 |
 | **하지 않는 것** | 스킬 실행, 파일 수정, 환경 변경 |
-| **참조 범위** | `.claude/skills/` 스킬 파일 목록 / 외부 문서 자동 포함 안 함 |
+| **참조 범위** | `.agents/skills/` 스킬 파일 목록 / 외부 문서 자동 포함 안 함 |
 | **수정 대상** | 없음 (출력만) |
 | **실행 레벨** | [수동] — 도움말 출력만 |
 | **에이전트 호환** | 범용 — 스킬 목록 파일 읽기 중심으로 모든 에이전트 처리 가능 |
 
 ## 문서 이력 관리
-- v03 2026-04-07 — 마스터 문서 d0007 → .claude/CLAUDE.md 스킬 카탈로그로 변경
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v03 2026-04-07 — 마스터 문서 d0007 → .codex/CLAUDE.md 스킬 카탈로그로 변경
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
 ## 개요
 
-**역할**: `.claude/CLAUDE.md` OAIS 스킬 카탈로그 표시
+**역할**: `.codex/CLAUDE.md` OAIS 스킬 카탈로그 표시
 
 CLAUDE.md의 "OAIS 스킬 및 에이전트 카탈로그" 섹션이 모든 스킬·에이전트 정보의 SSOT입니다.  
 세션마다 자동 로드되므로 항상 최신 상태가 유지됩니다.
@@ -48,7 +48,7 @@ CLAUDE.md의 "OAIS 스킬 및 에이전트 카탈로그" 섹션이 모든 스킬
 | `cchelp add checklist "항목"` | 체크리스트 항목 추가 | checklist.md |
 | `cchelp` | CLAUDE.md 스킬 카탈로그 전체 표시 |
 | `cchelp [카테고리]` | 특정 카테고리만 표시 (예: oo, agent, command) |
-| `cchelp [스킬명]` | 특정 스킬 상세 (.claude/skills/oo*/SKILL.md 참조) |
+| `cchelp [스킬명]` | 특정 스킬 상세 (.agents/skills/oo*/SKILL.md 참조) |
 
 ## CLAUDE.md 카탈로그 구조
 
@@ -56,7 +56,7 @@ CLAUDE.md의 "OAIS 스킬 및 에이전트 카탈로그" 섹션이 모든 스킬
 |------|------|
 | oo 스킬 | 카테고리별 47개 스킬 (core-dev / doc-env / meta-util / content) |
 | 범용 명령어 | sc/ 명령어 (analyze, build, implement 등) |
-| 에이전트 | .claude/agents/ 전문 서브에이전트 |
+| 에이전트 | .codex/agents/ 전문 서브에이전트 |
 
 ## 실행
 
@@ -70,7 +70,7 @@ cchelp agent    # 에이전트만
 cchelp command  # 범용 명령어만
 
 # 특정 스킬 상세
-cchelp oodev    # .claude/skills/oodev/SKILL.md 내용 표시
+cchelp ccdev    # .agents/skills/ccdev/SKILL.md 내용 표시
 ```
 
 > **관련 명령어**: analyze, implement (`.claude/commands/sc/`)
@@ -79,7 +79,7 @@ cchelp oodev    # .claude/skills/oodev/SKILL.md 내용 표시
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -99,10 +99,10 @@ cchelp oodev    # .claude/skills/oodev/SKILL.md 내용 표시
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -113,7 +113,7 @@ cchelp oodev    # .claude/skills/oodev/SKILL.md 내용 표시
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |
@@ -125,6 +125,6 @@ cchelp oodev    # .claude/skills/oodev/SKILL.md 내용 표시
 
 | 문서 | 용도 |
 |------|------|
-| `.claude/CLAUDE.md` | OAIS 스킬 및 에이전트 카탈로그 (SSOT) |
-| `.claude/skills/oo*/SKILL.md` | 개별 스킬 상세 정의 |
-| `.claude/guides/common_guide.md` | 공통 가이드라인 |
+| `.codex/CLAUDE.md` | OAIS 스킬 및 에이전트 카탈로그 (SSOT) |
+| `.agents/skills/oo*/SKILL.md` | 개별 스킬 상세 정의 |
+| `.codex/guides/common_guide.md` | 공통 가이드라인 |

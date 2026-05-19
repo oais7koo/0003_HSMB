@@ -2,7 +2,7 @@
 name: oohelp
 description: "명령어/스킬 도움말 스킬 'oohelp', '도움말', '명령어 목록', '스킬 목록' 등을 요청할 때 트리거된다"
 metadata:
-  version: "v02"
+  version: "v03"
   category: "meta-util"
 ---
 

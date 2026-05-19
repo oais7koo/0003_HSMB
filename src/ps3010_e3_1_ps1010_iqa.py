@@ -4,19 +4,19 @@
 # Author: oaiskoo
 # Date: 2026.05.15
 # Version: v01
-# Goal: ps1010_chungsong_MTF 50조건 frame 507장 → d0100 표준 7종(9컬럼) NR-IQA 스코어 산출
+# Goal: ps1010_chungsong_MTF 50조건 frame 520장 → d0100 표준 7종(9컬럼) NR-IQA 스코어 산출
 # Changes:
-#   - v01: 초기 버전 — ps0010_new_iqa_lib 기반, ps2010 출력 형식 준수
+#   - v01: 초기 버전 — common_iqa7 기반, ps2010 출력 형식 준수
 # Description:
 #   - 입력: data/ps1010_chungsong_MTF/ (50조건 폴더, 각 폴더 직속 frame_*.png)
-#   - IQA 라이브러리: ps0010_new_iqa_lib.compute_all_from_path() — 9컬럼
+#   - IQA 라이브러리: common_iqa7.compute_all_from_path() — 9컬럼
 #   - 조건 폴더명 파싱: low_{dist}_{speed}_{dist2}_ISO{iso}
 #   - is_defocus: ISO=400이면 1 (PRD §2.6 의도적 defocus 조건)
 #   - 중간 체크포인트: 조건 단위 incremental 저장
 #   - 출력 형식: ps2010과 동일 (01/02/03 xlsx)
 # Input: ./data/ps1010_chungsong_MTF/
 # Output: ./data/ps3010/01_전체데이터_*.xlsx, 02_그룹별통계_*.xlsx, 03_그룹별평균_*.xlsx
-# 참조: d3010_상세기획_E3_1_ps1010_IQA.md, d0001_prd.md §2.7
+# 참조: d3010_상세구현_청송MTF_IQA산출.md, d0001_prd.md §2.7
 # ################################################################################
 # Library
 # ################################################################################
@@ -37,7 +37,7 @@ import pandas as pd
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import ps0010_new_iqa_lib as iqa
+import common_iqa7 as iqa
 
 # ################################################################################
 # Setting
@@ -63,7 +63,7 @@ CONFIG = {
         "checkpoint_csv": "data/ps3010/_checkpoint.csv",
     },
     "processing": {
-        "device": None,    # None → ps0010 자동 (GPU 우선)
+        "device": None,    # None → common_iqa7 자동 (GPU 우선)
     },
     "stats": {
         "skip_cols": {"condition", "frame", "is_defocus"},
@@ -71,14 +71,25 @@ CONFIG = {
     },
 }
 
+
+def resolve_device_name(device_arg: str | None) -> str:
+    """실제 추론에 사용될 디바이스 문자열을 반환."""
+    return device_arg or iqa._default_device()
+
 parser = argparse.ArgumentParser(description="E3-1 ps1010 NR-IQA 일괄 산출")
 parser.add_argument("--image_dir", type=str, default=None)
+parser.add_argument("--output_dir", type=str, default=None)
+parser.add_argument("--checkpoint_csv", type=str, default=None)
 parser.add_argument("--device", type=str, default=None, help="cuda / cpu")
 parser.add_argument("--resume", action="store_true", help="체크포인트에서 재개")
 args = parser.parse_args()
 
 if args.image_dir:
     CONFIG["io"]["image_dir"] = args.image_dir
+if args.output_dir:
+    CONFIG["io"]["output_dir"] = args.output_dir
+if args.checkpoint_csv:
+    CONFIG["io"]["checkpoint_csv"] = args.checkpoint_csv
 if args.device:
     CONFIG["processing"]["device"] = args.device
 
@@ -153,29 +164,36 @@ def collect_frames(cond_dir: str) -> list:
     return sorted(glob(os.path.join(cond_dir, "frame_*.png")))
 
 
-def process_condition(cond_name: str, cond_dir: str, device) -> list:
-    """단일 조건의 모든 frame IQA 산출 → 행 목록 반환."""
+def process_frame(cond_name: str, fp: str, device) -> dict:
+    """단일 frame IQA 산출 → 행 dict 반환."""
     meta = parse_condition(cond_name)
-    frames = collect_frames(cond_dir)
-    rows = []
-    for fp in frames:
-        scores = iqa.compute_all_from_path(fp, device=device)
-        row = {
-            "condition": cond_name,
-            "distance_m": meta["distance_m"],
-            "speed_kmh": meta["speed_kmh"],
-            "iso": meta["iso"],
-            "frame": os.path.basename(fp),
-            "is_defocus": meta["is_defocus"],
-        }
-        row.update(scores)
-        rows.append(row)
+    scores = iqa.compute_all_from_path(fp, device=device)
+    row = {
+        "condition": cond_name,
+        "distance_m": meta["distance_m"],
+        "speed_kmh": meta["speed_kmh"],
+        "iso": meta["iso"],
+        "frame": os.path.basename(fp),
+        "is_defocus": meta["is_defocus"],
+    }
+    row.update(scores)
+    row["run_device"] = resolve_device_name(device)
+    row["common_iqa7_version"] = getattr(iqa, "LIB_VERSION", "unknown")
 
     if iqa._PYIQA_AVAILABLE:
         import torch
         torch.cuda.empty_cache()
 
-    return rows
+    return row
+
+
+def save_checkpoint(rows: list, path: str):
+    """체크포인트를 원자적으로 저장."""
+    tmp_path = f"{path}.tmp"
+    pd.DataFrame(rows).to_csv(
+        tmp_path, index=False, encoding="utf-8-sig", float_format="%.4f"
+    )
+    os.replace(tmp_path, path)
 
 
 def build_stats(df: pd.DataFrame, skip_cols: set) -> pd.DataFrame:
@@ -225,42 +243,58 @@ def main():
     print(f"\n조건 수: {len(conditions)}")
 
     # 체크포인트 재개
-    done_conditions: set = set()
+    done_items: set = set()
     all_rows: list = []
     if args.resume and os.path.exists(checkpoint_path):
         ckpt = pd.read_csv(checkpoint_path)
+        if {"condition", "frame"}.issubset(ckpt.columns):
+            ckpt = ckpt.drop_duplicates(subset=["condition", "frame"], keep="last")
         all_rows = ckpt.to_dict("records")
-        done_conditions = set(ckpt["condition"].unique())
-        print(f"[RESUME] 완료된 조건 {len(done_conditions)}개 로드")
+        done_items = {(r["condition"], r["frame"]) for _, r in ckpt.iterrows()}
+        print(f"[RESUME] 완료된 이미지 {len(done_items)}장 로드")
 
-    todo = [(n, d) for n, d in conditions if n not in done_conditions]
-    print(f"처리 대상: {len(todo)}조건\n")
+    total_images = sum(len(collect_frames(d)) for _, d in conditions)
+    print(f"전체 이미지 수: {total_images}")
 
     print(f"{'='*60}")
     print("IQA 산출 시작")
     print(f"{'='*60}")
 
-    for cond_name, cond_dir in tqdm(todo, desc="조건 처리"):
+    done_cond_count = 0
+    for cond_name, cond_dir in tqdm(conditions, desc="조건 처리"):
         frames = collect_frames(cond_dir)
         if not frames:
             print(f"  [SKIP] {cond_name}: frame 없음")
             continue
 
-        rows = process_condition(cond_name, cond_dir, device)
-        all_rows.extend(rows)
+        cond_hsmb = []
+        for fp in frames:
+            frame_name = os.path.basename(fp)
+            item_key = (cond_name, frame_name)
+            if item_key in done_items:
+                continue
+            row = process_frame(cond_name, fp, device)
+            all_rows.append(row)
+            done_items.add(item_key)
+            cond_hsmb.append(row.get("hsmb", float("nan")))
+            # 이미지 단위 체크포인트
+            save_checkpoint(all_rows, checkpoint_path)
 
-        # 조건 단위 체크포인트
-        pd.DataFrame(all_rows).to_csv(
-            checkpoint_path, index=False, encoding="utf-8-sig", float_format="%.4f"
-        )
+        if cond_hsmb:
+            done_cond_count += 1
+            hsmb_mean = np.nanmean(cond_hsmb)
+            print(f"  {cond_name} ({len(cond_hsmb)}프레임)  hsmb_mean={hsmb_mean:.4f}")
 
-        hsmb_mean = np.nanmean([r.get("hsmb", float("nan")) for r in rows])
-        print(f"  {cond_name} ({len(rows)}프레임)  hsmb_mean={hsmb_mean:.4f}")
+    if done_cond_count == 0 and args.resume:
+        print("[INFO] 재개 대상 없음: 모든 이미지가 이미 체크포인트에 기록되어 있습니다.")
 
     df = pd.DataFrame(all_rows)
 
     # 컬럼 정렬
-    meta_cols = ["condition", "distance_m", "speed_kmh", "iso", "frame", "is_defocus"]
+    meta_cols = [
+        "condition", "distance_m", "speed_kmh", "iso", "frame", "is_defocus",
+        "run_device", "common_iqa7_version",
+    ]
     df = df[[c for c in meta_cols + iqa.METRIC_COLUMNS if c in df.columns]]
 
     # ############################################################################

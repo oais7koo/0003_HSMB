@@ -2,8 +2,8 @@
 """
 ooskill_backup.py
 
-Claude 환경 파일(.claude/, CLAUDE.md 등)을 날짜별 zip 파일로 백업.
-원래 oosync backup 기능에서 이동됨.
+Codex 환경 파일(.codex/, CLAUDE.md 등)을 날짜별 zip 파일로 백업.
+원래 ccsync backup 기능에서 이동됨.
 """
 
 import sys
@@ -18,7 +18,7 @@ if sys.stdout.encoding != 'utf-8':
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
 
 BACKUP_TARGETS = [
-    ".claude/",
+    ".codex/",
     "CLAUDE.md",
     ".mcp.json",
     "cclaude.bat",

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ################################################################################
-# Title: ooscrap add - 다운로드 리스트에 URL 추가
+# Title: ccscrap add - 다운로드 리스트에 URL 추가
 # Author: ookoo
 # Date: 2026.03.26
 # Version: v01
@@ -28,7 +28,7 @@ SECTIONS = {
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="ooscrap add - URL 추가")
+    parser = argparse.ArgumentParser(description="ccscrap add - URL 추가")
     parser.add_argument("urls", nargs="+", help="추가할 URL (여러 개 가능)")
     parser.add_argument(
         "--section",

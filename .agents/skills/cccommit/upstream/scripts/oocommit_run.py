@@ -477,6 +477,55 @@ def cmd_preview():
     return 0
 
 
+def _mark_completed_todo_details_in_commit():
+    """R162: 직전 커밋의 d{SP}0004_todo.md 변경에서 완료 ToDo 섹션에 새로 추가된
+    R-ID(예: R164, R160-2)를 추출하고, 대응하는 todo/{ID}.md 헤더의 상태를
+    DONE으로 갱신한다. 실패 시 조용히 경고만 출력 (커밋 자체는 영향 받지 않음).
+    """
+    try:
+        import importlib.util as _imp_util
+        sp_num = resolve_sp(None)
+        sp_str = f"{sp_num:02d}"
+        # 직전 커밋 short hash
+        hash_res = run_git_command(["rev-parse", "--short", "HEAD"])
+        commit_hash = hash_res.stdout.strip() if hash_res.returncode == 0 else ""
+        # 인덱스 파일 경로
+        index_file = get_sp_doc_dir(sp_num) / f"d{sp_num}0004_todo.md"
+        if not index_file.exists():
+            return
+        # 직전 커밋의 변경 라인 추출 — 추가된 완료 ToDo 라인만
+        diff = run_git_command(["show", "HEAD", "--unified=0", "--", str(index_file)])
+        if diff.returncode != 0 or not diff.stdout:
+            return
+        added_ids = []
+        for line in diff.stdout.splitlines():
+            if not line.startswith("+") or line.startswith("+++"):
+                continue
+            m = re.match(r"^\+\s*>\s*(R\d+(?:-\d+)?(?:\.\d+)?)\s*[—-]", line)
+            if m:
+                added_ids.append(m.group(1))
+        if not added_ids:
+            return
+        # ootodo의 mark_todo_detail_done 동적 로드
+        ootodo_path = Path(__file__).parent.parent.parent / "ootodo" / "scripts" / "ootodo_run.py"
+        if not ootodo_path.exists():
+            return
+        spec = _imp_util.spec_from_file_location("ootodo_run_r162", ootodo_path)
+        ootodo_mod = _imp_util.module_from_spec(spec)
+        spec.loader.exec_module(ootodo_mod)
+        if not hasattr(ootodo_mod, "mark_todo_detail_done"):
+            return
+        for todo_id in added_ids:
+            try:
+                ok = ootodo_mod.mark_todo_detail_done(sp_str, todo_id, commit_hash)
+                if ok:
+                    print(f"[R162] todo/{todo_id}.md 헤더 DONE 갱신 (커밋 {commit_hash})")
+            except Exception as inner:
+                print(f"[R162 WARN] {todo_id}: {inner}")
+    except Exception as e:
+        print(f"[R162 WARN] todo 상세 파일 자동 갱신 실패: {e}")
+
+
 def cmd_commit(options):
     """Git 커밋만 수행 (commit 서브명령어)"""
     print("# oocommit commit\n")
@@ -524,6 +573,9 @@ def cmd_commit(options):
         return 1
 
     print("[OK] 커밋 완료")
+
+    # R162: todo 상세 파일 헤더 DONE 자동 갱신 (커밋 hash 포함)
+    _mark_completed_todo_details_in_commit()
 
     if options.get("no_push") or "--no-push" in sys.argv:
         print("\n[INFO] push 생략 (--no-push)")

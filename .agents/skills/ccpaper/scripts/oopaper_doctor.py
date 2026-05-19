@@ -11,7 +11,7 @@ oopaper_doctor.py - 종합 정합성 진단 (읽기 전용, v01)
     quality   : 산출물 품질 미달 (용량/미완료 마커)
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_doctor.py [--check NAME] [--lang en|ko]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_doctor.py [--check NAME] [--lang en|ko]
 
 옵션:
     --check NAME   특정 체크만 (생략 시 전체)

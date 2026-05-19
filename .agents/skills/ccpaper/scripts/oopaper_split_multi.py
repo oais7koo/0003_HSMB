@@ -7,7 +7,7 @@ oopaper_split_multi.py - 다중 PDF 폴더 분리 (v01)
 신규 ID는 PDF 파일의 mtime을 기반으로 발급 (충돌 시 분 +1).
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_split_multi.py --folder ID [--lang en|ko] [--dry-run]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_split_multi.py --folder ID [--lang en|ko] [--dry-run]
 
 주의:
     - suffix 부착(-NN) 절대 금지

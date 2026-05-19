@@ -1,29 +1,29 @@
 ---
 name: ccresearch
-description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `agents.md`"
+description: "공통: `.codex/guides/common_guide.md` | 에이전트 참조: `agents.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통: `.claude/guides/common_guide.md` | 에이전트 참조: `agents.md`
+> 공통: `.codex/guides/common_guide.md` | 에이전트 참조: `agents.md`
 
 ## 0. 스킬 요약
 
 | 항목 | 내용 |
 |------|------|
 | **핵심 역할** | SOTA 비교 기준으로 특정 분야 연구를 체계적으로 수행 (복수 에이전트 병렬) |
-| **하는 것** | {paper_root}/ 기존 논문 활용, 부족 자료 oopaper 자동 수집, 다각도 연구 분석 |
-| **하지 않는 것** | 논문 작성(→oosota), 서베이 생성(→oosurvey), 문헌 수집만(→oopaper) |
+| **하는 것** | {paper_root}/ 기존 논문 활용, 부족 자료 ccpaper 자동 수집, 다각도 연구 분석 |
+| **하지 않는 것** | 논문 작성(→ccsota), 서베이 생성(→ccsurvey), 문헌 수집만(→ccpaper) |
 | **참조 범위** | 현재 프로젝트 `{paper_root}/` + 웹 검색 / 외부 DB 자동 크롤링 안 함 |
 | **수정 대상** | 연구 결과 문서 파일 |
 | **실행 레벨** | [자동] — 복수 에이전트 병렬 연구 자동 실행 |
-| **에이전트 호환** | Claude Code 권장 — 병렬 서브에이전트 자동 배치 / 다른 에이전트: 연구 단계별 순차 실행 |
+| **에이전트 호환** | Codex 권장 — 병렬 서브에이전트 자동 배치 / 다른 에이전트: 연구 단계별 순차 실행 |
 
 ## 1. 개요
 
 SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연구를 체계적으로 수행하는 스킬.
-`{paper_root}/` 보유 논문을 1차 소스로 활용하고, 부족한 자료는 `oopaper`로 자동 수집한다.
+`{paper_root}/` 보유 논문을 1차 소스로 활용하고, 부족한 자료는 `ccpaper`로 자동 수집한다.
 복수 에이전트를 병렬 호출하여 다각도 연구를 수행한다.
 
 **역할 분리 (oosota와의 관계)**:
@@ -31,9 +31,9 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 | 스킬 | 역할 | 순서 |
 |------|------|------|
 | **`ccresearch`** | **논문 작성 전 조사** (SOTA 파악, 관련 연구 수집, 갭 분석) | 1단계 |
-| `oosota` | 논문 초안 작성 (ccresearch 결과를 입력으로 활용) | 2단계 |
+| `ccsota` | 논문 초안 작성 (ccresearch 결과를 입력으로 활용) | 2단계 |
 
-→ `ccresearch` 산출물(`d{SP}0200_research_*.md`)이 `oosota`의 related 섹션 입력이 됨.
+→ `ccresearch` 산출물(`d{SP}0200_research_*.md`)이 `ccsota`의 related 섹션 입력이 됨.
 
 **핵심 원칙**: 모든 분석은 SOTA 대비 상대적 평가. 절대 수치보다 SOTA와의 격차가 중요.
 
@@ -74,7 +74,7 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 | `--output [파일]` | 출력 파일 경로 지정 |
 | `--depth [basic\|deep]` | 분석 깊이 (기본: basic) |
 | `--year [N]` | 최근 N년 논문만 포함 (기본: 3) |
-| `--no-download` | oopaper 자동 다운로드 비활성화 |
+| `--no-download` | ccpaper 자동 다운로드 비활성화 |
 | `--dry-run` | 계획만 출력, 실행 안 함 |
 
 ## 3. 논문 소스 체계
@@ -94,16 +94,16 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 | 3 | `*_전문(영어).md` | 보통 |
 | 4 | `*.pdf` | 느림 |
 
-### 3.2 2차 소스: oopaper 자동 수집
+### 3.2 2차 소스: ccpaper 자동 수집
 
-보유 논문으로 부족할 때 `oopaper`를 호출하여 자동 다운로드한다.
+보유 논문으로 부족할 때 `ccpaper`를 호출하여 자동 다운로드한다.
 
 **트리거 조건**:
 - 주제 관련 보유 논문 5편 미만
 - SOTA Top-3 논문이 보유 목록에 없음
 - 최근 1년 논문이 없음
 
-**oopaper 호출 방식**: `oopaper run --lang en [topic 키워드]`
+**ccpaper 호출 방식**: `ccpaper run --lang en [topic 키워드]`
 
 ### 3.3 3차 소스: 웹 실시간 조사
 
@@ -128,12 +128,12 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 | 단계 | 에이전트 | 모델 | 역할 | 병렬 |
 |------|----------|------|------|:----:|
 | 논문 스캔 | `Explore` | haiku | {paper_root}/ 관련 논문 탐색 | O |
-| 논문 수집 | `oopaper` (스킬 호출) | - | 부족 논문 자동 다운로드 | - |
+| 논문 수집 | `ccpaper` (스킬 호출) | - | 부족 논문 자동 다운로드 | - |
 | SOTA 웹 조사 | `document-specialist` | sonnet | ArXiv, PWC, 학회 검색 | O |
 | 논문 심층 분석 | `academic-researcher` | sonnet | 서머리/전문 분석 | O |
 | 성능 비교 | `data-analyst` | sonnet | 벤치마크 수치 분석 | O |
 | 결과 통합 | `task-executor` | sonnet | 연구 문서 작성 | - |
-| 품질 검증 | `ooqa` | sonnet | 연구 완결성 검토 | - |
+| 품질 검증 | `ccqa` | sonnet | 연구 완결성 검토 | - |
 
 **병렬 실행 구성**:
 
@@ -195,17 +195,17 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 | 문서 | 용도 |
 |------|------|
 | `{paper_root}/11_paper_en/` | 1차 논문 소스 (보유 논문) |
-| `.claude/skills/oopaper/SKILL.md` | 논문 자동 수집 (2차 소스) |
-| `.claude/skills/oosurvey/SKILL.md` | 보유 논문 서베이 (연동 가능) |
-| `.claude/skills/oosota/SKILL.md` | **다음 단계**: ccresearch 결과 → 논문 초안 작성 |
-| `00_doc/d{SP}0200_research_*.md` | 연구 결과 문서 (oosota 입력) |
-| `.claude/skills/ccresearch/references/guide.md` | 도메인별 상세 가이드 |
+| `.agents/skills/ccpaper/SKILL.md` | 논문 자동 수집 (2차 소스) |
+| `.agents/skills/ccsurvey/SKILL.md` | 보유 논문 서베이 (연동 가능) |
+| `.agents/skills/ccsota/SKILL.md` | **다음 단계**: ccresearch 결과 → 논문 초안 작성 |
+| `00_doc/d{SP}0200_research_*.md` | 연구 결과 문서 (ccsota 입력) |
+| `.agents/skills/ccresearch/references/guide.md` | 도메인별 상세 가이드 |
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -221,7 +221,7 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 ## QMD 마크다운 검색 (문서 내용 탐색 시)
 
 > 마크다운 문서 **내용**을 찾을 때는 Glob/Grep 대신 **`mcp__qmd__query`** 우선 사용.
-> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.claude/guides/common_guide.md §10`
+> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.codex/guides/common_guide.md §10`
 
 | 도구 | 적합한 상황 |
 |------|-----------|
@@ -230,7 +230,7 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 | `Glob` | 파일 경로 패턴 검색 |
 | `Grep` | 코드·특정 문자열 검색 |
 
-**인덱싱**: `oostart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {프로젝트명}`
+**인덱싱**: `ccstart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {프로젝트명}`
 
 <!-- QMD-REF:END -->
 
@@ -243,10 +243,10 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -257,7 +257,7 @@ SOTA(State of the Art)를 항상 비교 기준으로 삼아 특정 분야의 연
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

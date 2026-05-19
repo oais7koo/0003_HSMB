@@ -5,11 +5,11 @@ hostname을 자동 감지하여 컴퓨터별 백업 경로를 선택합니다.
 backup_config.json은 oopaper와 공유 (같은 백업 위치).
 
 사용법:
-    uv run python .claude/skills/ccbook/scripts/oobook_backup.py backup [--dry-run] [--code CODE] [--subdir DIR]
-    uv run python .claude/skills/ccbook/scripts/oobook_backup.py restore [--dry-run] [--code CODE] [--subdir DIR]
-    uv run python .claude/skills/ccbook/scripts/oobook_backup.py status
-    uv run python .claude/skills/ccbook/scripts/oobook_backup.py config --path PATH
-    uv run python .claude/skills/ccbook/scripts/oobook_backup.py config --list
+    uv run python .agents/skills/ccbook/scripts/oobook_backup.py backup [--dry-run] [--code CODE] [--subdir DIR]
+    uv run python .agents/skills/ccbook/scripts/oobook_backup.py restore [--dry-run] [--code CODE] [--subdir DIR]
+    uv run python .agents/skills/ccbook/scripts/oobook_backup.py status
+    uv run python .agents/skills/ccbook/scripts/oobook_backup.py config --path PATH
+    uv run python .agents/skills/ccbook/scripts/oobook_backup.py config --list
 
 설정 파일 구조 (03_paper/backup_config.json, oopaper와 공유):
     {
@@ -31,7 +31,7 @@ from pathlib import Path
 if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
-# scripts/ → ccbook/ → skills/ → .claude/ → PROJECT_ROOT
+# scripts/ → ccbook/ → skills/ → .codex/ → PROJECT_ROOT
 # OAIS=03_paper/ 하위, 독립 프로젝트=루트 직하 양쪽 호환
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 PAPER_BASE = PROJECT_ROOT / "03_paper" if (PROJECT_ROOT / "03_paper").exists() else PROJECT_ROOT

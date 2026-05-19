@@ -97,12 +97,12 @@ def search_grep(query, limit):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='ooscrap search')
+    parser = argparse.ArgumentParser(description='ccscrap search')
     parser.add_argument('query', help='검색 키워드')
     parser.add_argument('--limit', type=int, default=10, help='최대 결과 수 (기본: 10)')
     args = parser.parse_args()
 
-    print(f'[ooscrap search] "{args.query}" (최대 {args.limit}건)')
+    print(f'[ccscrap search] "{args.query}" (최대 {args.limit}건)')
     print(f'  대상: 04_scraping/01_유튜브서머리/, 04_scraping/04_읽을거리/')
     print()
 

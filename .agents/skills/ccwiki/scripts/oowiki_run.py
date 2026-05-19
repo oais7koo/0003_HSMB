@@ -1,20 +1,42 @@
 """ccwiki - LLM Wiki 지식 체계 유틸리티 스크립트
 
 유틸리티 기능(status, lint, index, list)을 담당.
-실제 수집·통합(run)은 Claude(AI)가 주도.
+실제 수집·통합(run)은 Codex(AI)가 주도.
 """
 import sys
 import os
-import re
-import urllib.request
+import json
+import socket
 from pathlib import Path
 from datetime import datetime
 
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-WIKI_DIR = Path(__file__).parents[3].parent / "01_obsidian" / "0020_wiki"
-INBOX_DIR = Path(__file__).parents[3].parent / "01_obsidian" / "0019_정리"
+# 위키 폴더 경로: 컴퓨터마다 위키 위치가 달라 컴퓨터명(hostname) 기준으로 해석한다.
+_PROJECT_ROOT = Path(__file__).parents[3].parent
+_WIKI_CONFIG = Path(__file__).parent.parent / "references" / "wiki_config.json"
+
+
+def _resolve_wiki_dir() -> Path:
+    """위키 폴더 경로 해석 — 컴퓨터명(hostname) 기준.
+
+    `references/wiki_config.json`의 `wiki_dir` 맵에서 현재 컴퓨터명으로 위키 경로를 조회한다.
+    새 컴퓨터는 wiki_config.json에 `"컴퓨터명": "위키경로"` 한 줄만 추가하면 된다.
+    조회 실패 시 기본값(프로젝트 루트/01_obsidian/0020_wiki).
+    """
+    if _WIKI_CONFIG.exists():
+        data = json.loads(_WIKI_CONFIG.read_text(encoding="utf-8"))
+        host = socket.gethostname().strip().lower()
+        wiki_map = {str(k).lower(): v for k, v in (data.get("wiki_dir") or {}).items()}
+        val = wiki_map.get(host)
+        if val:
+            return Path(str(val)).expanduser()
+    return _PROJECT_ROOT / "01_obsidian" / "0020_wiki"
+
+
+WIKI_DIR = _resolve_wiki_dir()
+INBOX_DIR = WIKI_DIR.parent / "0019_정리"
 
 BINARY_EXTENSIONS = {
     # 이미지 (텍스트 추출 불가)
@@ -36,101 +58,6 @@ INDEX_FILE = WIKI_DIR / "index.md"
 LOG_FILE = WIKI_DIR / "log.md"
 SCHEMA_FILE = WIKI_DIR / "schema.md"
 SKILL_FILE = Path(__file__).parents[1] / "SKILL.md"
-
-
-def _tokenize_query(query: str) -> list[str]:
-    tokens = [t.strip().lower() for t in re.split(r"\s+", query) if t.strip()]
-    # 중복 제거(순서 유지)
-    seen = set()
-    out = []
-    for t in tokens:
-        if t not in seen:
-            seen.add(t)
-            out.append(t)
-    return out
-
-
-def _strip_frontmatter(content: str) -> str:
-    lines = content.splitlines()
-    if len(lines) >= 2 and lines[0].strip() == "---":
-        for i in range(1, len(lines)):
-            if lines[i].strip() == "---":
-                return "\n".join(lines[i + 1:])
-    return content
-
-
-def _first_matching_line(content: str, tokens: list[str]) -> str:
-    fallback = ""
-    for raw in content.splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or line.startswith("|"):
-            continue
-        if line.startswith("```"):
-            continue
-        low = line.lower()
-        if any(t in low for t in tokens):
-            # 일반 설명 문장을 우선 채택
-            if not line.startswith(("-", "*", ">")) and len(line) >= 12:
-                return line
-            if not fallback:
-                fallback = line
-    return fallback
-
-
-def cmd_search(query: str, top_k: int = 5):
-    if not query.strip():
-        print("[ccwiki search] 검색어를 입력하세요. 예: ccwiki search txtai")
-        return
-    if not WIKI_DIR.exists():
-        print(f"[ccwiki search] 위키 폴더 없음: {WIKI_DIR}")
-        return
-
-    tokens = _tokenize_query(query)
-    if not tokens:
-        print("[ccwiki search] 검색어를 해석하지 못했습니다.")
-        return
-
-    pages = [f for f in WIKI_DIR.rglob("*.md") if f.name not in ("index.md", "log.md", "schema.md")]
-    scored = []
-    for p in pages:
-        try:
-            raw = p.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
-            continue
-        content = _strip_frontmatter(raw)
-        low = content.lower()
-        title = p.stem.lower()
-        score = 0
-        for t in tokens:
-            score += low.count(t)
-            if t in title:
-                score += 5
-        if score > 0:
-            snippet = _first_matching_line(content, tokens)
-            scored.append((score, p, snippet))
-
-    scored.sort(key=lambda x: (-x[0], x[1].name))
-
-    print(f"[ccwiki search] 질문: {query}")
-    if not scored:
-        print("검색 결과가 없습니다.")
-        cmd_log_append("query", query, [], "검색 결과 없음")
-        return
-
-    top = scored[:top_k]
-    print(f"검색 결과: {len(scored)}개 중 상위 {len(top)}개\n")
-    hit_pages = []
-    for i, (score, path, snippet) in enumerate(top, 1):
-        rel = path.relative_to(WIKI_DIR).as_posix()
-        hit_pages.append(path.stem)
-        print(f"{i}. [[{path.stem}]] (score={score})")
-        print(f"   경로: {rel}")
-        if snippet:
-            print(f"   인용: {snippet[:160]}")
-        else:
-            print("   인용: (본문 매칭 줄 없음)")
-
-    cmd_log_append("query", query, hit_pages, f"검색 히트 {len(scored)}개")
 
 
 def _parse_skill_help() -> str:
@@ -614,71 +541,6 @@ def cmd_log_append(action: str, target: str, pages: list, summary: str):
     print(f"[log] {now} — {action} 기록 완료")
 
 
-def _slug_from_url(url: str) -> str:
-    slug = re.sub(r"^https?://", "", url.strip(), flags=re.IGNORECASE)
-    slug = slug.strip("/").replace("/", "_")
-    slug = re.sub(r"[^a-zA-Z0-9._-]", "_", slug)
-    slug = slug.lower()
-    return slug or "url_page"
-
-
-def _extract_title(html: str) -> str:
-    m = re.search(r"<title[^>]*>(.*?)</title>", html, flags=re.IGNORECASE | re.DOTALL)
-    if not m:
-        return "Untitled"
-    title = re.sub(r"\s+", " ", m.group(1)).strip()
-    return title or "Untitled"
-
-
-def _extract_text_snippet(html: str, max_len: int = 1200) -> str:
-    body = re.sub(r"(?is)<script.*?>.*?</script>", " ", html)
-    body = re.sub(r"(?is)<style.*?>.*?</style>", " ", body)
-    body = re.sub(r"(?is)<[^>]+>", " ", body)
-    body = re.sub(r"\s+", " ", body).strip()
-    return body[:max_len]
-
-
-def cmd_run_url(url: str):
-    if not url:
-        print("[ccwiki run] URL이 비어 있습니다.")
-        return
-    WIKI_DIR.mkdir(parents=True, exist_ok=True)
-    cat_dir = WIKI_DIR / "004_컴퓨터일반"
-    cat_dir.mkdir(parents=True, exist_ok=True)
-
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; ccwiki/1.0)"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        html = resp.read().decode("utf-8", errors="replace")
-
-    title = _extract_title(html)
-    snippet = _extract_text_snippet(html)
-    slug = _slug_from_url(url)
-    page_path = cat_dir / f"{slug}.md"
-    today = datetime.now().strftime("%Y-%m-%d")
-    content = (
-        "---\n"
-        f"title: {title}\n"
-        "category: 004_컴퓨터일반\n"
-        f"tags: [{slug}, web, url]\n"
-        f"created: {today}\n"
-        f"updated: {today}\n"
-        f"sources: [{url}]\n"
-        "---\n\n"
-        f"# {title}\n\n"
-        "## 개요\n"
-        f"{snippet}\n\n"
-        "## 참고 출처\n"
-        f"- {url}\n"
-    )
-    page_path.write_text(content, encoding="utf-8")
-    cmd_index()
-    cmd_log_append("ingest", url, [page_path.stem], f"{page_path.relative_to(WIKI_DIR).as_posix()} 생성")
-    print(f"[ccwiki run] URL 통합 완료: {page_path}")
-
-
 def main():
     args = sys.argv[1:]
     if not args or args[0] == "help":
@@ -703,9 +565,6 @@ def main():
             else:
                 print("log.md 없음")
     elif args[0] == "run":
-        if len(args) >= 3 and args[1] == "--url":
-            cmd_run_url(args[2])
-            return
         print("[ccwiki run] AI 주도 수집·통합을 시작합니다.")
         print("Claude가 index.md를 확인하고 위키에 통합합니다.")
         cmd_status()
@@ -742,7 +601,9 @@ def main():
             cmd_inbox_list()
     elif args[0] == "search":
         query = " ".join(args[1:]) if len(args) > 1 else ""
-        cmd_search(query)
+        print(f"[ccwiki search] 질문: {query}")
+        print("Claude가 index.md와 관련 페이지를 검색하여 답변합니다.")
+        cmd_status()
     else:
         print(f"알 수 없는 명령: {args[0]}")
         cmd_help()

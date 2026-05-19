@@ -1,10 +1,10 @@
 ---
 name: ccdesign
-description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
+description: "공통 가이드라인: `.codex/guides/common_guide.md` 참조"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccdesign - 디자인 통합 스킬
 
@@ -14,7 +14,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 |------|------|
 | **핵심 역할** | 디자인 시스템 통합 스킬 — 토큰·컴포넌트·테마 생성 및 AI 디자인·코드 변환 |
 | **하는 것** | 디자인 토큰 생성, 컴포넌트 파일 생성, 테마 관리, URL 레퍼런스 분석, 디자인→코드 변환 |
-| **하지 않는 것** | 앱 코드 구현(→oodev), 문서 작성(→oodoc), 스크린샷 캡처(→oocapture) |
+| **하지 않는 것** | 앱 코드 구현(→ccdev), 문서 작성(→ccdoc), 스크린샷 캡처(→cccapture) |
 | **참조 범위** | 현재 프로젝트 내부 파일 + 지정 URL 레퍼런스 / 외부 프로젝트 자동 포함 안 함 |
 | **수정 대상** | `07_designsystem/` 하위 파일 (03_vars/, 04_components/, 05_themes/ 등) |
 | **실행 레벨** | [반자동] — 생성 계획 확인 후 실행 |
@@ -27,9 +27,11 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 - v09 2026-04-05 — 03_vars 단순화: 00_shared/01_web/02_flutter/10_themes 삭제, 테마 폴더(11~15)만 유지
 - v08 2026-04-05 — export 서브명령어 추가: pen → PNG/Dart 변환 (섹션 11)
 
-> 공통 가이드라인: `.claude/guides/common_guide.md` 참조
+> 공통 가이드라인: `.codex/guides/common_guide.md` 참조
 > 디자인 원칙: `00_doc/sp07/d70300_디자인원칙.md`
 > 방법론 참조: `00_doc/sp07/d70200~d70240`
+> **SP04 web 표준 디자인 SSOT**: `00_doc/sp04/d42500_상세설계_web_base_표준디자인시스템.md` — `tokens.css`·`components.css`·`_components.html` 매크로·신규 페이지 체크리스트 + DO/DON'T 가이드. SP04 web 페이지 마이그레이션 시 이 문서를 참조한다.
+> 명령 패턴 예: `ccdesign d42500 적용 — stamp/create.html` → d42500 §7 체크리스트 따라 마이그레이션 수행 + 회귀 검증
 
 ---
 
@@ -47,7 +49,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 
 ## 2. 토큰-테마 아키텍처
 
-> 상세: `.claude/skills/ccdesign/references/design-detail.md` §2 참조
+> 상세: `.agents/skills/ccdesign/references/design-detail.md` §2 참조
 
 - `02_tokens/`: 공유(00_shared), 웹(01_web), 테마 오버라이드(11~15)
 - `03_vars/`: 테마별 산출물 (CSS/SCSS/pen) — 11_bootstrap_official ~ 15_wello
@@ -75,9 +77,9 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 | `ccdesign run [--theme 테마명]` | 전체 프로세스 실행 (analyze → token → component) |
 
 실행:
-- token: `uv run python .claude/skills/ccdesign/scripts/token_sync.py [--theme 테마명|--all-themes]`
-- check: `uv run python .claude/skills/ccdesign/scripts/audit_script.py [--platform web|flutter|senior_world|all]`
-- 나머지: Claude Code 직접 수행 (AI 분석/생성)
+- token: `uv run python .agents/skills/ccdesign/scripts/token_sync.py [--theme 테마명|--all-themes]`
+- check: `uv run python .agents/skills/ccdesign/scripts/audit_script.py [--platform web|flutter|senior_world|all]`
+- 나머지: Codex 직접 수행 (AI 분석/생성)
 
 ### check 워크플로우
 
@@ -110,7 +112,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 
 ## 5. 폴더 구조 (v2.0 넘버링)
 
-> AMOTP 넘버링·플랫폼 접미사·00_index.html 규칙 상세: `.claude/skills/ccdesign/references/design-detail.md` §5 참조
+> AMOTP 넘버링·플랫폼 접미사·00_index.html 규칙 상세: `.agents/skills/ccdesign/references/design-detail.md` §5 참조
 
 | 경로 | 용도 |
 |------|------|
@@ -121,7 +123,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 | `07_designsystem/03_vars/11_~15_{테마}/` | 테마별 산출물 (CSS/SCSS/pen) |
 | `07_designsystem/04_components/{atoms\|molecules\|organisms\|templates\|pages}/` | 컴포넌트 (플랫 구조) |
 | `07_designsystem/06_pencil/` | Pencil MCP 프로토타입 (.pen) |
-| `.claude/skills/ccdesign/scripts/token_sync.py` | 토큰 변환 스크립트 v2.0 |
+| `.agents/skills/ccdesign/scripts/token_sync.py` | 토큰 변환 스크립트 v2.0 |
 
 **핵심 규칙**: 색상은 `var(--ds-xxx)` CSS 변수 참조 / T·P 계층은 플랫폼 접미사 필수(bw/fm 등) / 각 폴더에 `00_index.html` 필수
 
@@ -143,7 +145,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 |------|------|------|
 | Pencil Dev MCP | **채택** | 로컬 .pen 파일 기반, 23/25점 |
 | Figma MCP | 미채택 | 14/25점 (Phase 3 비교 결과) |
-| Claude Code | 보조 | 직접 HTML/CSS 생성 |
+| Codex | 보조 | 직접 HTML/CSS 생성 |
 
 > 도구 비교 결과: `00_doc/sp07/d70300_ai_comparison.md`
 
@@ -167,7 +169,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 
 ## 8. elem-box 분리 원칙
 
-> 상세 규칙: `.claude/skills/ccdesign/references/design-detail.md` §8 참조
+> 상세 규칙: `.agents/skills/ccdesign/references/design-detail.md` §8 참조
 
 - **분리 O**: 독립 CSS 클래스 조합, 상태/색상 variant, 밑줄/아이콘 위치 변형
 - **유지 O**: 복합 패턴, 그룹/목록, 레이아웃 컨텍스트 필요, 상태 기반 컴포넌트
@@ -177,7 +179,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 
 ## 9. compbuild — 컴포넌트 엘리먼트 빌드
 
-> elem-box 구조·elem-deps 규칙·넘버링 상세: `.claude/skills/ccdesign/references/design-detail.md` §9 참조
+> elem-box 구조·elem-deps 규칙·넘버링 상세: `.agents/skills/ccdesign/references/design-detail.md` §9 참조
 
 > 코드 예시: references/guide.md 참조
 
@@ -187,7 +189,7 @@ description: "공통 가이드라인: `.claude/guides/common_guide.md` 참조"
 
 ## 10. Pen 컴포넌트 번호 라벨링
 
-> 라벨 스타일 규격·wrapper 패턴·컴포넌트 매핑 테이블 상세: `.claude/skills/ccdesign/references/design-detail.md` §10 참조
+> 라벨 스타일 규격·wrapper 패턴·컴포넌트 매핑 테이블 상세: `.agents/skills/ccdesign/references/design-detail.md` §10 참조
 
 **핵심 원칙**: `04_components`가 기준, pen이 따라감. pen 요소가 기존 컴포넌트와 다를 경우 디자인 시스템에 먼저 추가 후 pen에서 참조.
 
@@ -202,7 +204,7 @@ Atom(A) 레벨은 라벨 생략 — M/O 단위만 표출.
 
 ## 11. export — pen 파일 변환
 
-> PNG/Dart 변환 상세 워크플로우: `.claude/skills/ccdesign/references/design-detail.md` §11 참조
+> PNG/Dart 변환 상세 워크플로우: `.agents/skills/ccdesign/references/design-detail.md` §11 참조
 
 ```
 ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
@@ -217,7 +219,7 @@ ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
 
 ### init — 새 프로젝트 초기화
 
-> 상세 워크플로우·이식 복사 대상: `.claude/skills/ccdesign/references/design-detail.md` init 섹션 참조
+> 상세 워크플로우·이식 복사 대상: `.agents/skills/ccdesign/references/design-detail.md` init 섹션 참조
 
 다른 프로젝트에 `ccdesign` 스킬 폴더 복사 후 실행 → 폴더 구조 + bootstrap_official 토큰 자동 생성.
 
@@ -227,7 +229,7 @@ ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
 
 ### pencil — 테마 변수 자동 등록
 
-> 토큰 매핑 상세·테마 매핑 테이블: `.claude/skills/ccdesign/references/design-detail.md` pencil 섹션 참조
+> 토큰 매핑 상세·테마 매핑 테이블: `.agents/skills/ccdesign/references/design-detail.md` pencil 섹션 참조
 
 새 `.pen` 파일 생성 시 `02_tokens/`에서 토큰을 읽어 Pencil 변수로 자동 등록.
 
@@ -237,7 +239,7 @@ ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
 
 ### vars 연결 가이드
 
-> 상세: `.claude/skills/ccdesign/references/design-detail.md` vars 섹션 참조
+> 상세: `.agents/skills/ccdesign/references/design-detail.md` vars 섹션 참조
 
 > 코드 예시: references/guide.md 참조
 
@@ -247,7 +249,7 @@ ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -267,10 +269,10 @@ ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -281,7 +283,7 @@ ccdesign export [pen파일경로] [--format png|dart|both] [--output 경로]
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

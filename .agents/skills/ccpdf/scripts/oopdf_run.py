@@ -17,7 +17,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)

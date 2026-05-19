@@ -3,19 +3,19 @@
 """oopaper_extract_text.py - pdfplumber 기반 PDF 전문 텍스트 추출
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extract_text.py <pdf_path> [--output <output_path>]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extract_text.py --folder <folder_path> [--force]
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extract_text.py --batch <ko_dir> [--force]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extract_text.py <pdf_path> [--output <output_path>]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extract_text.py --folder <folder_path> [--force]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extract_text.py --batch <ko_dir> [--force]
 
 예시:
     # 단일 PDF
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extract_text.py 03_paper/12_paper_ko/260324-1526/260324-1526_01_스마트도로_통합체계.pdf
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extract_text.py 03_paper/12_paper_ko/260324-1526/260324-1526_01_스마트도로_통합체계.pdf
 
     # 폴더 내 모든 PDF
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extract_text.py --folder 03_paper/12_paper_ko/260324-1526/
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extract_text.py --folder 03_paper/12_paper_ko/260324-1526/
 
     # 12_paper_ko 전체 배치
-    uv run python .claude/skills/ccpaper/scripts/oopaper_extract_text.py --batch 03_paper/12_paper_ko/ --force
+    uv run python .agents/skills/ccpaper/scripts/oopaper_extract_text.py --batch 03_paper/12_paper_ko/ --force
 """
 
 import argparse

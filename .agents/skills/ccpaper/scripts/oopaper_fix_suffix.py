@@ -6,7 +6,7 @@ oopaper_fix_suffix.py - suffix 폴더(`-NN`) 정규화 (v01)
 동작: mtime 기반 신규 정상 FOLDER_ID 발급 → 폴더·내부 파일 prefix 일괄 rename
 
 사용법:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_fix_suffix.py [--folder ID] [--batch] [--dry-run] [--lang en|ko]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_fix_suffix.py [--folder ID] [--batch] [--dry-run] [--lang en|ko]
 
 옵션:
     --folder ID  특정 suffix 폴더만 (예: 260222-1851-08)

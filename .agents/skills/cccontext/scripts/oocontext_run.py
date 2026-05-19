@@ -3,7 +3,7 @@
 """
 oocontext_run.py
 
-서브프로젝트 컨텍스트 관리 (.claude/skills/cccontext/SKILL.md 구현)
+서브프로젝트 컨텍스트 관리 (.agents/skills/cccontext/SKILL.md 구현)
 
 서브명령어:
     [N]            - SP N으로 설정 (sp_config.json 자동 갱신 포함)
@@ -13,10 +13,10 @@ oocontext_run.py
     version        - 스킬 버전 정보
 
 사용법:
-    python .claude/skills/cccontext/scripts/oocontext_run.py
-    python .claude/skills/cccontext/scripts/oocontext_run.py 04
-    python .claude/skills/cccontext/scripts/oocontext_run.py clear
-    python .claude/skills/cccontext/scripts/oocontext_run.py list
+    python .agents/skills/cccontext/scripts/oocontext_run.py
+    python .agents/skills/cccontext/scripts/oocontext_run.py 04
+    python .agents/skills/cccontext/scripts/oocontext_run.py clear
+    python .agents/skills/cccontext/scripts/oocontext_run.py list
 """
 
 import sys
@@ -40,7 +40,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -212,7 +212,7 @@ def cmd_set(sp: str, dry_run: bool = False):
     print(f"- **서브프로젝트**: {get_sp_info(sp, defs)}")
     print(f"- **TODO 문서**: `{todo_path.relative_to(PROJECT_ROOT)}` {todo_exists}")
     print(f"- **설정 시각**: {data['updated_at']}")
-    print(f"\n> 이후 oocheck/oofix/oodev 등은 SP{sp} 문서를 참조합니다.")
+    print(f"\n> 이후 cccheck/ccfix/ccdev 등은 SP{sp} 문서를 참조합니다.")
 
 
 def cmd_clear():

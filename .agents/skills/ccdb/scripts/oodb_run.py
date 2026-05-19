@@ -31,7 +31,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -82,9 +82,9 @@ def print_usage():
     print("    --report                리포트 생성 (tmp/)")
     print()
     print("예시:")
-    print("    uv run python .claude/skills/ccdb/scripts/oodb_run.py status")
-    print("    uv run python .claude/skills/ccdb/scripts/oodb_run.py run")
-    print("    uv run python .claude/skills/ccdb/scripts/oodb_run.py optimize --table users")
+    print("    uv run python .agents/skills/ccdb/scripts/oodb_run.py status")
+    print("    uv run python .agents/skills/ccdb/scripts/oodb_run.py run")
+    print("    uv run python .agents/skills/ccdb/scripts/oodb_run.py optimize --table users")
 
 
 def extract_db_issues_from_todo():

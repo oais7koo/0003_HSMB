@@ -2,7 +2,7 @@
 name: oowiki
 description: "LLM Wiki 지식 체계 구축 스킬 — 'oowiki run [내용]'으로 지식을 수집·통합하고, 01_obsidian/0020_wiki/에 위키 기반 지식 체계를 구축·유지한다. Karpathy LLM Wiki 철학 기반."
 metadata:
-  version: "v07"
+  version: "v10"
   category: "content"
 ---
 
@@ -18,15 +18,15 @@ metadata:
 | **핵심 역할** | 지식 수집·통합·조회·유지보수 (LLM Wiki) |
 | **하는 것** | 새 정보를 기존 위키에 통합, index/log 자동 갱신, 품질 점검 |
 | **하지 않는 것** | 단순 파일 저장(→oomemo), 코드 구현(→oodev), 문서 생성(→oodoc) |
-| **저장 위치** | `01_obsidian/0020_wiki/` |
+| **저장 위치** | `01_obsidian/0020_wiki/` (기본) — 컴퓨터별 경로는 `references/wiki_config.json`에서 설정 (§2 참조) |
 | **실행 레벨** | [반자동] — AI가 통합 주도, 스크립트는 유틸리티 지원 |
 
 ## 문서 이력 관리
+- v10 2026-05-19 — 위키 경로 컴퓨터명(hostname) 기준 설정: `references/wiki_config.json`의 `wiki_dir` 맵으로 컴퓨터별 위키 경로 지정 (타 프로젝트에서 중앙 위키 사용 가능), 버전 표기 통일
 - v09 2026-05-04 — §3.5 통합 정책 변경: "스킵 우선" → "최대 보존" + 위치 결정 (실전 사례는 별도 서브섹션, 80% 중복 스킵 조건 폐지)
 - v08 2026-05-03 — 프로젝트 아카이브 처리 가이드(섹션 3.7) 추가: 위키 외부 0030_projects/ 분리, PII 정책, 파일 크기별 처리, 중단 프로젝트 규칙
 - v07 2026-04-28 — 개인 프로젝트 코드 지식화 가이드(섹션 3.6) 추가: 추출 항목·스킵 조건·파일 탐색 순서
 - v06 2026-04-25 — 통합 품질 판단 기준(섹션 3.5) 추가: 의미 없는 정보 필터링
-- v05 2026-04-25 — inbox 기능 추가: 0019_정리 → 0020_wiki 처리 후 삭제 (oowiki inbox)
 
 ---
 
@@ -35,7 +35,7 @@ metadata:
 | 명령어 | 설명 | 출력 |
 |--------|------|------|
 | `oowiki help` | 서브명령어 목록 표시 | 터미널 |
-| `oowiki version` | 스킬 버전 정보 (v02) | 터미널 |
+| `oowiki version` | 스킬 버전 정보 (v10) | 터미널 |
 | `oowiki status` | 위키 현황 (페이지 수, 카테고리, 마지막 수집일) | 터미널 |
 | `oowiki check` | references/checklist.md 기반 체크 | 터미널 |
 | `oowiki run [내용]` | 새 지식 수집·통합 (Ingest) + inbox 감지 + qmd embed | 위키 페이지 + index.md + log.md |
@@ -64,6 +64,27 @@ metadata:
 └── [카테고리]/
     └── [페이지명].md # 위키 페이지 (Obsidian 호환)
 ```
+
+### 위키 경로 설정 (wiki_config.json)
+
+위키 폴더는 컴퓨터마다 경로가 달라, **컴퓨터명(hostname) 기준**으로 해석한다. 설정 파일은 `references/wiki_config.json`:
+
+```json
+{
+  "wiki_dir": {
+    "koodesk": "D:\\resilio\\1_oais\\01_obsidian\\0020_wiki"
+  }
+}
+```
+
+| 우선순위 | 경로 |
+|:--------:|------|
+| 1 | `wiki_config.json`의 `wiki_dir`에서 현재 컴퓨터명으로 조회 |
+| 2 | 기본값 `{프로젝트 루트}/01_obsidian/0020_wiki` |
+
+- **새 컴퓨터 추가**: `wiki_dir`에 `"컴퓨터명(소문자)": "위키 절대경로"` 한 줄 추가. 컴퓨터명은 `python -c "import socket; print(socket.gethostname())"`로 확인.
+- **다른 프로젝트에서 중앙 위키 사용**: 위키 콘텐츠는 1_oais 전용 자산이라 다른 프로젝트엔 `01_obsidian/0020_wiki/`가 없다. 그 프로젝트의 `wiki_config.json`에 동일 컴퓨터명으로 1_oais 위키 경로를 지정하면 `oowiki search` 등을 동일하게 쓸 수 있다. inbox(`0019_정리`)도 위키 폴더의 형제 경로로 함께 따라간다.
+- **동기화**: `wiki_config.json`은 컴퓨터별 절대경로를 담으므로 oosync로 전파하지 않는다 — Resilio Sync로 컴퓨터 간 동기화된다.
 
 ### 위키 페이지 포맷
 

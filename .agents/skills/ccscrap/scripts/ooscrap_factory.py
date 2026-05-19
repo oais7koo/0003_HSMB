@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ################################################################################
-# Title: ooscrap factory - 유튜브팩토리.md 인덱스 자동 갱신
+# Title: ccscrap factory - 유튜브팩토리.md 인덱스 자동 갱신
 # Author: ookoo
 # Date: 2026.03.22
 # Version: v01

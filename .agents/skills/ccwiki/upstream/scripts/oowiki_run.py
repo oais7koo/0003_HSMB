@@ -5,14 +5,38 @@
 """
 import sys
 import os
+import json
+import socket
 from pathlib import Path
 from datetime import datetime
 
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-WIKI_DIR = Path(__file__).parents[3].parent / "01_obsidian" / "0020_wiki"
-INBOX_DIR = Path(__file__).parents[3].parent / "01_obsidian" / "0019_정리"
+# 위키 폴더 경로: 컴퓨터마다 위키 위치가 달라 컴퓨터명(hostname) 기준으로 해석한다.
+_PROJECT_ROOT = Path(__file__).parents[3].parent
+_WIKI_CONFIG = Path(__file__).parent.parent / "references" / "wiki_config.json"
+
+
+def _resolve_wiki_dir() -> Path:
+    """위키 폴더 경로 해석 — 컴퓨터명(hostname) 기준.
+
+    `references/wiki_config.json`의 `wiki_dir` 맵에서 현재 컴퓨터명으로 위키 경로를 조회한다.
+    새 컴퓨터는 wiki_config.json에 `"컴퓨터명": "위키경로"` 한 줄만 추가하면 된다.
+    조회 실패 시 기본값(프로젝트 루트/01_obsidian/0020_wiki).
+    """
+    if _WIKI_CONFIG.exists():
+        data = json.loads(_WIKI_CONFIG.read_text(encoding="utf-8"))
+        host = socket.gethostname().strip().lower()
+        wiki_map = {str(k).lower(): v for k, v in (data.get("wiki_dir") or {}).items()}
+        val = wiki_map.get(host)
+        if val:
+            return Path(str(val)).expanduser()
+    return _PROJECT_ROOT / "01_obsidian" / "0020_wiki"
+
+
+WIKI_DIR = _resolve_wiki_dir()
+INBOX_DIR = WIKI_DIR.parent / "0019_정리"
 
 BINARY_EXTENSIONS = {
     # 이미지 (텍스트 추출 불가)

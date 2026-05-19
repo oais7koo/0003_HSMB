@@ -1,12 +1,12 @@
 ---
 name: cchwp
-description: "공통: `.claude/guides/common_guide.md` | 스크립트: `.claude/skills/cchwp/scripts/` | 레퍼런스: `.claude/skills/cchwp/references/hwpx-format.md`"
+description: "공통: `.codex/guides/common_guide.md` | 스크립트: `.agents/skills/cchwp/scripts/` | 레퍼런스: `.agents/skills/cchwp/references/hwpx-format.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통: `.claude/guides/common_guide.md` | 스크립트: `.claude/skills/cchwp/scripts/` | 레퍼런스: `.claude/skills/cchwp/references/hwpx-format.md`
+> 공통: `.codex/guides/common_guide.md` | 스크립트: `.agents/skills/cchwp/scripts/` | 레퍼런스: `.agents/skills/cchwp/references/hwpx-format.md`
 
 HWPX(아래한글) 문서를 XML-first 방식으로 생성/편집/읽는 스킬.
 의존성: `lxml` (`uv run --with lxml`)
@@ -20,11 +20,11 @@ HWPX(아래한글) 문서를 XML-first 방식으로 생성/편집/읽는 스킬.
 |------|------|
 | **핵심 역할** | 한글(HWPX) 문서를 XML-first 방식으로 생성·편집·읽기 |
 | **하는 것** | HWPX 파일 생성/편집, 공문 작성, HWP→MD 읽기 |
-| **하지 않는 것** | Word 문서(→ooword), PDF 변환(→oopdf), 한글 앱 직접 제어 |
+| **하지 않는 것** | Word 문서(→ccword), PDF 변환(→ccpdf), 한글 앱 직접 제어 |
 | **참조 범위** | 현재 프로젝트 내부 파일만 / 외부 한글 서버 자동 연결 안 함 |
 | **수정 대상** | `*.hwpx` 파일 |
 | **실행 레벨** | [반자동] — 문서 구조 확인 후 생성 |
-| **에이전트 호환** | Claude Code 권장 — `uv run --with lxml` 자동 실행 / 다른 에이전트: lxml 설치 후 수동 스크립트 실행 |
+| **에이전트 호환** | Codex 권장 — `uv run --with lxml` 자동 실행 / 다른 에이전트: lxml 설치 후 수동 스크립트 실행 |
 
 ## 서브명령어
 
@@ -57,7 +57,7 @@ HWPX(아래한글) 문서를 XML-first 방식으로 생성/편집/읽는 스킬.
 | `minutes` | 회의록 |
 | `proposal` | 제안서 |
 
-**Claude 직접 생성 방식:**
+**Codex 직접 생성 방식:**
 1. `references/hwpx-format.md` 참조하여 `section0.xml` 직접 작성
 2. `examples/sample_section0.xml`, `examples/sample_header.xml` 참고
 3. `build_hwpx.py --section <파일>` 으로 빌드
@@ -132,7 +132,7 @@ HWPX(아래한글) 문서를 XML-first 방식으로 생성/편집/읽는 스킬.
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -152,10 +152,10 @@ HWPX(아래한글) 문서를 XML-first 방식으로 생성/편집/읽는 스킬.
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -166,7 +166,7 @@ HWPX(아래한글) 문서를 XML-first 방식으로 생성/편집/읽는 스킬.
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

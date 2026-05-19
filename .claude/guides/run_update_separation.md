@@ -87,7 +87,7 @@ def cmd_run():
 
 ### 높음 (내부에 cmd_update 함수 존재)
 - `ooskill` — 완료 (catalog, gemma 타겟으로 분리)
-- `oocheck`, `oocontext`, `oofeature`, `ooprd`, `ooreport`, `oouser` — 분리 필요
+- `oocheck`, `oocontext`, `oofeature`, `ooprd`, `ooreport` — 분리 필요
 
 ### 중간 (SKILL.md에 update 언급, 구현 위치 불명확)
 - `oodoc`, `ooenv`, `oopaper`, `ooppt`, `oorun`, `ootodo`, `ootutorial`, `oouv`, `ooword`

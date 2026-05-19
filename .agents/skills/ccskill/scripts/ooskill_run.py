@@ -11,10 +11,10 @@ ooskill_run.py - oo 스킬 최적화 검증
     run [스킬명] - 특정 스킬만 최적화
 
 사용법:
-    uv run python .claude/skills/ccskill/scripts/ooskill_run.py status
-    uv run python .claude/skills/ccskill/scripts/ooskill_run.py validate
-    uv run python .claude/skills/ccskill/scripts/ooskill_run.py run
-    uv run python .claude/skills/ccskill/scripts/ooskill_run.py run oocheck
+    uv run python .agents/skills/ccskill/scripts/ooskill_run.py status
+    uv run python .agents/skills/ccskill/scripts/ooskill_run.py validate
+    uv run python .agents/skills/ccskill/scripts/ooskill_run.py run
+    uv run python .agents/skills/ccskill/scripts/ooskill_run.py run cccheck
 """
 
 import sys
@@ -34,7 +34,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8").replace('\r\r\n', '\n').replace('\r\n', '\n').replace('\r', '\n')
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -68,10 +68,10 @@ KNOWN_AGENTS = [
 # - alias 스킬: 한 줄짜리 라우팅 → 위임 불필요
 # - 단순 표시/메모 스킬: 출력/저장만 수행 → 위임 불필요
 SKIP_AGENT_CHECK = {
-    # alias (oocontext/oodev/oofeature/oocheck/oostart 라우팅)
-    "ooc", "ood", "oof", "ook", "oos",
+    # alias (cccontext/ccdev/ccfeature/cccheck/ccstart 라우팅)
+    "ccc", "ccd", "ccf", "cck", "ccs",
     # 단순 표시/메모/도움말
-    "oohelp", "oomemo", "oonow", "ooprevious", "ootoken",
+    "cchelp", "ccmemo", "ccnow", "ccprevious", "cctoken",
 }
 
 # 권장 명령어 목록
@@ -234,7 +234,7 @@ def cmd_version():
     print("# ccskill version\n")
     print("버전: v04")
     print("설명: oo SKILL.md 서브에이전트/명령어 최적화 검증 스킬")
-    print(f"위치: .claude/skills/ccskill/")
+    print(f"위치: .agents/skills/ccskill/")
     return 0
 
 
@@ -313,7 +313,7 @@ def cmd_validate_checklist(fix: bool = False):
     # checklist.md 검증 제외 대상
     # - alias 스킬: 단순 라우팅만 수행, 독자 checklist 불필요
     # - 단순 메모/표시 스킬: 자가 건강 점검할 상태 없음
-    SKIP_CHECKLIST = {"ooc", "ood", "oof", "ook", "oos", "oomemo"}
+    SKIP_CHECKLIST = {"ccc", "ccd", "ccf", "cck", "ccs", "ccmemo"}
 
     skills = sorted([d for d in SKILLS_DIR.iterdir() if d.is_dir() and d.name.startswith("oo")])
     TABLE_HEADER = "| ID | 항목 | 검증 내용 | 심각도 |"
@@ -562,7 +562,7 @@ def cmd_check():
         results.append(("C12", "help 완전스크립트화", "ERROR (스크립트 없음)"))
 
     # C17 guide.md 존재 및 완전성
-    SKIP_GUIDE = {"ooc", "ood", "oof", "ook", "oos", "oohelp", "oomemo", "oonow", "ooprevious", "ootoken"}
+    SKIP_GUIDE = {"ccc", "ccd", "ccf", "cck", "ccs", "cchelp", "ccmemo", "ccnow", "ccprevious", "cctoken"}
     target_skill_dirs = sorted([
         d for d in SKILLS_DIR.iterdir()
         if d.is_dir() and d.name.startswith("oo") and d.name not in SKIP_GUIDE
@@ -765,16 +765,16 @@ def _add_related_commands_hint(content: str, skill_name: str) -> tuple[str, bool
 
     # sc/ 명령어 추론 (스킬 이름 기반)
     cmd_map = {
-        "oocheck": "analyze, troubleshoot",
-        "oofix":   "improve, troubleshoot",
-        "oodev":   "implement, build",
-        "ootest":  "test",
-        "oolib":   "cleanup, analyze",
-        "oodb":    "analyze, design",
-        "ooprd":   "design",
-        "ooplan":  "design, task",
-        "oodoc":   "document",
-        "oocommit":"git",
+        "cccheck": "analyze, troubleshoot",
+        "ccfix":   "improve, troubleshoot",
+        "ccdev":   "implement, build",
+        "cctest":  "test",
+        "cclib":   "cleanup, analyze",
+        "ccdb":    "analyze, design",
+        "ccprd":   "design",
+        "ccplan":  "design, task",
+        "ccdoc":   "document",
+        "cccommit":"git",
     }
     cmds = cmd_map.get(skill_name, "analyze, implement")
     hint = f"\n> **관련 명령어**: {cmds} (`.claude/commands/sc/`)\n"

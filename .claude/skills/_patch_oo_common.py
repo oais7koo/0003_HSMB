@@ -112,10 +112,6 @@ TARGETS = [
         (r'    if subcommand in \("help", "-h"\):\n        print\("ootodo \[add\|clear\|status\|help\]\\nTODO \uc790\ub3d9 \ucc98\ub9ac"\)\n        return',
          '    if subcommand in ("help", "-h"):\n        _print_skill_help("ootodo")\n        return'),
     ]),
-    ("oouser",    "oouser/scripts/oouser_run.py",     [
-        (r'    elif cmd in \("help", "-h"\):\n        print\("oouser \[run\|add\|faq\|update\|sync\|status\|help\]\\n\uc0ac\uc6a9\uc790 \uac00\uc774\ub4dc \uad00\ub9ac"\)\n        return 0',
-         '    elif cmd in ("help", "-h"):\n        _print_skill_help("oouser")\n        return 0'),
-    ]),
 ]
 
 BLOCK_PATTERN = re.compile(

@@ -2,18 +2,24 @@
 ooflow_run.py — ooflow 스킬 스크립트
 전체 SW 개발 워크플로우 오케스트레이터 (기획→설계→개발→검증→완료)
 
+todo 게이트 방식: 사전 todo 점검 → 검증·기획·설계(탐지) → 상세설계 게이트
+→ todo 0건일 때만 개발·검증·완료 진행.
+
 서브명령어:
   help                    도움말
-  version                 버전 정보 (v02)
+  version                 버전 정보 (v04)
   status [--sp N]         현재 SP 워크플로우 진행 현황
   check [--sp N]          checklist.md 기반 체크
-  run [OPTIONS]           dry-run 미리보기 → 확인 → 실행 지시 출력
+  run [OPTIONS]           사전 todo 점검 → dry-run 미리보기 → 확인 → 실행 지시 출력
     --dry-run             계획만 출력 (실제 실행 없음)
     --yes                 확인 없이 즉시 실행
     --interactive         단계별 확인 (CRITICAL 시 중단)
     --sp N                특정 SP 지정
     --until 단계          기획|설계|개발|검증 까지만
     --feature dXXXX       특정 Feature 1개만
+  plan [OPTIONS]          사전 todo 점검 + 검증·기획·설계까지만 전반 검토
+    --dry-run             계획만 출력 (실제 실행 없음)
+    --sp N                특정 SP 지정
   show checklist          역할 수행 체크리스트 표시
 """
 import sys
@@ -71,6 +77,49 @@ def get_plan_path(sp: int) -> Optional[Path]:
         return matches[0]
     p = doc_dir / f"d{doc_num:05d}_plan.md"
     return p if p.exists() else None
+
+
+def get_todo_path(sp: int) -> Optional[Path]:
+    """d{SP}0004_todo.md 경로 반환 (없으면 None)"""
+    doc_dir = get_doc_dir(sp)
+    doc_num = sp * 10000 + 4
+    matches = list(doc_dir.glob(f"d{doc_num}_*.md")) + list(doc_dir.glob(f"d{doc_num:05d}_*.md"))
+    if matches:
+        return matches[0]
+    # sp00은 d0004_todo.md 형식
+    p = doc_dir / f"d{doc_num:04d}_todo.md"
+    return p if p.exists() else None
+
+
+# ── 사전 todo 점검 ───────────────────────────────────────────────
+OPEN_TODO_KEYWORDS = ("대기", "pending", "진행중", "진행 중", "in progress", "in-progress", "open")
+
+
+def count_open_todos(sp: int) -> int:
+    """d{SP}0004_todo.md에서 미해결 todo 개수를 센다.
+
+    todo 행 패턴: `| ID | ... | 상태 |` 형식에서 상태 셀이
+    대기/pending/진행중 등인 행. 파일이 없거나 0건이면 0을 반환한다.
+    """
+    todo_path = get_todo_path(sp)
+    if not todo_path or not todo_path.exists():
+        return 0
+    content = todo_path.read_text(encoding="utf-8")
+    count = 0
+    for line in content.splitlines():
+        line = line.strip()
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        # 구분선(---) 또는 헤더 행 제외
+        if all(set(c) <= set("-: ") for c in cells):
+            continue
+        last = cells[-1].lower()
+        if any(kw in last for kw in OPEN_TODO_KEYWORDS):
+            count += 1
+    return count
 
 
 # ── plan.md 파싱 ─────────────────────────────────────────────────
@@ -264,8 +313,31 @@ def build_plan(sp: int, until: Optional[str], feature_id: Optional[str]) -> dict
     return {'targets': targets, 'sp': sp, 'until': until_stage}
 
 
-def print_run_instructions(plan: dict, interactive: bool = False, review_enabled: bool = True):
-    """Claude 오케스트레이션용 실행 지시 출력"""
+def print_todo_gate_check(sp: int) -> int:
+    """Step 0 사전 todo 점검 출력. 미해결 todo 개수를 반환한다."""
+    open_count = count_open_todos(sp)
+    todo_path = get_todo_path(sp)
+    print()
+    print("─" * 60)
+    print("[Step 0] 사전 todo 점검")
+    print("─" * 60)
+    if open_count > 0:
+        rel = todo_path.name if todo_path else f"d{sp*10000+4:05d}_todo.md"
+        print(f"  ⚠️  미해결 todo {open_count}건 발견 — {rel}")
+        print("  → 기존 todo를 먼저 처리한 후 ooflow를 실행하세요.")
+        print("  → Claude는 미해결 todo를 하나씩 보여주며 처리 여부를 사용자에게 문의할 것.")
+    else:
+        print("  ✅ 미해결 todo 없음 — 워크플로우 진행 가능")
+    return open_count
+
+
+def print_run_instructions(plan: dict, interactive: bool = False, review_enabled: bool = True,
+                           plan_mode: bool = False):
+    """Claude 오케스트레이션용 실행 지시 출력
+
+    plan_mode=True: Step 0(사전 todo 점검) + Step 1(검증·기획·설계)까지만 출력.
+                    항상 상세설계 단계에서 멈춤 (개발·검증·완료 미출력).
+    """
     sp = plan['sp']
     targets = plan['targets']
     until = plan['until']
@@ -273,23 +345,35 @@ def print_run_instructions(plan: dict, interactive: bool = False, review_enabled
     if not targets:
         return
 
-    mode_note = " [--interactive: CRITICAL 발생 시 사용자 확인]" if interactive else " [완전 무인 자동화]"
+    if plan_mode:
+        mode_note = " [plan 모드 — 상세설계까지 전반 검토]"
+    elif interactive:
+        mode_note = " [--interactive: CRITICAL 발생 시 사용자 확인]"
+    else:
+        mode_note = " [todo 게이트 방식]"
+    label = "ooflow plan" if plan_mode else "ooflow run"
     print()
     print("=" * 60)
-    print(f"[ooflow run] 실행 지시{mode_note}")
+    print(f"[{label}] 실행 지시{mode_note}")
     print("=" * 60)
     print()
     print("다음 순서대로 스킬을 실행하세요:\n")
 
+    print("  # ── [Step 1] 검증·기획·설계 (탐지 모드) ──")
+    print("  #   ooprd/ooplan 정합성 검증 + 기획·설계는 탐지 위주.")
+    print("  #   자동 수정하지 말 것 — 발견된 정합성/설계 문제는")
+    print(f"  #   전부 d{sp*10000+4:05d}_todo.md(또는 d0004_todo.md)에 적재.")
     step = 1
-    print(f"  [{step:02d}] ooprd run --sp {sp:02d}")
+    print(f"  [{step:02d}] ooprd run --sp {sp:02d}      # PRD 정합성 검증 (탐지)")
     step += 1
-    print(f"  [{step:02d}] ooplan run --sp {sp:02d}")
+    print(f"  [{step:02d}] ooplan run --sp {sp:02d}     # Plan 정합성 검증 (탐지)")
     step += 1
     print(f"  [{step:02d}] oofeature needed --sp {sp:02d}")
     step += 1
     print()
 
+    # plan 모드 또는 run 모드 모두: 기획·설계 단계 먼저 출력
+    print("  # ── [Step 1 계속] Feature별 기획·설계 (탐지) ──")
     for f in targets:
         doc_id = f['doc_id']
         name = f['name']
@@ -315,11 +399,55 @@ def print_run_instructions(plan: dict, interactive: bool = False, review_enabled
             elif s == "설계":
                 print(f"  [{step:02d}] oofeature next {doc_id}   # 기획→설계 전환")
                 step += 1
-            elif s == "개발":
-                print(f"  [{step:02d}] oodev run {doc_id}")
+    print()
+
+    # ── 상세설계 게이트 ──────────────────────────────────────────
+    print("─" * 60)
+    print("[Step 2] 상세설계 게이트")
+    print("─" * 60)
+    print(f"  검증·기획·설계 단계에서 d{sp*10000+4:05d}_todo.md(또는 d0004_todo.md)에")
+    print("  신규 todo가 적재됐는지 확인할 것.")
+    print("  ▸ 신규 todo 있음 → 상세설계 단계에서 중단(개발·검증으로 진행 금지).")
+    print("    \"발생한 todo를 전부 해결한 후 ooflow를 다시 실행하세요\" 안내 +")
+    print("    발생한 todo를 하나씩 보여주며 처리 여부를 사용자에게 문의.")
+    print("  ▸ 신규 todo 없음(0건) → [Step 3] 개발·검증·완료로 진행.")
+    print()
+
+    if plan_mode:
+        print("=" * 60)
+        print("[ooflow plan] 검토 종료 — 상세설계 단계까지만 진행")
+        print("=" * 60)
+        print("  plan 모드는 게이트와 무관하게 항상 상세설계에서 멈춥니다.")
+        print("  개발을 진행하려면: ooflow run")
+        return
+
+    # ── [Step 3] 개발·검증·완료 (todo 0건일 때만) ────────────────
+    print("  # ── [Step 3] 개발·검증·완료 (d0004 신규 todo 0건일 때만 진행) ──")
+    for f in targets:
+        doc_id = f['doc_id']
+        name = f['name']
+        stage = f['stage']
+        print(f"  # ── {doc_id} {name} ──")
+
+        if stage == '미착수':
+            remaining = STAGE_ORDER[:-1]
+        else:
+            idx = STAGE_ORDER.index(stage)
+            remaining = STAGE_ORDER[idx + 1:-1]
+        if until != "완료" and until in STAGE_ORDER:
+            until_idx = STAGE_ORDER.index(until)
+            remaining = [s for s in remaining if STAGE_ORDER.index(s) <= until_idx]
+
+        for s in remaining:
+            if s == "개발":
+                print(f"  [{step:02d}] ootest write {doc_id}   # TDD RED: TC 코드 작성")
+                step += 1
+                print(f"  [{step:02d}] oodev run {doc_id}      # TDD GREEN: 최소 구현")
+                step += 1
+                print(f"  [{step:02d}] ootest run {doc_id}     # 테스트 실행 (PASS 확인)")
                 step += 1
             elif s == "검증":
-                print(f"  [{step:02d}] oocheck run {doc_id}   # 정적 분석")
+                print(f"  [{step:02d}] oocheck run {doc_id}    # 정적 분석")
                 step += 1
                 if review_enabled:
                     print(f"  [{step:02d}] ooreview run {doc_id}   # AI 리뷰 (설계·보안·품질 + Codex 2차)")
@@ -333,22 +461,19 @@ def print_run_instructions(plan: dict, interactive: bool = False, review_enabled
 
         print()
 
+    print("  # ── [Step 4] 마무리 ──")
     print(f"  [{step:02d}] oodoc run")
     step += 1
     print(f"  [{step:02d}] oohistory run")
     step += 1
     print(f"  [{step:02d}] oocommit run   # 최종 커밋")
     print()
+    print("  ※ [개발 단계 이슈 처리 — 설계와 다름]")
+    print("  ※ oocheck/ooreview 이슈 발견 시:")
+    print(f"  ※   → d{sp*10000+4:05d}_todo.md(또는 d0004_todo.md)에 적재")
+    print("  ※   → oofix 자동 실행 → 재검증 (중단하지 않고 계속 진행)")
     if interactive:
-        print("  ※ oocheck CRITICAL 이슈 발생 시: oofix run → oocheck run 재검증 (최대 3회)")
-        if review_enabled:
-            print("  ※ ooreview CRITICAL/ERROR 발생 시: oofix run → ooreview run 재검증 (최대 2회)")
         print("  ※ --interactive 모드: CRITICAL 3회 실패 시 사용자에게 확인 요청")
-    else:
-        print("  ※ oocheck CRITICAL/ERROR → oofix run 자동 실행 → 재검증 (최대 3회)")
-        if review_enabled:
-            print("  ※ ooreview CRITICAL/ERROR → oofix run 자동 실행 → 재검증 (최대 2회)")
-        print("  ※ WARNING → d{SP}0004_todo.md 등록 후 계속 진행")
     if not review_enabled:
         print("  ※ --no-review: ooreview 단계 생략됨 (모든 Feature)")
 
@@ -425,7 +550,7 @@ def main():
         return
 
     if args[0] == "version":
-        print("ooflow v02")
+        print("ooflow v04")
         return
 
     if args[0] == "show" and len(args) > 1 and args[1] == "checklist":
@@ -453,6 +578,11 @@ def main():
         feature_id = args[args.index("--feature") + 1] if "--feature" in args else None
 
         sp = get_sp_number(sp_arg)
+
+        # Step 0: 사전 todo 점검
+        open_todos = print_todo_gate_check(sp)
+        print()
+
         plan = build_plan(sp, until=until, feature_id=feature_id)
 
         if dry_run or not plan['targets']:
@@ -460,8 +590,11 @@ def main():
 
         if not yes_mode:
             print()
+            prompt = "위 계획으로 실행하시겠습니까? [y/N] "
+            if open_todos > 0:
+                prompt = f"미해결 todo {open_todos}건이 있습니다. 그래도 실행하시겠습니까? [y/N] "
             try:
-                ans = input("위 계획으로 실행하시겠습니까? [y/N] ").strip().lower()
+                ans = input(prompt).strip().lower()
             except EOFError:
                 ans = "n"
             if ans not in ("y", "yes"):
@@ -469,6 +602,25 @@ def main():
                 return
 
         print_run_instructions(plan, interactive=interactive, review_enabled=review_enabled)
+        return
+
+    if args[0] == "plan":
+        dry_run = "--dry-run" in args
+        sp_arg = args[args.index("--sp") + 1] if "--sp" in args else None
+
+        sp = get_sp_number(sp_arg)
+
+        # Step 0: 사전 todo 점검
+        print_todo_gate_check(sp)
+        print()
+
+        # plan 모드는 항상 설계 단계까지만 전반 검토
+        plan = build_plan(sp, until="설계", feature_id=None)
+
+        if dry_run or not plan['targets']:
+            return
+
+        print_run_instructions(plan, plan_mode=True)
         return
 
     print(f"알 수 없는 서브명령어: {args[0]}")

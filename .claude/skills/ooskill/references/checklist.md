@@ -23,6 +23,7 @@
 | C16 | gemma --caller 전파 | 스킬이 gemma(gemma_run.py)를 호출하는 경우 `--caller <skill>` 인자 또는 `GEMMA_CALLER` 환경변수를 반드시 전달해야 함. 미전달 시 로그 caller가 `direct`로 기록되어 스킬별 집계 불가. 현재 gemma 직접 호출 지점 없음 → 필요 시점에 개별 반영 | INFO |
 | C17 | guide.md 존재 및 완전성 | 모든 oo 스킬이 `references/guide.md`를 보유하고 있는지 확인. 존재하는 경우 핵심 방법론(How)이 SKILL.md 외부로 분리되어 guide.md에 정리되어 있는지 점검. 누락 스킬은 WARNING, guide.md가 있으나 내용이 SKILL.md 수준(구조·명령어만)이면 INFO 리포트 | WARNING |
 | C18 | SKILL.md/guide.md 역할 분리 | SKILL.md(명령어·구조·워크플로우)와 guide.md(방법론·코드·패턴) 간 역할 혼재 감지. ① guide.md에 `## 서브명령어` 섹션 존재 시 WARN(명령어 목록은 SKILL.md 전용), ② SKILL.md 코드블록 10개 이상 시 INFO(guide.md로 분리 권장) | WARNING |
+| C19 | clean/clear/cleanup 용어 일관성 | 모든 oo* 스킬·커맨드의 서브명령어 중 `clean`·`clear`·`cleanup`이 유사 용어로 같은 의미에 혼용되는지 검사. 각 용어의 실제 동작을 비교하여 동일 의미면 하나로 통일 권고(예: 이력 정리=`clear`, 산출물 삭제=`clean`), 의미가 다르면 정의를 SKILL.md에 명시하도록 리포트 | WARNING |
 
 ## check 출력 형식
 

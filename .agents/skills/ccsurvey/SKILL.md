@@ -1,12 +1,12 @@
 ---
 name: ccsurvey
-description: "공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/skills/oocontext/SKILL.md`"
+description: "공통: `.codex/guides/common_guide.md` | 컨텍스트: `.agents/skills/cccontext/SKILL.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/skills/oocontext/SKILL.md`
+> 공통: `.codex/guides/common_guide.md` | 컨텍스트: `.agents/skills/cccontext/SKILL.md`
 
 ## 0. 스킬 요약
 
@@ -14,14 +14,14 @@ description: "공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/
 |------|------|
 | **핵심 역할** | 논문 서베이 및 선행연구 체계적 정리 |
 | **하는 것** | 논문 분류·비교표 생성, 연구 동향 분석, 서베이 문서 작성 |
-| **하지 않는 것** | 새 논문 작성(→oosota), 문헌 수집(→oopaper), 연구 수행(→ooresearch) |
+| **하지 않는 것** | 새 논문 작성(→ccsota), 문헌 수집(→ccpaper), 연구 수행(→ccresearch) |
 | **참조 범위** | 현재 프로젝트 `03_paper/` 내부 파일 + 웹 검색 보조 |
 | **수정 대상** | 서베이 결과 MD 파일 |
 | **실행 레벨** | [반자동] — 분석 범위 확인 후 생성 |
-| **에이전트 호환** | Claude Code 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
+| **에이전트 호환** | Codex 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
 
 ## 문서 이력 관리
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -36,7 +36,7 @@ description: "공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/
 - **입력**: 논문 폴더 내 논문 (PDF, 서머리, 전문)
 - **출력**: `00_doc/sp00/d0110_survey.md` 서베이 문서
 - **연동**: d0001_prd.md (연구 주제), d0004_todo.md (이슈)
-- **컨텍스트**: `--sp N` 또는 `oocontext N`
+- **컨텍스트**: `--sp N` 또는 `cccontext N`
 
 ### 1.1 논문 폴더 설정
 
@@ -188,7 +188,7 @@ ID 규칙: `P` Prefix (예: P001, P002)
 | d0004 이슈 등록 | 분석 불가 논문 기록 |
 | PRD 연동 확인 | 연구 주제 일치 |
 
-> **관련 문서**: `00_doc/sp00/d0001_prd.md` | `00_doc/sp00/d0110_survey.md` | `00_doc/sp00/d0004_todo.md` | `.claude/skills/ccsurvey/references/guide.md`
+> **관련 문서**: `00_doc/sp00/d0001_prd.md` | `00_doc/sp00/d0110_survey.md` | `00_doc/sp00/d0004_todo.md` | `.agents/skills/ccsurvey/references/guide.md`
 
 ## 11. 관련 문서
 
@@ -197,8 +197,8 @@ ID 규칙: `P` Prefix (예: P001, P002)
 | `00_doc/sp00/d0001_prd.md` | 연구 주제 및 키워드 소스 |
 | `00_doc/sp00/d0110_survey.md` | 서베이 출력 문서 |
 | `00_doc/sp00/d0004_todo.md` | 분석 불가 논문 이슈 등록 |
-| `.claude/skills/ccsurvey/references/guide.md` | 상세 가이드 |
-| `.claude/skills/oopaper/SKILL.md` | 논문 수집/정리 (입력 소스) |
+| `.agents/skills/ccsurvey/references/guide.md` | 상세 가이드 |
+| `.agents/skills/ccpaper/SKILL.md` | 논문 수집/정리 (입력 소스) |
 
 ## 12. 사용 예시
 
@@ -208,7 +208,7 @@ ID 규칙: `P` Prefix (예: P001, P002)
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -228,10 +228,10 @@ ID 규칙: `P` Prefix (예: P001, P002)
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -242,7 +242,7 @@ ID 규칙: `P` Prefix (예: P001, P002)
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

@@ -1,6 +1,7 @@
 # oohelp_guide - 명령어/스킬 도움말 가이드
 
 ## 문서 이력 관리
+- v03 2026-05-17 — §4 d0007_command.md 잔여 문구 제거 (d0007은 oodata 전용 — d0007_data.md)
 - v02 2026-04-07 — 마스터 문서 d0007 → .claude/CLAUDE.md 전환
 - v01 2026-02-05 — 초기 생성
 
@@ -51,7 +52,7 @@ oohelp [명령어]
 |------|------|
 | 핵심 개발 스킬 | ooprd, ooplan, oofeature, oodev, ootest, oocheck, oofix, oocommit |
 | 모듈/DB 스킬 | oolib, oodb, oodeep, ooopti |
-| 문서/환경 스킬 | oodoc, ooenv, oohistory, oonote, ootodo, oouser, oodesign, ootutorial |
+| 문서/환경 스킬 | oodoc, ooenv, oohistory, oonote, ootodo, oodesign, ootutorial |
 | 실행/유틸 스킬 | oorun, oouv, oocontext, oonext, oonow, ooprevious, ootoken, oowork, oocapture |
 | 콘텐츠 생성 스킬 | ooppt, ooword, oobook, oopaper, ooreport, oopdf, ooresearch, oosota, oosurvey, ooscrap, oohwp, oosidi |
 | 메타 스킬 | oostart, oostop, oohelp, ooskill, oosync |
@@ -88,8 +89,7 @@ oohelp ootest   # .claude/skills/ootest/SKILL.md 표시
 
 ## 4. 스킬 카탈로그 갱신
 
-스킬 추가/변경 시 `.claude/CLAUDE.md`의 카탈로그 섹션을 직접 수정합니다.  
-d0007_command.md는 더 이상 관리하지 않습니다.
+스킬 추가/변경 시 `.claude/CLAUDE.md`의 카탈로그 섹션을 직접 수정합니다.
 
 | 상황 | 작업 |
 |------|------|
@@ -109,4 +109,4 @@ d0007_command.md는 더 이상 관리하지 않습니다.
 
 ---
 
-**버전**: v02 (2026-04-07)
+**버전**: v03 (2026-05-17)

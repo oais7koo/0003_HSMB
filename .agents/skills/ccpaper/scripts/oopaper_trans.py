@@ -224,8 +224,8 @@ def create_korean_translation(folder_path, english_file, title, use_gemma=True):
 
     Returns:
         tuple: (성공, 파일경로, 오류, stage)
-            - stage=1: Gemma 1차 완료 (Claude 검수 대기)
-            - stage=0: 템플릿만 생성됨 (Gemma 미사용/실패, Claude/사용자 직접 번역 필요)
+            - stage=1: Gemma 1차 완료 (Codex 검수 대기)
+            - stage=0: 템플릿만 생성됨 (Gemma 미사용/실패, Codex/사용자 직접 번역 필요)
     """
     if not english_file.exists():
         return False, None, "영문 전문 파일 없음", 0
@@ -245,7 +245,7 @@ def create_korean_translation(folder_path, english_file, title, use_gemma=True):
     v1_chars = 0
     full_text = "[TODO: 번역 필요]"
     stage = 0
-    stage_label = "★ 0차 (템플릿만 — Claude/사용자 번역 대기)"
+    stage_label = "★ 0차 (템플릿만 — Codex/사용자 번역 대기)"
 
     RATIO_MIN = 0.3  # 한글/영어 문자량 최소 비율
     eng_len = len(english_text.strip())
@@ -268,7 +268,7 @@ def create_korean_translation(folder_path, english_file, title, use_gemma=True):
                 v1_at = _now_iso()
                 v1_chars = len(translated)
                 stage = 1
-                stage_label = "★ 1차 (Gemma 자동 번역 — Claude 검수 대기)"
+                stage_label = "★ 1차 (Gemma 자동 번역 — Codex 검수 대기)"
                 break
             else:
                 print(f"  [WARN] 비율 {ratio:.2f} < {RATIO_MIN} → {'재시도' if attempt == 1 else '번역 실패 처리'}", flush=True)
@@ -551,7 +551,7 @@ def _update_frontmatter(content: str, updates: dict) -> str:
 
 def _claude_review(folder_id: str, korean_file: Path, english_file: Path, limit_chunks: int | None = None) -> tuple[bool, int, str | None]:
     """
-    Claude Code CLI로 한글 번역 2차 검수.
+    Codex CLI로 한글 번역 2차 검수.
     Returns: (성공, 수정건수, 오류메시지)
     """
     import subprocess
@@ -595,20 +595,20 @@ def _claude_review(folder_id: str, korean_file: Path, english_file: Path, limit_
         f"[Gemma 1차 번역]\n{translation_body}"
     )
 
-    # claude CLI 경로 탐색
+    # codex CLI 경로 탐색
     import shutil, os
-    claude_cmd = shutil.which("claude")
+    claude_cmd = shutil.which("codex")
     if not claude_cmd:
         # Git Bash / Windows 공통 fallback 경로
         for candidate in [
-            os.path.expanduser("~/.local/bin/claude"),
-            r"C:\Users\oaiskoo\.local\bin\claude",
+            os.path.expanduser("~/.local/bin/codex"),
+            r"C:\Users\oaiskoo\.local\bin\codex",
         ]:
             if Path(candidate).exists():
                 claude_cmd = candidate
                 break
     if not claude_cmd:
-        return False, 0, "claude CLI 미설치 또는 PATH 미설정"
+        return False, 0, "codex CLI 미설치 또는 PATH 미설정"
 
     env = os.environ.copy()
     env["PATH"] = str(Path(claude_cmd).parent) + os.pathsep + env.get("PATH", "")
@@ -636,7 +636,7 @@ def _claude_review(folder_id: str, korean_file: Path, english_file: Path, limit_
     limit = limit_chunks
     if limit:
         chunks = chunks[:limit]
-    print(f"  [Claude] {folder_id} 2차 검수 시작 ({len(translation_body):,}자, {len(chunks)}개 chunk)...", flush=True)
+    print(f"  [Codex] {folder_id} 2차 검수 시작 ({len(translation_body):,}자, {len(chunks)}개 chunk)...", flush=True)
 
     reviewed_parts = []
     t0 = time.time()
@@ -665,17 +665,17 @@ def _claude_review(folder_id: str, korean_file: Path, english_file: Path, limit_
             if not out:
                 return False, 0, f"chunk {i} 응답 비어 있음"
             reviewed_parts.append(out)
-            print(f"  [Claude] {i}/{len(chunks)} · {len(chunk)}→{len(out)}자 · {time.time()-ct0:.1f}s", flush=True)
+            print(f"  [Codex] {i}/{len(chunks)} · {len(chunk)}→{len(out)}자 · {time.time()-ct0:.1f}s", flush=True)
         except subprocess.TimeoutExpired:
             return False, 0, f"chunk {i} 타임아웃 (120s)"
 
     reviewed_text = "\n\n".join(reviewed_parts)
     elapsed = time.time() - t0
     changes = sum(1 for a, b in zip(translation_body.split("\n"), reviewed_text.split("\n")) if a != b)
-    print(f"  [Claude] 완료 · 총 {elapsed:.1f}s · 수정 ~{changes}줄", flush=True)
+    print(f"  [Codex] 완료 · 총 {elapsed:.1f}s · 수정 ~{changes}줄", flush=True)
 
     # frontmatter 갱신
-    v2_engine = "claude-code"
+    v2_engine = "codex-code"
     v2_at = _now_iso()
     updated_content = _update_frontmatter(korean_text, {
         "stage": "2",
@@ -686,7 +686,7 @@ def _claude_review(folder_id: str, korean_file: Path, english_file: Path, limit_
 
     # body 교체: frontmatter 끝 이후를 헤더 + 검수 결과로 대체
     fm_end = updated_content.find("\n---", 3) + 4
-    stage_label = "★★ 2차 (Claude Code 검수 완료)"
+    stage_label = "★★ 2차 (Codex 검수 완료)"
     new_body_section = "\n" + "\n".join(header_lines) + "\n" + reviewed_text + "\n"
     updated_content = updated_content[:fm_end] + new_body_section
 
@@ -699,9 +699,9 @@ def _claude_review(folder_id: str, korean_file: Path, english_file: Path, limit_
 
 
 def do_korean_review(args):
-    """한글 번역 2차 Claude 검수."""
+    """한글 번역 2차 Codex 검수."""
     sys.stdout.reconfigure(encoding="utf-8")
-    print("# ccpaper trans korean --review - Claude 2차 검수\n", flush=True)
+    print("# ccpaper trans korean --review - Codex 2차 검수\n", flush=True)
     print(f"실행 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n", flush=True)
 
     if not PAPER_DIR.exists():
@@ -878,8 +878,8 @@ def main():
     kor_p = subparsers.add_parser("korean", help="한글 번역 생성")
     kor_p.add_argument("--folder", type=str, help="특정 폴더만 처리")
     kor_p.add_argument("--force", action="store_true", help="기존 파일 덮어쓰기")
-    kor_p.add_argument("--review", action="store_true", help="Claude 2차 검수 (stage 1→2)")
-    kor_p.add_argument("--no-gemma", action="store_true", dest="no_gemma", help="Gemma 건너뛰기 (Claude 직접 번역)")
+    kor_p.add_argument("--review", action="store_true", help="Codex 2차 검수 (stage 1→2)")
+    kor_p.add_argument("--no-gemma", action="store_true", dest="no_gemma", help="Gemma 건너뛰기 (Codex 직접 번역)")
     kor_p.add_argument("--limit-chunks", type=int, dest="limit_chunks", help="검수할 최대 chunk 수 (테스트용)")
 
     if len(sys.argv) == 1:

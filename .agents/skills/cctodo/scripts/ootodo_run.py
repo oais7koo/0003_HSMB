@@ -43,7 +43,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding="utf-8")
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -209,7 +209,7 @@ def _parse_section_blocks(section_text: str) -> list[dict]:
         block_end = splits[i + 1].start() if i + 1 < len(splits) else len(section_text)
         block_body = section_text[block_start:block_end]
 
-        # ID + 제목: "C008 [ooprd] 제목" or "T010 제목"
+        # ID + 제목: "C008 [ccprd] 제목" or "T010 제목"
         id_m = re.match(r"([CT]\d+)\s*(.*)", heading)
         if not id_m:
             continue
@@ -626,27 +626,27 @@ def get_processing_skill(tag: str, content: str) -> str:
     content_lower = content.lower()
 
     tag_map = {
-        "FEATURE": "oodev", "BUGFIX": "oofix", "HOTFIX": "oofix",
-        "DOCS": "ooprd", "UPDATE": "ooenv", "CONFIG": "ooenv",
-        "PPT": "ooppt", "PAPER": "ooreport", "IMPROVE": "oodev",
-        "REFACTOR": "oodev", "TEST": "ootest",
+        "FEATURE": "ccdev", "BUGFIX": "ccfix", "HOTFIX": "ccfix",
+        "DOCS": "ccprd", "UPDATE": "ooenv", "CONFIG": "ooenv",
+        "PPT": "ccppt", "PAPER": "ccreport", "IMPROVE": "ccdev",
+        "REFACTOR": "ccdev", "TEST": "cctest",
     }
     if tag in tag_map:
         return tag_map[tag]
 
     if "문서" in content_lower or "doc" in content_lower:
-        return "ooprd"
+        return "ccprd"
     if "에러" in content_lower or "fix" in content_lower or "수정" in content_lower:
-        return "oofix"
+        return "ccfix"
     if "테스트" in content_lower or "test" in content_lower:
-        return "ootest"
+        return "cctest"
     if "ppt" in content_lower or "발표" in content_lower:
-        return "ooppt"
+        return "ccppt"
     if "논문" in content_lower or "paper" in content_lower:
-        return "ooreport"
+        return "ccreport"
     if "설정" in content_lower or "config" in content_lower:
         return "ooenv"
-    return "oodev"
+    return "ccdev"
 
 
 # ============================================================
@@ -1101,7 +1101,7 @@ def cmd_run(sp: str = "00", dry_run: bool = False, max_items: int = 0):
         print(f"    1. 해당 항목을 '## 완료 ToDo' 섹션으로 이동")
         print(f"       - 항목 ID: {todo['id']}")
         print(f"       - 파일: {todo_file.relative_to(PROJECT_ROOT)}")
-        print(f"    2. oocommit run  ← 커밋 + 이력 이동")
+        print(f"    2. cccommit run  ← 커밋 + 이력 이동")
         print(f"    3. 다음 항목으로 이동")
 
     print("\n" + "=" * 50)
@@ -1308,4 +1308,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

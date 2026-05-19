@@ -4,7 +4,7 @@ description: "{사용자의 직전 메시지 원문}"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 ## 0. 스킬 요약
 
@@ -12,11 +12,11 @@ description: "{사용자의 직전 메시지 원문}"
 |------|------|
 | **핵심 역할** | 직전 사용자 입력과 현재 작업 컨텍스트를 요약 표시 |
 | **하는 것** | 현재 세션의 직전 요청 내용 + 컨텍스트 요약 출력 |
-| **하지 않는 것** | 파일 수정, 작업 실행, 이전 세션 정보 조회(→ooprevious) |
+| **하지 않는 것** | 파일 수정, 작업 실행, 이전 세션 정보 조회(→ccprevious) |
 | **참조 범위** | 현재 세션 내 컨텍스트만 / 외부 파일·시스템 자동 포함 안 함 |
 | **수정 대상** | 없음 (출력만) |
 | **실행 레벨** | [수동] — 세션 상태 표시만 |
-| **에이전트 호환** | Claude Code 전용 — 세션 컨텍스트 접근 필요 / 다른 에이전트: 현재 대화 내용 요약으로 대체 가능 |
+| **에이전트 호환** | Codex 전용 — 세션 컨텍스트 접근 필요 / 다른 에이전트: 현재 대화 내용 요약으로 대체 가능 |
 
 ## 1. 개요
 
@@ -54,7 +54,7 @@ description: "{사용자의 직전 메시지 원문}"
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -70,7 +70,7 @@ description: "{사용자의 직전 메시지 원문}"
 ## QMD 마크다운 검색 (문서 내용 탐색 시)
 
 > 마크다운 문서 **내용**을 찾을 때는 Glob/Grep 대신 **`mcp__qmd__query`** 우선 사용.
-> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.claude/guides/common_guide.md §10`
+> qmd 미가동 시 Glob/Grep 폴백. 자세한 기준: `.codex/guides/common_guide.md §10`
 
 | 도구 | 적합한 상황 |
 |------|-----------|
@@ -79,7 +79,7 @@ description: "{사용자의 직전 메시지 원문}"
 | `Glob` | 파일 경로 패턴 검색 |
 | `Grep` | 코드·특정 문자열 검색 |
 
-**인덱싱**: `oostart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {프로젝트명}`
+**인덱싱**: `ccstart run` 시 `qmd update` 자동 실행 / 최초: `qmd collection add . --name {프로젝트명}`
 
 <!-- QMD-REF:END -->
 
@@ -92,10 +92,10 @@ description: "{사용자의 직전 메시지 원문}"
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -106,7 +106,7 @@ description: "{사용자의 직전 메시지 원문}"
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

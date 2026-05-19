@@ -1,4 +1,12 @@
 {
-  "total_findings": 0,
-  "report": {}
+  "total_findings": 1,
+  "report": {
+    "ccdoc": [
+      {
+        "code": "CLAUDE_AGENT_KEYWORD",
+        "file": ".agents\\skills\\ccdoc\\SKILL.md",
+        "snippet": "CLAUDE.md · .codex/templates/ · 00_doc/sp00/d0001~d0010 / 명령어: `.codex/commands/sc/index.md`"
+      }
+    ]
+  }
 }

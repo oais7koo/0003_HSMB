@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-oodata_run.py - data/ 폴더 백업/복원 스킬
-Usage: uv run python .claude/skills/oodata/scripts/oodata_run.py [backup|restore|list|status|help]
+oodata_run.py - data/ 폴더 문서화/백업/복원 스킬
+Usage: uv run python .claude/skills/oodata/scripts/oodata_run.py [run|comment|backup|restore|list|status|help]
 """
 import sys
 import shutil
+from datetime import datetime
 from pathlib import Path
 import re as _re
 
@@ -39,12 +40,14 @@ if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 SKILL_NAME = "oodata"
-VERSION = "v01"
+VERSION = "v04"
 
 # 프로젝트 루트: scripts/ → oodata/ → skills/ → .claude/ → project_root
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 DEFAULT_BACKUP_PATH = Path(r"f:\udd\data_exa\exa63_dual_branch")
+# data/ 는 프로젝트 공통 폴더 — SP 무관, 단일 문서로 관리
+DATA_DOC_PATH = PROJECT_ROOT / "00_doc" / "sp00" / "d0007_data.md"
 
 
 # ============================================================
@@ -253,6 +256,340 @@ def cmd_restore():
             print(f"  [FAIL] {name}: {reason}")
 
 
+def scan_all_data_entries() -> list:
+    """data/ 의 실제 폴더 + 백업 마커를 통합한 항목 목록.
+    Returns: [(name, status, size_mb), ...]  status ∈ {'존재', '백업됨'}
+    """
+    folders = list_data_folders()
+    markers = list_backup_markers()
+    folder_names = {f.name for f in folders}
+    backup_only = {m.name.removesuffix("_backup") for m in markers} - folder_names
+
+    entries = []
+    for f in folders:
+        entries.append((f.name, "존재", folder_size_mb(f)))
+    for name in backup_only:
+        entries.append((name, "백업됨", 0.0))
+    return sorted(entries, key=lambda x: x[0])
+
+
+def parse_existing_descriptions(doc_path: Path) -> dict:
+    """기존 문서에서 '폴더명 → 설명' 매핑 추출 (보존용)."""
+    if not doc_path.exists():
+        return {}
+    desc = {}
+    for line in doc_path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        # 헤더/구분선 스킵
+        if cells[0] in ("폴더", "") or set(cells[0]) <= set("-: "):
+            continue
+        folder_clean = cells[0].rstrip("/").strip()
+        desc[folder_clean] = cells[2]
+    return desc
+
+
+def gather_folder_detail(folder: Path, max_files: int = 20000) -> dict:
+    """폴더의 파일 통계·서브폴더 구조 수집.
+    Returns: {file_count, ext_counts, subdirs, truncated}
+    """
+    ext_counts: dict = {}
+    file_count = 0
+    truncated = False
+    subdirs: list = []
+
+    if not folder.exists():
+        return {"file_count": 0, "ext_counts": {}, "subdirs": [], "truncated": False}
+
+    # 1단계 서브폴더 (각 서브폴더의 재귀 파일 수)
+    try:
+        for child in sorted(folder.iterdir()):
+            if child.is_dir() and not child.name.startswith("."):
+                try:
+                    sub_count = sum(1 for p in child.rglob("*") if p.is_file())
+                except Exception:
+                    sub_count = -1
+                subdirs.append((child.name, sub_count))
+    except Exception:
+        pass
+
+    # 전체 파일 / 확장자 카운트 (max_files 제한)
+    try:
+        for f in folder.rglob("*"):
+            if not f.is_file():
+                continue
+            file_count += 1
+            if file_count > max_files:
+                truncated = True
+                break
+            ext = f.suffix.lower() or "(확장자없음)"
+            ext_counts[ext] = ext_counts.get(ext, 0) + 1
+    except Exception:
+        pass
+
+    return {
+        "file_count": file_count,
+        "ext_counts": ext_counts,
+        "subdirs": subdirs,
+        "truncated": truncated,
+    }
+
+
+_EXT_LABEL = {
+    ".png": "이미지", ".jpg": "이미지", ".jpeg": "이미지", ".bmp": "이미지",
+    ".gif": "이미지", ".tif": "이미지", ".tiff": "이미지", ".webp": "이미지",
+    ".csv": "CSV 데이터", ".tsv": "TSV 데이터", ".parquet": "Parquet 데이터",
+    ".json": "JSON 데이터", ".yaml": "YAML 설정", ".yml": "YAML 설정", ".toml": "TOML 설정",
+    ".pdf": "PDF 문서", ".md": "Markdown 문서", ".txt": "텍스트",
+    ".docx": "Word 문서", ".xlsx": "Excel 시트", ".pptx": "PPT",
+    ".ttf": "폰트", ".otf": "폰트", ".woff": "폰트", ".woff2": "폰트",
+    ".py": "Python 스크립트", ".ipynb": "Jupyter 노트북",
+    ".js": "JavaScript", ".ts": "TypeScript", ".html": "HTML", ".css": "CSS",
+    ".zip": "압축", ".tar": "압축", ".gz": "압축", ".7z": "압축",
+    ".npy": "NumPy 배열", ".npz": "NumPy 배열", ".pkl": "Pickle",
+    ".pt": "PyTorch 모델", ".pth": "PyTorch 모델", ".onnx": "ONNX 모델", ".h5": "HDF5",
+    ".mp4": "동영상", ".mov": "동영상", ".avi": "동영상",
+    ".mp3": "오디오", ".wav": "오디오",
+    ".db": "DB", ".sqlite": "DB",
+}
+
+
+def guess_folder_purpose(name: str, ext_counts: dict) -> str:
+    """폴더명·확장자 분포로 성격 추정."""
+    name_lower = name.lower()
+    parts = []
+
+    # 폴더명 키워드
+    name_hints = {
+        "env": "환경 설정",
+        "capture": "화면 캡처/스크린샷",
+        "font": "폰트 자산",
+        "csv": "CSV 데이터",
+        "backup": "백업",
+        "design": "디자인 자산",
+        "sample": "샘플 데이터",
+        "memory": "메모리/지식 저장소",
+        "gemini": "Gemini 관련",
+        "claude": "Claude 관련",
+        "old": "구버전/보관용",
+        "tunnel": "터널 데이터",
+        "crack": "균열 데이터",
+        "pocketbase": "PocketBase DB",
+    }
+    for key, hint in name_hints.items():
+        if key in name_lower:
+            parts.append(hint)
+            break
+
+    # 확장자 기반
+    if not ext_counts:
+        parts.append("빈 폴더")
+    else:
+        total = sum(ext_counts.values())
+        top_ext, top_n = max(ext_counts.items(), key=lambda x: x[1])
+        ext_label = _EXT_LABEL.get(top_ext, top_ext)
+        ratio = top_n / total
+        if ratio >= 0.7:
+            parts.append(f"{ext_label} 위주 ({top_n}/{total})")
+        else:
+            parts.append(f"혼합 (최다 {ext_label} {top_n}/{total})")
+
+    # ps번호 정책
+    if _re.match(r"^ps1\d{3}", name) or _re.match(r"^ps10\d{2}", name):
+        parts.append("원본 데이터 추정 (백업 정책: 제외)")
+    elif _re.match(r"^ps3\d{3}", name):
+        parts.append("Inopam 실험 결과 추정 (백업 대상)")
+    elif _re.match(r"^ps4\d{3}", name):
+        parts.append("CrackSeg9k 실험 결과 추정 (백업 대상)")
+    elif _re.match(r"^ps[6-9]\d{3}", name):
+        parts.append("SP별 워킹 데이터 추정")
+
+    return " · ".join(parts)
+
+
+def build_detail_section(entries: list, descriptions: dict) -> str:
+    """폴더별 상세 섹션 생성."""
+    lines = ["## 폴더 상세", ""]
+    for name, status, mb in entries:
+        folder = DATA_DIR / name
+        comment = descriptions.get(name, "")
+
+        lines.append(f"### {name}/")
+        lines.append("")
+        status_line = f"- 상태: {status}"
+        if status == "존재" and mb > 0:
+            status_line += f" ({mb:.1f} MB)"
+        lines.append(status_line)
+        if comment:
+            lines.append(f"- 코멘트: {comment}")
+
+        if status == "백업됨":
+            lines.append("- 비고: 외부 경로로 이동됨 (data/ 본체 없음)")
+            lines.append("")
+            continue
+
+        detail = gather_folder_detail(folder)
+        file_count_str = f"{detail['file_count']}개"
+        if detail["truncated"]:
+            file_count_str += " (≥, 스캔 제한)"
+        lines.append(f"- 총 파일 수: {file_count_str}")
+
+        # 확장자 분포 (상위 5)
+        if detail["ext_counts"]:
+            top5 = sorted(detail["ext_counts"].items(), key=lambda x: -x[1])[:5]
+            ext_str = ", ".join(f"`{ext}` {cnt}" for ext, cnt in top5)
+            lines.append(f"- 주요 확장자: {ext_str}")
+
+        # 서브폴더 (최대 20개)
+        if detail["subdirs"]:
+            lines.append("- 서브폴더:")
+            for sub_name, sub_count in detail["subdirs"][:20]:
+                cnt_str = f"{sub_count} files" if sub_count >= 0 else "?"
+                lines.append(f"  - `{sub_name}/` ({cnt_str})")
+            if len(detail["subdirs"]) > 20:
+                lines.append(f"  - … 외 {len(detail['subdirs']) - 20}개")
+        else:
+            lines.append("- 서브폴더: 없음 (루트에 파일만)")
+
+        # 추정
+        lines.append(f"- 추정 성격: {guess_folder_purpose(name, detail['ext_counts'])}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def build_data_doc(entries: list, descriptions: dict) -> str:
+    """d0007_data.md 본문 생성 (SP 무관, 프로젝트 공통)."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    lines = [
+        "# data/ 폴더 구조 (프로젝트 공통)",
+        "",
+        "> data/ 는 SP에 무관한 프로젝트 루트 공통 폴더이며, 본 문서는 oodata 스킬이 관리한다.",
+        "",
+        "## 문서 이력 관리",
+        f"- {now} — oodata run 자동 생성/업데이트",
+        "",
+        "## 서브폴더 목록",
+        "",
+        "| 폴더 | 상태 | 설명 |",
+        "|------|------|------|",
+    ]
+    for name, status, mb in entries:
+        if status == "존재" and mb > 0:
+            status_cell = f"존재 ({mb:.1f} MB)"
+        else:
+            status_cell = status
+        desc = descriptions.get(name, "")
+        lines.append(f"| {name}/ | {status_cell} | {desc} |")
+    lines += [
+        "",
+        f"> data/ 경로: `{DATA_DIR}`",
+        f"> 외부 백업 기본 경로: `{DEFAULT_BACKUP_PATH}`",
+        "",
+    ]
+    # 상세 섹션 추가
+    lines.append(build_detail_section(entries, descriptions))
+    return "\n".join(lines)
+
+
+def cmd_run():
+    DATA_DOC_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    entries = scan_all_data_entries()
+    existing_desc = parse_existing_descriptions(DATA_DOC_PATH)
+    content = build_data_doc(entries, existing_desc)
+
+    is_new = not DATA_DOC_PATH.exists()
+    DATA_DOC_PATH.write_text(content, encoding="utf-8")
+
+    print(f"# oodata run\n")
+    print(f"- data/  : {DATA_DIR}")
+    print(f"- 문서   : {DATA_DOC_PATH}")
+    print(f"- 상태   : {'생성됨' if is_new else '업데이트'} ({len(entries)}개 폴더)")
+    print()
+    print("## 등록된 서브폴더")
+    print()
+    print("| 폴더 | 상태 | 크기 |")
+    print("|------|------|------|")
+    for name, status, mb in entries:
+        size_str = f"{mb:.1f} MB" if status == "존재" and mb > 0 else "-"
+        print(f"| {name}/ | {status} | {size_str} |")
+
+
+def _update_detail_comment(lines: list, target: str, merged_comment: str) -> bool:
+    """상세 섹션 '### target/' 블록에 '- 코멘트:' 라인 갱신/삽입."""
+    heading = f"### {target}/"
+    for i, line in enumerate(lines):
+        if line.strip() != heading:
+            continue
+        # 블록 범위 (다음 ### 또는 ## 헤딩까지)
+        block_end = len(lines)
+        for j in range(i + 1, len(lines)):
+            if lines[j].startswith("### ") or lines[j].startswith("## "):
+                block_end = j
+                break
+        # 기존 코멘트 라인 갱신
+        for k in range(i + 1, block_end):
+            if lines[k].lstrip().startswith("- 코멘트:"):
+                lines[k] = f"- 코멘트: {merged_comment}"
+                return True
+        # 없으면 '- 상태:' 다음에 삽입
+        for k in range(i + 1, block_end):
+            if lines[k].lstrip().startswith("- 상태:"):
+                lines.insert(k + 1, f"- 코멘트: {merged_comment}")
+                return True
+        # 상태 라인도 없으면 heading 바로 아래 빈 줄 다음에 삽입
+        lines.insert(i + 2, f"- 코멘트: {merged_comment}")
+        return True
+    return False
+
+
+def cmd_comment(folder_name: str, memo: str):
+    if not DATA_DOC_PATH.exists():
+        print(f"[ERROR] 문서 없음: {DATA_DOC_PATH}")
+        print("먼저 `oodata run` 을 실행하세요.")
+        return
+
+    target = folder_name.rstrip("/").strip()
+    lines = DATA_DOC_PATH.read_text(encoding="utf-8").splitlines()
+    updated = False
+    merged_comment = memo
+
+    # 1) 서브폴더 목록 테이블 셀 갱신
+    for i, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) < 3:
+            continue
+        if cells[0] in ("폴더", "") or set(cells[0]) <= set("-: "):
+            continue
+        cell_name = cells[0].rstrip("/").strip()
+        if cell_name == target:
+            merged_comment = f"{cells[2]} | {memo}" if cells[2] else memo
+            cells[2] = merged_comment
+            lines[i] = "| " + " | ".join(cells) + " |"
+            updated = True
+            break
+
+    # 2) 상세 섹션 코멘트 라인 갱신/삽입
+    detail_updated = _update_detail_comment(lines, target, merged_comment) if updated else False
+
+    if updated:
+        DATA_DOC_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"[OK] '{target}' 설명 업데이트")
+        print(f"  메모   : {memo}")
+        print(f"  반영   : 테이블 셀{' + 상세 섹션' if detail_updated else ''}")
+        print(f"  문서   : {DATA_DOC_PATH}")
+    else:
+        print(f"[WARN] '{target}' 폴더를 문서에서 찾을 수 없음")
+        print(f"  문서: {DATA_DOC_PATH}")
+
+
 def cmd_status():
     print(f"[{SKILL_NAME} status]  버전: {VERSION}")
     print(f"  DATA_DIR     : {DATA_DIR}  ({'존재' if DATA_DIR.exists() else '없음'})")
@@ -285,10 +622,17 @@ def main():
     if show_help_if_no_args(SKILL_NAME, args):
         return
     cmd = args[0].lower()
+    if cmd == "comment":
+        if len(args) < 3:
+            print('[ERROR] 사용법: oodata comment <폴더명> "<메모>"')
+            return
+        cmd_comment(args[1], args[2])
+        return
     dispatch = {
         "version": cmd_version,
         "status":  cmd_status,
         "list":    cmd_list,
+        "run":     cmd_run,
         "backup":  cmd_backup,
         "restore": cmd_restore,
     }

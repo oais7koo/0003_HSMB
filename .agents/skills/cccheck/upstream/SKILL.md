@@ -2,7 +2,7 @@
 name: oocheck
 description: "코드 품질 체크 스킬 'oocheck', '코드 체크', '에러 분석', '정적 분석' 등의 키워드로 트리거된다"
 metadata:
-  version: v05
+  version: v08
   category: core-dev
 ---
 
@@ -21,14 +21,15 @@ metadata:
 | 항목 | 내용 |
 |------|------|
 | **핵심 역할** | 코드 정적 분석 및 품질 체크 (Python/Flutter 자동 감지) |
-| **하는 것** | py_compile→pylint→mypy→pytest 검증 체인 실행, 이슈 d{SP}0004 등록 |
+| **하는 것** | ① 코드품질 분석(py_compile→pylint→mypy→pytest) ② 체크리스트 실행(d0008+스킬 체크리스트), 결과 d{SP}0004 등록 |
 | **하지 않는 것** | 이슈 수정(→oofix), 설계 검토(→ooreview), 실행 테스트(→ootest) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (src/, oo/, tests/, lib/) / 외부 프로젝트 자동 포함 안 함 |
-| **수정 대상** | `d{SP}0004_todo.md` (이슈 등록만, 코드 수정 안 함) |
-| **실행 레벨** | [자동] — 스캔→분석→등록 자동 실행 |
+| **수정 대상** | `d{SP}0008_checklist.md` (체크리스트 항목 추가), `d{SP}0004_todo.md` (이슈·체크 결과 등록) |
+| **실행 레벨** | [반자동] — 1단계 코드품질 분석은 자동, 2단계 체크리스트는 스킬 선택 질문 후 실행 |
 | **에이전트 호환** | Claude Code 권장 — `uv run` 기반 도구 체인 자동 실행 / 다른 에이전트: pylint·mypy·pytest를 수동 실행 후 결과를 d{SP}0004에 직접 기록 |
 
 ## 문서 이력 관리
+- v08 2026-05-16 — d0008 프로젝트 체크리스트 도입 — oocheck add(성격별 코드부여)·run 2단계(코드품질+체크리스트)·--sp N 범위 지정
 - v07 2026-04-23 — Streamlit API 오용 감지 섹션 추가 — E2E 렌더링(Playwright) 필수 명시, 검증 체인 업데이트
 - v06 2026-04-23 — 함수 내부 import 스코프 오류 감지 룰 추가 — UnboundLocalError 위험 AST 분석으로 감지
 - v05 2026-04-07 — dXXXX 단계 감지 + 자동전환 — 개발→검증 자동전환, 기획/설계 차단, 결과 저장 명시
@@ -43,13 +44,15 @@ metadata:
 | 명령어 | 설명 |
 |--------|------|
 | `oocheck help` | 서브명령어 목록 표시 |
-| `oocheck version` | 스킬 버전 정보 (v02) |
+| `oocheck version` | 스킬 버전 정보 (v08) |
 | `oocheck status` | 서브명령어 리스트, 체크 대상 현황, 최근 이슈 |
-| `oocheck check` | references/checklist.md 기반 체크 및 리포팅 | 터미널 |
-| `oocheck run` | 코드 품질 분석 실행 (배치 실행) |
+| `oocheck check` | oocheck 스킬 자체 건강 체크 (references/checklist.md 기반) | 터미널 |
+| `oocheck run` | **2단계 체크** — ① 코드품질 분석 ② 체크리스트 실행 (전체 SP) |
+| `oocheck run --sp N` | 해당 서브프로젝트만 체크 |
+| **`oocheck add "내용"`** | **d{SP}0008_checklist.md 에 프로젝트 체크리스트 항목 추가 (성격 자동분류·코드부여)** |
 | `oocheck update` | d0004_todo.md / d0010_history.md 정리 및 동기화 (현행화) |
 | `oocheck show checklist` | 역할 수행 체크리스트 표시 | 터미널 |
-| `oocheck add checklist "항목"` | 체크리스트 항목 추가 | checklist.md |
+| `oocheck add checklist "항목"` | oocheck 스킬 자체 체크리스트에 항목 추가 | references/checklist.md |
 | **`oocheck run dXXXX`** | **상세 문서 기반 관련 코드만 체크 (oofeature 연동)** |
 | **`oocheck run this`** | **직전 작업 파일만 체크** (→ common_guide.md §9) |
 | oocheck / oocheck [대상] | 전체 또는 특정 대상 체크 |
@@ -70,6 +73,49 @@ metadata:
 **포함**: lib/, test/ | **제외**: build/, .dart_tool/, *.g.dart, *.freezed.dart, firebase_options.dart
 
 ## 워크플로우
+
+### oocheck run (2단계 체크)
+
+> `oocheck run` = 코드품질 분석 + 체크리스트 실행. `--sp N` 으로 특정 SP 범위 한정.
+
+```
+oocheck run [--sp N]
+├─ [1단계] 코드품질 분석
+│   Python: py_compile→pylint→mypy→pytest / Flutter: dart analyze→flutter test
+│   → 이슈 d{SP}0004_todo.md 등록
+└─ [2단계] 체크리스트 실행
+    1. 체크리스트 보유 스킬 목록 제시 (.claude/skills/oo*/references/checklist.md)
+    2. 어떤 스킬 체크리스트를 체크할지 사용자에게 질문 (AskUserQuestion)
+    3. 전체 체크 수행:
+       - d{SP}0008_checklist.md 항목 (프로젝트 체크리스트) — 항상
+       - oocheck 스킬 체크리스트 — 항상
+       - 사용자 선택 스킬 체크리스트 — 선택
+    4. 체크 결과 → d{SP}0004_todo.md (및 d0004) 등록
+```
+
+- **범위**: `oocheck run` = 전체 SP / `oocheck run --sp N` = SP N 만
+- **필수 절차**: 2단계의 스킬 선택은 반드시 사용자에게 질문 후 진행 (자동 선택 금지)
+
+### d0008 프로젝트 체크리스트
+
+> 스킬 체크리스트(`oo*/references/checklist.md`)는 **각 스킬 고유**로 특정 프로젝트와 무관하다.
+> `d{SP}0008_checklist.md`는 **해당 프로젝트 전용** 체크리스트다. (문서번호 0008 ↔ `oocheck` 매핑)
+
+**`oocheck add "내용"`** 동작:
+1. `d{SP}0008_checklist.md` 없으면 자동 생성 (현재 SP, 템플릿 기반)
+2. 내용 키워드로 성격 자동 판정 → 접두사 부여
+3. 접두사별 일련번호 부여 → 블록 추가 (d0004 todo 블록 포맷 동일)
+
+**성격별 코드체계** (d0004 todo와 동일 구조 — 1자 접두사 + 3자리 일련번호):
+
+| 접두사 | 성격 | 판정 키워드 |
+|--------|------|-----------|
+| `C` | 코드 | 코드·구현·함수·pylint·리팩토링·API·모듈 |
+| `D` | 문서 | 문서·PRD·가이드·README·주석·명세 |
+| `S` | 보안 | 보안·취약점·인증·권한·시크릿 |
+| `T` | 테스트 | 테스트·pytest·커버리지·검증 |
+| `E` | 환경 | 환경·설정·의존성·패키지·빌드·배포 |
+| `G` | 일반 | 위 미매칭 |
 
 ### oocheck run dXXXX (상세 문서 기반 체크)
 

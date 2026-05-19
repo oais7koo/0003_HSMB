@@ -57,7 +57,7 @@ SKILL_CATEGORIES = {
     "개발": ["oodev"],
     "품질": ["oocheck", "oofix", "ootest"],
     "모듈/DB": ["oolib", "oodb"],
-    "문서": ["oodoc", "oouser", "oohistory", "oocommit"],
+    "문서": ["oodoc", "oohistory", "oocommit"],
     "보고서": ["ooppt", "ooreport"],
     "도움말": ["oohelp"],
 }

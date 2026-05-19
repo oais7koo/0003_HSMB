@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ooplan_run.py - ccplan 스킬 스크립트 (구현 계획 생성)
-Usage: uv run python .claude/skills/ccplan/scripts/ooplan_run.py [help|version|status]
+Usage: uv run python .agents/skills/ccplan/scripts/ooplan_run.py [help|version|status]
 """
 import sys
 from pathlib import Path
@@ -15,7 +15,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)

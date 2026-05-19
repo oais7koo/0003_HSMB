@@ -32,7 +32,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -74,7 +74,7 @@ def _detect_sp_cwd() -> int:
     return 0
 
 def resolve_sp(sp_arg=None) -> int:
-    """SP 번호 결정: --sp 인자 > oocontext 상태 > CWD 감지 > 기본값 0"""
+    """SP 번호 결정: --sp 인자 > cccontext 상태 > CWD 감지 > 기본값 0"""
     if sp_arg is not None:
         return int(sp_arg)
     ctx = _get_sp_from_state()
@@ -128,9 +128,9 @@ def print_usage():
     print("    ccprd section [번호]   특정 섹션만 생성/갱신")
     print()
     print("예시:")
-    print("    python .claude/skills/ccprd/scripts/ooprd_run.py run")
-    print("    python .claude/skills/ccprd/scripts/ooprd_run.py validate")
-    print("    python .claude/skills/ccprd/scripts/ooprd_run.py template")
+    print("    python .agents/skills/ccprd/scripts/ooprd_run.py run")
+    print("    python .agents/skills/ccprd/scripts/ooprd_run.py validate")
+    print("    python .agents/skills/ccprd/scripts/ooprd_run.py template")
 
 
 def _sp_folder_from_docnum(doc_number: str) -> str:

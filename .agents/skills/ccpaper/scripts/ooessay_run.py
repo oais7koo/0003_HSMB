@@ -3,11 +3,11 @@
 이 스크립트는 'ooessay' 스킬의 핵심 실행 파일로, 국내 보고서 데이터를 관리합니다.
 
 사용법:
-    uv run python .claude/skills/ooessay/scripts/ooessay_run.py run [--limit N] [--dry-run]
-    uv run python .claude/skills/ooessay/scripts/ooessay_run.py status
-    uv run python .claude/skills/ooessay/scripts/ooessay_run.py trans [--folder ID] [--force]
-    uv run python .claude/skills/ooessay/scripts/ooessay_run.py fix [--folder ID] [--check-only] [--auto-fix]
-    uv run python .claude/skills/ooessay/scripts/ooessay_run.py version
+    uv run python .agents/skills/ooessay/scripts/ooessay_run.py run [--limit N] [--dry-run]
+    uv run python .agents/skills/ooessay/scripts/ooessay_run.py status
+    uv run python .agents/skills/ooessay/scripts/ooessay_run.py trans [--folder ID] [--force]
+    uv run python .agents/skills/ooessay/scripts/ooessay_run.py fix [--folder ID] [--check-only] [--auto-fix]
+    uv run python .agents/skills/ooessay/scripts/ooessay_run.py version
 """
 
 import argparse
@@ -42,9 +42,9 @@ def show_help_if_no_args(skill_name, args):
             print("### 서브명령어\n")
             for _cc in _cmds:
                 print(f"- `{skill_name} {_cc}`")
-            print(f"\n**상세 문서**: `.claude/skills/{skill_name}/SKILL.md`")
+            print(f"\n**상세 문서**: `.agents/skills/{skill_name}/SKILL.md`")
         else:
-            print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+            print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return True
     return False
 

@@ -33,7 +33,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -75,7 +75,7 @@ def _detect_sp_cwd() -> int:
     return 0
 
 def resolve_sp(sp_arg=None) -> int:
-    """SP 번호 결정: --sp 인자 > oocontext 상태 > CWD 감지 > 기본값 0"""
+    """SP 번호 결정: --sp 인자 > cccontext 상태 > CWD 감지 > 기본값 0"""
     if sp_arg is not None:
         return int(sp_arg)
     ctx = _get_sp_from_state()
@@ -114,10 +114,10 @@ def print_usage():
     print("    --screenshot              스크린샷 저장 (E2E)")
     print()
     print("예시:")
-    print("    python .claude/skills/cctest/scripts/ootest_run.py run")
-    print("    python .claude/skills/cctest/scripts/ootest_run.py run TC-001")
-    print("    python .claude/skills/cctest/scripts/ootest_run.py run P0")
-    print("    python .claude/skills/cctest/scripts/ootest_run.py preview")
+    print("    python .agents/skills/cctest/scripts/ootest_run.py run")
+    print("    python .agents/skills/cctest/scripts/ootest_run.py run TC-001")
+    print("    python .agents/skills/cctest/scripts/ootest_run.py run P0")
+    print("    python .agents/skills/cctest/scripts/ootest_run.py preview")
 
 
 def cmd_show_checklist():

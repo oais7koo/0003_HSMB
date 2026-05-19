@@ -4,7 +4,7 @@
 ccpaper 인용정리 - 검증 불가 인용 제거 및 재번호
 
 Usage:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_cite_cleanup.py [--input FILE] [--output FILE] [--dry-run]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_cite_cleanup.py [--input FILE] [--output FILE] [--dry-run]
 """
 
 import re

@@ -6,7 +6,7 @@ description: "Vibe 환경 동기화 스킬 'oosync', '동기화', '프로젝트 
 
 metadata:
 
-  version: "v14"
+  version: "v15"
 
   category: "meta-util"
 
@@ -68,7 +68,7 @@ metadata:
 
 | `oosync help` | 서브명령어 목록 표시 |
 
-| `oosync version` | 스킬 버전 정보 (v13) |
+| `oosync version` | 스킬 버전 정보 (v15) |
 
 | `oosync status` | 서브명령어 리스트, 동기화 대상 현황 |
 
@@ -92,9 +92,11 @@ metadata:
 
 | `oosync run [project]` | 동기화 실행 (대화형) |
 
-| `oosync run --push-only` | push만 필요한 모든 프로젝트 일괄 동기화 |
+| `oosync run --push-only` | push만 필요한 모든 프로젝트 일괄 동기화 (대상 전용 파일은 삭제 여부를 대화형으로 질문) |
 
-| `oosync run --push-only --add` | push 동기화 + 대상에만 있는 파일 삭제 없이 유지 |
+| `oosync run --push-only --add` | push 동기화 + 대상에만 있는 파일을 질문 없이 유지 |
+
+| `oosync run --push-only --delete` | push 동기화 + 대상에만 있는 파일을 질문 없이 삭제 |
 
 | `oosync pipeline` | 표준 검증(ooenv standard) → 배포(run --push-only) 파이프라인 |
 
@@ -294,7 +296,7 @@ YYMMDD-HHMMSS.zip
 
 **루트 설정**: CLAUDE.md, AGENTS.md, .mcp.json, .claudeignore, cclaude.bat, cclaude.sh, gemma.ps1, gemma.sh
 
-**Codex/Agents**: .codex/, .agents/
+**Codex/Agents**: .codex/, .agents/, .gemini/
 
 **GitHub**: .github/
 
@@ -382,7 +384,7 @@ YYMMDD-HHMMSS.zip
 
 
 
-`__pycache__/`, `*.pyc`, `.git/`, `tmp/`, `data/`, `.venv/`, `node_modules/`, `.claude/settings.local.json`, `scheduled_tasks.lock`
+`__pycache__/`, `*.pyc`, `.git/`, `tmp/`, `data/`, `.venv/`, `node_modules/`, `worktrees/`, `.claude/settings.local.json`, `scheduled_tasks.lock`
 
 
 

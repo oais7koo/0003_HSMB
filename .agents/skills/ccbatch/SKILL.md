@@ -4,7 +4,7 @@ description: "**관련 명령어**: analyze, implement (`.claude/commands/sc/`)"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 ## 0. 스킬 요약
 
@@ -13,7 +13,7 @@ description: "**관련 명령어**: analyze, implement (`.claude/commands/sc/`)"
 | **핵심 역할** | 모든 oo* 스킬에 동일한 서브명령어 일괄 실행 |
 | **하는 것** | oo* SKILL.md 스캔 → 서브명령어 보유 스킬 탐지 → 일괄 실행 |
 | **하지 않는 것** | 개별 스킬 로직 수정, 코드 변경 |
-| **참조 범위** | `.claude/skills/oo*/SKILL.md` 전체 |
+| **참조 범위** | `.agents/skills/oo*/SKILL.md` 전체 |
 | **수정 대상** | 없음 (실행만) |
 | **실행 레벨** | [자동] — 스캔 후 일괄 실행 |
 | **에이전트 호환** | 범용 |
@@ -38,15 +38,15 @@ ccbatch check --fix  → check --fix 서브명령어가 있는 모든 oo* 스킬
 | `ccbatch list <subcmd>` | 해당 서브명령어 보유 스킬 목록만 출력 | 터미널 |
 | `ccbatch help` | 도움말 | 터미널 |
 
-실행: `uv run python .claude/skills/ccbatch/scripts/oobatch_run.py [subcmd] [args]`
+실행: `uv run python .agents/skills/ccbatch/scripts/oobatch_run.py [subcmd] [args]`
 
 ## 3. 실행 방식
 
-1. `.claude/skills/oo*/SKILL.md` 전체 스캔
+1. `.agents/skills/oo*/SKILL.md` 전체 스캔
 2. 서브명령어 테이블에서 `<subcmd>` 보유 스킬 탐지
 3. 스킬별 스크립트(`{skill}_run.py`) 존재 여부 확인
 4. 스크립트 있는 스킬 → `uv run python` 실행
-5. 스크립트 없는 스킬 → SKIP 표시 (Claude 오케스트레이션 필요)
+5. 스크립트 없는 스킬 → SKIP 표시 (Codex 오케스트레이션 필요)
 6. 결과 요약 리포트
 
 ## 4. 결과 상태
@@ -81,7 +81,7 @@ ccbatch list check
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

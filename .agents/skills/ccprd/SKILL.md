@@ -1,12 +1,12 @@
 ---
 name: ccprd
-description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccprd/references/guide.md"
+description: "참조: common_guide.md, cccontext.md | 상세: .agents/skills/ccprd/references/guide.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccprd/references/guide.md
+> 참조: common_guide.md, cccontext.md | 상세: .agents/skills/ccprd/references/guide.md
 
 ## 문서 이력 관리
 - v10 2026-04-19 — validate/optimize → check/check --fix 통합
@@ -16,13 +16,13 @@ description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccp
 | 항목 | 내용 |
 |------|------|
 | 핵심 역할 | PRD 생성·현행화·코드/문서 정합성 검증 |
-| 하지 않는 것 | 계획(→ooplan), 구현(→oodev), 이슈 수정(→oofix) |
+| 하지 않는 것 | 계획(→ccplan), 구현(→ccdev), 이슈 수정(→ccfix) |
 | 수정 대상 | `00_doc/sp{N}/d{SP}0001_prd.md` |
 | 실행 레벨 | [반자동] — 계획 표시 → 확인 후 실행 |
 
 ## 1. 개요
 
-컨텍스트: `--sp N`/`oocontext N` · 출력: `d{SP}0001_prd.md` · 연계: `d{SP}0004_todo.md`(이슈), `d{SP}0002_plan.md`(개발) · 템플릿: guide.md §6.11
+컨텍스트: `--sp N`/`cccontext N` · 출력: `d{SP}0001_prd.md` · 연계: `d{SP}0004_todo.md`(이슈), `d{SP}0002_plan.md`(개발) · 템플릿: guide.md §6.11
 
 ## 2. 서브명령어
 
@@ -56,14 +56,14 @@ description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccp
 |------|------|
 | run 분기 | PRD 없음→신규 / 있음→정합성 검증 |
 | 신규 생성 | 템플릿 Must 누락 시 1개씩 질문 (빈칸 금지) — guide.md §6.1 |
-| 정합성 검증 | 코드/d0002·d0003·d0005·d0006·d0008 비교 → d{SP}0004_todo 등록 |
+| 정합성 검증 | 코드/d0002·d0003·d0005·d0006 비교 → d{SP}0004_todo 등록 |
 | check --fix | 템플릿 완성·모호함 0·MoSCoW·중복 제거 |
 | unitdev | 1.개요 기준 2~5 섹션 정합성 (연계: guide.md §6.2) |
 | clarify | 6 영역 모호도 검사 → 최대 5개 질문 (guide.md §6.3) |
 
-### 3.7 ooplan 분해용 PRD 필수 항목
+### 3.7 ccplan 분해용 PRD 필수 항목
 
-| PRD 섹션 | ooplan 활용 |
+| PRD 섹션 | ccplan 활용 |
 |----------|------------|
 | §기능요구사항 (MoSCoW) | Epic→Feature 분해 근거 |
 | §기능 상세 (입출력/시나리오) | Feature→Task 세분화 근거 |
@@ -105,13 +105,13 @@ description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccp
 
 ## 12. 관련 문서
 
-- .claude/skills/ccprd/templates/prd/, .claude/templates/common_unit_dev_doc.md
+- .agents/skills/ccprd/templates/prd/, .claude/templates/common_unit_dev_doc.md
 - d{SP}0001_prd.md, d{SP}0002_plan.md, d{SP}0004_todo.md
 - 관련 명령어: .claude/commands/sc/design.md, .claude/commands/sc/document.md
 
 <!-- RUN-UPDATE-REF:START -->
 ## run과 update 분리 원칙
-> `.claude/guides/run_update_separation.md` 준수. `run`이 `update`를 자동 호출 안 함.
+> `.codex/guides/run_update_separation.md` 준수. `run`이 `update`를 자동 호출 안 함.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -130,12 +130,12 @@ description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccp
 | `Glob` | 파일 경로 패턴 |
 | `Grep` | 코드·특정 문자열 |
 
-**인덱싱**: `oostart run` 시 `qmd update` / 최초: `qmd collection add . --name {프로젝트명}`
+**인덱싱**: `ccstart run` 시 `qmd update` / 최초: `qmd collection add . --name {프로젝트명}`
 <!-- QMD-REF:END -->
 
 <!-- KARPATHY-REF:START -->
 ## Karpathy 코딩 가이드라인 (필수 준수)
-> `/andrej-karpathy-skills:karpathy-guidelines` 4원칙. 미러: `.claude/rules/karpathy-guidelines.md`
+> `/andrej-karpathy-skills:karpathy-guidelines` 4원칙. 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|
@@ -151,10 +151,10 @@ description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccp
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
 
@@ -164,7 +164,7 @@ description: "참조: common_guide.md, oocontext.md | 상세: .claude/skills/ccp
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

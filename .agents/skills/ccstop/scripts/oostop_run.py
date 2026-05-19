@@ -21,7 +21,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -124,8 +124,8 @@ def print_usage():
     print("    --message [msg]     작업 내역 메시지 지정")
     print()
     print("예시:")
-    print("    python .claude/skills/ccstop/scripts/oostop_run.py run")
-    print("    python .claude/skills/ccstop/scripts/oostop_run.py readme --message \"로그인 기능 구현\"")
+    print("    python .agents/skills/ccstop/scripts/oostop_run.py run")
+    print("    python .agents/skills/ccstop/scripts/oostop_run.py readme --message \"로그인 기능 구현\"")
 
 
 def get_git_status():
@@ -265,7 +265,7 @@ def cmd_sync(options):
         # 버전 히스토리 섹션에 오늘 항목 추가 확인
         if today not in content:
             print(f"  [INFO] {today} 이력이 없습니다.")
-            print("  [TIP] oohistory run 으로 이력을 추가하세요.")
+            print("  [TIP] cchistory run 으로 이력을 추가하세요.")
         else:
             print(f"  [OK] {today} 이력 존재")
     else:

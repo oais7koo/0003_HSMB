@@ -229,7 +229,6 @@ def check_sync_target():
 # - 참고 문서는 on-demand로 Read 도구로 로드
 # - Context 효율성: 필수 2개 = ~6k tokens, 참고 6개 = ~24k tokens
 DOCS_TO_CHECK = [
-    "d0000_manual.md",   # 전체 사용 매뉴얼
     "d0001_prd.md",      # PRD - 프로젝트 요구사항
     "d0004_todo.md",     # TODO/디버깅 - 이슈 추적
 ]
@@ -383,6 +382,57 @@ def run_qmd_update() -> tuple[str, str]:
         return "WARN", str(e)[:80]
 
 
+def _check_todo_folder(sp_num: int) -> None:
+    """R163: SP별 `todo/` 폴더 점검 — 상태 카운트 + 인덱스↔상세 고아 검출."""
+    import re as _re_todo
+    todo_dir = PROJECT_ROOT / "00_doc" / f"sp{sp_num:02d}" / "todo"
+    print(f"## 1b. ToDo 폴더 점검 (`00_doc/sp{sp_num:02d}/todo/`)\n")
+    if not todo_dir.exists():
+        print(f"[INFO] todo/ 폴더 미도입 — 인덱스만 사용 중\n")
+        return
+    # 상세 파일 스캔 (예약 파일 제외)
+    detail_files = [p for p in todo_dir.glob("*.md") if p.stem not in ("_template", "README")]
+    counts = {"OPEN": 0, "IN_PROGRESS": 0, "HOLD": 0, "DONE": 0, "UNKNOWN": 0}
+    detail_ids: set[str] = set()
+    head_re = _re_todo.compile(r"^>\s*우선순위:[^|]+\|\s*상태:\s*([A-Z_]+)", _re_todo.MULTILINE)
+    for fp in detail_files:
+        detail_ids.add(fp.stem)
+        try:
+            text = fp.read_text(encoding="utf-8")
+            m = head_re.search(text)
+            state = m.group(1).strip() if m else "UNKNOWN"
+            counts[state if state in counts else "UNKNOWN"] += 1
+        except Exception:
+            counts["UNKNOWN"] += 1
+    # 인덱스 ID 추출 — 대기 ToDo 표(`| R### |`)만 대상. 완료 ToDo·문서이력은 옛 형식 R-ID가 많아 비교에서 제외.
+    index_file = PROJECT_ROOT / "00_doc" / f"sp{sp_num:02d}" / f"d{sp_num}0004_todo.md"
+    index_ids: set[str] = set()
+    if index_file.exists():
+        idx_text = index_file.read_text(encoding="utf-8")
+        for m in _re_todo.finditer(r"^\|\s*(R\d+(?:-\d+)?(?:\.\d+)?)\s*\|", idx_text, _re_todo.MULTILINE):
+            index_ids.add(m.group(1).strip())
+    # OPEN/IN_PROGRESS/HOLD인 상세 파일만 인덱스 미참조 후보 (DONE은 완료 ToDo 섹션에 있어 검출 안 됨이 정상)
+    open_detail_ids: set[str] = set()
+    open_re = _re_todo.compile(r"^>\s*우선순위:[^|]+\|\s*상태:\s*(OPEN|IN_PROGRESS|HOLD)\b", _re_todo.MULTILINE)
+    for fp in detail_files:
+        try:
+            if open_re.search(fp.read_text(encoding="utf-8")):
+                open_detail_ids.add(fp.stem)
+        except Exception:
+            pass
+    orphan_detail = open_detail_ids - index_ids  # 활성 상세이지만 인덱스 대기 미참조
+    orphan_index = index_ids - detail_ids  # 인덱스 대기 ToDo에 있지만 상세 파일 없음
+    total = sum(counts.values())
+    print(f"- 상세 파일: **{total}개** (OPEN {counts['OPEN']} · IN_PROGRESS {counts['IN_PROGRESS']} · HOLD {counts['HOLD']} · DONE {counts['DONE']}" + (f" · UNKNOWN {counts['UNKNOWN']}" if counts['UNKNOWN'] else "") + ")")
+    if orphan_detail:
+        print(f"- [WARN] 인덱스 미참조 상세 파일: {', '.join(sorted(orphan_detail))}")
+    if orphan_index:
+        print(f"- [WARN] 인덱스에만 있고 상세 파일 없음: {', '.join(sorted(orphan_index))}")
+    if not orphan_detail and not orphan_index:
+        print(f"- [OK] 인덱스 ↔ 상세 정합성 일치")
+    print()
+
+
 def cmd_show_checklist():
     """references/checklist.md 내용 출력"""
     checklist_path = Path(__file__).parent.parent / "references" / "checklist.md"
@@ -510,6 +560,11 @@ def main():
             status, mtime = check_file_status(file_path)
             print(f"| {doc_name} | {sp_doc_label} | {status} | {mtime if mtime else '-'} |")
     print("\n")
+
+    # R163: todo/ 폴더 점검 (SP 모드, sp00 아닐 때만)
+    if not no_sp and current_sp != "00":
+        sp_num = int(current_sp)
+        _check_todo_folder(sp_num)
 
     print("## 2. Sync Checklist (Action Required)\n")
     print("### d0001_prd.md (Requirements)")

@@ -14,7 +14,7 @@
         # 기존 경로(academic-researcher 등)
         ...
 
-업무 경계 (`.claude/guides/gemma_delegation.md` 준수):
+업무 경계 (`.codex/guides/gemma_delegation.md` 준수):
   ⭕ 허용: 자유형식 서머리(초안), 단일 페이지 번역(초안), Rephrase
   ❌ 금지: 엄격한 포맷 강제, 장문 배치 번역(최종), 학술 번역 최종본
 """

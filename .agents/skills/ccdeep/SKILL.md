@@ -1,12 +1,12 @@
 ---
 name: ccdeep
-description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md"
+description: "공통 가이드: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md
+> 공통 가이드: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md
 
 ## 0. 스킬 요약
 
@@ -14,14 +14,14 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 |------|------|
 | **핵심 역할** | PyTorch 딥러닝 코드 GPU 효율성 모니터링 및 자동 최적화 반복 사이클 |
 | **하는 것** | 학습 실행, GPU 효율 모니터링, 비효율 감지 시 코드 최적화, 최대 5회 반복 |
-| **하지 않는 것** | 일반 코드 최적화(→ooopti), 의존성 관리(→oouv), 모델 평가(→ooresearch) |
+| **하지 않는 것** | 일반 코드 최적화(→ccopti), 의존성 관리(→ccuv), 모델 평가(→ccresearch) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (PyTorch 코드) / 외부 데이터셋 자동 다운로드 안 함 |
 | **수정 대상** | PyTorch 학습 코드 파일 |
 | **실행 레벨** | [자동] — 실행→모니터링→판단→최적화→재실행 자동 사이클 |
-| **에이전트 호환** | Claude Code 권장 — GPU 환경에서 `uv run` 자동 실행 / 다른 에이전트: GPU 모니터링 결과를 수동 확인 후 최적화 적용 |
+| **에이전트 호환** | Codex 권장 — GPU 환경에서 `uv run` 자동 실행 / 다른 에이전트: GPU 모니터링 결과를 수동 확인 후 최적화 적용 |
 
 ## 문서 이력 관리
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -105,7 +105,7 @@ ccdeep run train.py
 
 ## 6. 모니터링 스크립트
 
-실행: `uv run python .claude/skills/ccdeep/scripts/oodeep_monitor.py`
+실행: `uv run python .agents/skills/ccdeep/scripts/oodeep_monitor.py`
 
 ### 기능
 
@@ -184,15 +184,15 @@ ccdeep run train.py
 
 ## 11. 관련 문서
 
-- `.claude/skills/ccdeep/references/guide.md`: 상세 최적화 가이드
-- `.claude/skills/oodev/SKILL.md`: TDD 기반 개발
-- `.claude/skills/oocheck/SKILL.md`: 코드 품질 체크
+- `.agents/skills/ccdeep/references/guide.md`: 상세 최적화 가이드
+- `.agents/skills/ccdev/SKILL.md`: TDD 기반 개발
+- `.agents/skills/cccheck/SKILL.md`: 코드 품질 체크
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -212,10 +212,10 @@ ccdeep run train.py
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -226,7 +226,7 @@ ccdeep run train.py
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

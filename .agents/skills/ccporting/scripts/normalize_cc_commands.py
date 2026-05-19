@@ -12,16 +12,18 @@ def load_ports():
     return [(p['source'].split('/')[-1], p['target']) for p in data.get('ports', [])]
 
 
-def replace_text(text: str, src: str, tgt: str) -> str:
+def replace_text(text: str, mapping: list[tuple[str, str]]) -> str:
     out = text
-    out = re.sub(rf'\b{re.escape(src)}\b', tgt, out)
-    # command variants like `oohelp` etc in generic lines
-    if src.startswith('oo') and tgt.startswith('cc'):
+    out = out.replace('.claude/skills/', '.agents/skills/')
+    out = out.replace('.codex/skills/', '.agents/skills/')
+    out = out.replace('.codex/commands/', '.claude/commands/')
+    out = out.replace('.codex/templates/', '.claude/templates/')
+    for src, tgt in mapping:
         out = re.sub(rf'\b{re.escape(src)}\b', tgt, out)
     return out
 
 
-def normalize_target(src: str, tgt: str) -> tuple[int, int]:
+def normalize_target(tgt: str, mapping: list[tuple[str, str]]) -> tuple[int, int]:
     base = TARGET_ROOT / tgt
     changed = 0
     files = 0
@@ -29,7 +31,7 @@ def normalize_target(src: str, tgt: str) -> tuple[int, int]:
         if not p.exists() or 'upstream' in p.parts:
             continue
         old = p.read_text(encoding='utf-8', errors='ignore')
-        new = replace_text(old, src, tgt)
+        new = replace_text(old, mapping)
         if new != old:
             p.write_text(new, encoding='utf-8')
             changed += 1
@@ -38,10 +40,11 @@ def normalize_target(src: str, tgt: str) -> tuple[int, int]:
 
 
 def main():
+    mapping = sorted(load_ports(), key=lambda item: len(item[0]), reverse=True)
     total_files = 0
     total_changed = 0
-    for src, tgt in load_ports():
-        files, changed = normalize_target(src, tgt)
+    for src, tgt in mapping:
+        files, changed = normalize_target(tgt, mapping)
         total_files += files
         total_changed += changed
         print(f'normalized: {src} -> {tgt} (scanned {files}, changed {changed})')

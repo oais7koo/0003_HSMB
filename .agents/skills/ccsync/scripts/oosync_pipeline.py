@@ -30,7 +30,7 @@ if hasattr(sys.stderr, 'reconfigure'):
 
 # 경로 설정
 SCRIPT_DIR = Path(__file__).parent
-SKILLS_DIR = SCRIPT_DIR.parent.parent      # .claude/skills/
+SKILLS_DIR = SCRIPT_DIR.parent.parent      # .agents/skills/
 PROJECT_ROOT = SKILLS_DIR.parent.parent    # 프로젝트 루트
 
 STANDARD_SCRIPT = SKILLS_DIR / "ooenv" / "scripts" / "ooenv_standard.py"

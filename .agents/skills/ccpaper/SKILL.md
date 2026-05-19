@@ -1,12 +1,12 @@
 ---
 name: ccpaper
-description: "공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/skills/oocontext/SKILL.md`"
+description: "공통: `.codex/guides/common_guide.md` | 컨텍스트: `.agents/skills/cccontext/SKILL.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/skills/oocontext/SKILL.md`
+> 공통: `.codex/guides/common_guide.md` | 컨텍스트: `.agents/skills/cccontext/SKILL.md`
 > 한글 코드 예시: `references/guide.md` | EN 상세: `references/guide_en.md` | KO 상세: `references/guide_ko.md`
 
 ## 0. 스킬 요약
@@ -15,17 +15,17 @@ description: "공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/
 |------|------|
 | **핵심 역할** | 학술 논문(EN)·국내 보고서(KO) 통합 문헌 관리 (수집·정규화·분류·번역·정합성) |
 | **하는 것** | PDF 수집·폴더화, 영문 추출, 한글 번역, 서머리·참고문헌 생성, paper_list 동기화 |
-| **하지 않는 것** | 논문 작성(→oosota), 서베이(→oosurvey), SOTA 연구(→ooresearch), 외부 일반 스크래핑(→ooscrap) |
+| **하지 않는 것** | 논문 작성(→ccsota), 서베이(→ccsurvey), SOTA 연구(→ccresearch), 외부 일반 스크래핑(→ccscrap) |
 | **참조 범위** | `{paper_root}/**` + 웹(논문 검색·확장 다운로드 시) |
 | **수정 대상** | `{paper_root}/**/*.md`, `paper_list.md`, `12_paper_ko.md`, `00_doc/sp03/d30004_todo.md` |
 | **실행 레벨** | [반자동] — Phase별 dry-run 후 적용 |
-| **에이전트 호환** | Claude Code 권장 — academic-researcher / translator 서브에이전트 자동 위임 |
+| **에이전트 호환** | Codex 권장 — academic-researcher / translator 서브에이전트 자동 위임 |
 
 ## 문서 이력 관리
 - v08 2026-05-09 — 진단 반영 전면 재구조화: 폴더 ID 표준 strict화(suffix 금지 명시), 파일명 prefix 표준 표 신설, 1폴더 1논문 정책 강조, paper_list **양방향** 동기화 명시, `fix`/`doctor` 정의 재정의, multi-PDF 분리 절차 추가
 - v07 2026-05-03 — Phase 순서 재변경(영문→**서머리**→한글). 상태 체계 X/E/**S**/**T**/O로 swap
-- v06 2026-04-29 — 문서 템플릿 신설, 한글 번역 2단계(Gemma 1차 → Claude 검수)
-- v05 2026-04-29 — `oopaper_auto.py` 신설 (organize/dedup/meta/ref-match-fuzzy)
+- v06 2026-04-29 — 문서 템플릿 신설, 한글 번역 2단계(Gemma 1차 → Codex 검수)
+- v05 2026-04-29 — `ccpaper_auto.py` 신설 (organize/dedup/meta/ref-match-fuzzy)
 - v04 2026-04-29 — Phase 순서 변경, 5단계 상태 체계 도입
 - v03 2026-04-18 — `--gemma` 플래그
 - v02 2026-03-29 — extend 명령어 추가
@@ -51,7 +51,7 @@ description: "공통: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/
 | `en` (기본) | `{paper_root}/00_down/` | `{paper_root}/11_paper_en/{FOLDER_ID}/` | `{paper_root}/11_paper_en/paper_list.md` |
 | `ko` | `{paper_root}/00_down/` | `{paper_root}/12_paper_ko/{FOLDER_ID}/` | `{paper_root}/12_paper_ko.md` |
 
-> ooreport와 구분: ccpaper = **수집/정리** (외부 → 내부), ooreport = **출력/생성** (내부 → 외부)
+> ooreport와 구분: ccpaper = **수집/정리** (외부 → 내부), ccreport = **출력/생성** (내부 → 외부)
 
 ### 1.3 PRD/TODO 참조
 
@@ -214,18 +214,18 @@ ccpaper fix-suffix --batch --use-mtime    # baseline 대신 mtime 기반 (예외
 | `ccpaper backup [--dry-run]` | O | O | PDF 외부 경로 백업 |
 | `ccpaper restore [--dry-run]` | O | O | 백업 PDF 복원 |
 | **자동화 (oopaper_auto.py)** | | | |
-| `oopaper_auto organize [--dry-run]` | O | - | 00_down → FOLDER_ID 자동 정리 (Phase 0) |
-| `oopaper_auto dedup [--fuzzy]` | O | - | 폴더 간 중복 검출 |
-| `oopaper_auto meta [--folder] [--limit]` | O | - | PDF 메타데이터 추출 |
-| `oopaper_auto ref-match-fuzzy` | O | - | rapidfuzz 기반 참고문헌 매칭 |
+| `ccpaper_auto organize [--dry-run]` | O | - | 00_down → FOLDER_ID 자동 정리 (Phase 0) |
+| `ccpaper_auto dedup [--fuzzy]` | O | - | 폴더 간 중복 검출 |
+| `ccpaper_auto meta [--folder] [--limit]` | O | - | PDF 메타데이터 추출 |
+| `ccpaper_auto ref-match-fuzzy` | O | - | rapidfuzz 기반 참고문헌 매칭 |
 
 ### 6.1 실행 분기
 
 | --lang | 진입 스크립트 |
 |--------|--------------|
-| `en` (기본) | `uv run python .claude/skills/ccpaper/scripts/oopaper_run.py [subcommand]` |
-| `ko` | `uv run python .claude/skills/ccpaper/scripts/ooessay_run.py [subcommand]` |
-| `backup`/`restore` | `uv run python .claude/skills/ccpaper/scripts/oopaper_backup.py [subcommand]` |
+| `en` (기본) | `uv run python .agents/skills/ccpaper/scripts/oopaper_run.py [subcommand]` |
+| `ko` | `uv run python .agents/skills/ccpaper/scripts/ooessay_run.py [subcommand]` |
+| `backup`/`restore` | `uv run python .agents/skills/ccpaper/scripts/oopaper_backup.py [subcommand]` |
 
 ---
 
@@ -382,18 +382,18 @@ PDF를 외부 경로로 이동·복원. 대상: `11_paper_en/`, `12_paper_ko/` (
 trans korean
 ├─ 1차 (Gemma)
 │  ├─ 가용 → 자동 (stage=1, v1_engine=gemma4:26b)
-│  └─ 미가용 → 사용자 확인 ("Claude 단독? y/n")
-└─ 2차 (Claude 검수, 옵션 기본 활성)
-   └─ Gemma 결과 + 영문 원문 → 검수 (stage=2, v2_engine=claude-*)
+│  └─ 미가용 → 사용자 확인 ("Codex 단독? y/n")
+└─ 2차 (Codex 검수, 옵션 기본 활성)
+   └─ Gemma 결과 + 영문 원문 → 검수 (stage=2, v2_engine=codex-*)
 ```
 
 | 플래그 | 설명 |
 |--------|------|
-| `--no-claude-review` | Gemma만 (1차에서 멈춤) |
-| `--claude-only` | Gemma 건너뛰기 |
+| `--no-codex-review` | Gemma만 (1차에서 멈춤) |
+| `--codex-only` | Gemma 건너뛰기 |
 | `--stage 1\|2` | 특정 단계만 |
 
-> 토큰 절감: 813편 처리 시 1차 Gemma → Claude 검수만 부분 → Claude 토큰 ≈90% 절감
+> 토큰 절감: 813편 처리 시 1차 Gemma → Codex 검수만 부분 → Codex 토큰 ≈90% 절감
 
 ---
 
@@ -452,21 +452,21 @@ trans korean
 ### EN
 | 스크립트 | 용도 |
 |---------|------|
-| `oopaper_run.py` | 통합 실행, 상태, sync(양방향), fix, download, doctor/split-multi/fix-suffix 라우팅 |
-| `oopaper_doctor.py` | 종합 정합성 진단 6종 (folder-id/file-name/multi-pdf/sync/orphan/quality) |
-| `oopaper_split_multi.py` | 다중 PDF 폴더 분리 (1폴더 1논문 정책) |
-| `oopaper_fix_suffix.py` | suffix 폴더(`-NN`) 정규화 |
-| `oopaper_auto.py` | organize / dedup / meta / ref-match-fuzzy |
-| `oopaper_trans.py` | PDF 텍스트 추출, 한글 번역 템플릿 |
-| `oopaper_extend.py` | 서머리 → 외부 참고문헌 자동 다운로드 |
-| `oopaper_pdf_compress.py` | PDF 압축 (EN/KO 공유) |
-| `oopaper_cite_*.py` | 인용 검증·정규화·매핑·정리 |
-| `oopaper_backup.py` | PDF 백업·복원 (EN/KO 공통) |
+| `ccpaper_run.py` | 통합 실행, 상태, sync(양방향), fix, download, doctor/split-multi/fix-suffix 라우팅 |
+| `ccpaper_doctor.py` | 종합 정합성 진단 6종 (folder-id/file-name/multi-pdf/sync/orphan/quality) |
+| `ccpaper_split_multi.py` | 다중 PDF 폴더 분리 (1폴더 1논문 정책) |
+| `ccpaper_fix_suffix.py` | suffix 폴더(`-NN`) 정규화 |
+| `ccpaper_auto.py` | organize / dedup / meta / ref-match-fuzzy |
+| `ccpaper_trans.py` | PDF 텍스트 추출, 한글 번역 템플릿 |
+| `ccpaper_extend.py` | 서머리 → 외부 참고문헌 자동 다운로드 |
+| `ccpaper_pdf_compress.py` | PDF 압축 (EN/KO 공유) |
+| `ccpaper_cite_*.py` | 인용 검증·정규화·매핑·정리 |
+| `ccpaper_backup.py` | PDF 백업·복원 (EN/KO 공통) |
 
 ### KO
 | 스크립트 | 용도 |
 |---------|------|
-| `ooessay_run.py` | 통합 실행, 상태, 무결성, 텍스트 추출, 정밀 분석 |
+| `ccessay_run.py` | 통합 실행, 상태, 무결성, 텍스트 추출, 정밀 분석 |
 
 ---
 
@@ -488,7 +488,7 @@ trans korean
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -508,10 +508,10 @@ trans korean
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -522,7 +522,7 @@ trans korean
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

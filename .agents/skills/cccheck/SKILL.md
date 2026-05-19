@@ -1,14 +1,14 @@
 ---
 name: cccheck
-description: "참조: .claude/guides/common_guide.md, .claude/guides/debugging_guide.md, .claude/skills/oocontext/SKILL.md"
+description: "참조: .codex/guides/common_guide.md, .codex/guides/debugging_guide.md, .agents/skills/cccontext/SKILL.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 참조: .claude/guides/common_guide.md, .claude/guides/debugging_guide.md, .claude/skills/oocontext/SKILL.md
+> 참조: .codex/guides/common_guide.md, .codex/guides/debugging_guide.md, .agents/skills/cccontext/SKILL.md
 > 결과: 에러 -> d0004 AND d{SP}0004 | 개발 -> d{SP}0002_plan.md | 이력 -> d{SP}0010_history.md
-> 상세 가이드: .claude/skills/cccheck/references/guide.md
+> 상세 가이드: .agents/skills/cccheck/references/guide.md
 
 **옵션**: --sp N (서브프로젝트) | **에이전트**: code-error-checker, python-code-reviewer, ooqa
 
@@ -21,20 +21,21 @@ description: "참조: .claude/guides/common_guide.md, .claude/guides/debugging_g
 | 항목 | 내용 |
 |------|------|
 | **핵심 역할** | 코드 정적 분석 및 품질 체크 (Python/Flutter 자동 감지) |
-| **하는 것** | py_compile→pylint→mypy→pytest 검증 체인 실행, 이슈 d{SP}0004 등록 |
-| **하지 않는 것** | 이슈 수정(→oofix), 설계 검토(→ooreview), 실행 테스트(→ootest) |
+| **하는 것** | ① 코드품질 분석(py_compile→pylint→mypy→pytest) ② 체크리스트 실행(d0008+스킬 체크리스트), 결과 d{SP}0004 등록 |
+| **하지 않는 것** | 이슈 수정(→ccfix), 설계 검토(→ccreview), 실행 테스트(→cctest) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (src/, oo/, tests/, lib/) / 외부 프로젝트 자동 포함 안 함 |
-| **수정 대상** | `d{SP}0004_todo.md` (이슈 등록만, 코드 수정 안 함) |
-| **실행 레벨** | [자동] — 스캔→분석→등록 자동 실행 |
-| **에이전트 호환** | Claude Code 권장 — `uv run` 기반 도구 체인 자동 실행 / 다른 에이전트: pylint·mypy·pytest를 수동 실행 후 결과를 d{SP}0004에 직접 기록 |
+| **수정 대상** | `d{SP}0008_checklist.md` (체크리스트 항목 추가), `d{SP}0004_todo.md` (이슈·체크 결과 등록) |
+| **실행 레벨** | [반자동] — 1단계 코드품질 분석은 자동, 2단계 체크리스트는 스킬 선택 질문 후 실행 |
+| **에이전트 호환** | Codex 권장 — `uv run` 기반 도구 체인 자동 실행 / 다른 에이전트: pylint·mypy·pytest를 수동 실행 후 결과를 d{SP}0004에 직접 기록 |
 
 ## 문서 이력 관리
+- v08 2026-05-16 — d0008 프로젝트 체크리스트 도입 — cccheck add(성격별 코드부여)·run 2단계(코드품질+체크리스트)·--sp N 범위 지정
 - v07 2026-04-23 — Streamlit API 오용 감지 섹션 추가 — E2E 렌더링(Playwright) 필수 명시, 검증 체인 업데이트
 - v06 2026-04-23 — 함수 내부 import 스코프 오류 감지 룰 추가 — UnboundLocalError 위험 AST 분석으로 감지
 - v05 2026-04-07 — dXXXX 단계 감지 + 자동전환 — 개발→검증 자동전환, 기획/설계 차단, 결과 저장 명시
 - v04 2026-04-07 — cccheck run dXXXX 추가 — 상세 문서 기반 관련 코드만 체크
 - v02 2026-03-29 — Flutter/Dart 지원 추가 — 프로젝트 자동 감지, dart analyze 연동, Dart 체크 워크플로우
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -43,14 +44,16 @@ description: "참조: .claude/guides/common_guide.md, .claude/guides/debugging_g
 | 명령어 | 설명 |
 |--------|------|
 | `cccheck help` | 서브명령어 목록 표시 |
-| `cccheck version` | 스킬 버전 정보 (v02) |
+| `cccheck version` | 스킬 버전 정보 (v08) |
 | `cccheck status` | 서브명령어 리스트, 체크 대상 현황, 최근 이슈 |
-| `cccheck check` | references/checklist.md 기반 체크 및 리포팅 | 터미널 |
-| `cccheck run` | 코드 품질 분석 실행 (배치 실행) |
+| `cccheck check` | cccheck 스킬 자체 건강 체크 (references/checklist.md 기반) | 터미널 |
+| `cccheck run` | **2단계 체크** — ① 코드품질 분석 ② 체크리스트 실행 (전체 SP) |
+| `cccheck run --sp N` | 해당 서브프로젝트만 체크 |
+| **`cccheck add "내용"`** | **d{SP}0008_checklist.md 에 프로젝트 체크리스트 항목 추가 (성격 자동분류·코드부여)** |
 | `cccheck update` | d0004_todo.md / d0010_history.md 정리 및 동기화 (현행화) |
 | `cccheck show checklist` | 역할 수행 체크리스트 표시 | 터미널 |
-| `cccheck add checklist "항목"` | 체크리스트 항목 추가 | checklist.md |
-| **`cccheck run dXXXX`** | **상세 문서 기반 관련 코드만 체크 (oofeature 연동)** |
+| `cccheck add checklist "항목"` | cccheck 스킬 자체 체크리스트에 항목 추가 | references/checklist.md |
+| **`cccheck run dXXXX`** | **상세 문서 기반 관련 코드만 체크 (ccfeature 연동)** |
 | **`cccheck run this`** | **직전 작업 파일만 체크** (→ common_guide.md §9) |
 | cccheck / cccheck [대상] | 전체 또는 특정 대상 체크 |
 | cccheck oo / error / term | oo모듈 / 에러 / 표준용어 체크 |
@@ -71,9 +74,52 @@ description: "참조: .claude/guides/common_guide.md, .claude/guides/debugging_g
 
 ## 워크플로우
 
+### cccheck run (2단계 체크)
+
+> `cccheck run` = 코드품질 분석 + 체크리스트 실행. `--sp N` 으로 특정 SP 범위 한정.
+
+```
+cccheck run [--sp N]
+├─ [1단계] 코드품질 분석
+│   Python: py_compile→pylint→mypy→pytest / Flutter: dart analyze→flutter test
+│   → 이슈 d{SP}0004_todo.md 등록
+└─ [2단계] 체크리스트 실행
+    1. 체크리스트 보유 스킬 목록 제시 (.agents/skills/oo*/references/checklist.md)
+    2. 어떤 스킬 체크리스트를 체크할지 사용자에게 질문 (AskUserQuestion)
+    3. 전체 체크 수행:
+       - d{SP}0008_checklist.md 항목 (프로젝트 체크리스트) — 항상
+       - cccheck 스킬 체크리스트 — 항상
+       - 사용자 선택 스킬 체크리스트 — 선택
+    4. 체크 결과 → d{SP}0004_todo.md (및 d0004) 등록
+```
+
+- **범위**: `cccheck run` = 전체 SP / `cccheck run --sp N` = SP N 만
+- **필수 절차**: 2단계의 스킬 선택은 반드시 사용자에게 질문 후 진행 (자동 선택 금지)
+
+### d0008 프로젝트 체크리스트
+
+> 스킬 체크리스트(`oo*/references/checklist.md`)는 **각 스킬 고유**로 특정 프로젝트와 무관하다.
+> `d{SP}0008_checklist.md`는 **해당 프로젝트 전용** 체크리스트다. (문서번호 0008 ↔ `cccheck` 매핑)
+
+**`cccheck add "내용"`** 동작:
+1. `d{SP}0008_checklist.md` 없으면 자동 생성 (현재 SP, 템플릿 기반)
+2. 내용 키워드로 성격 자동 판정 → 접두사 부여
+3. 접두사별 일련번호 부여 → 블록 추가 (d0004 todo 블록 포맷 동일)
+
+**성격별 코드체계** (d0004 todo와 동일 구조 — 1자 접두사 + 3자리 일련번호):
+
+| 접두사 | 성격 | 판정 키워드 |
+|--------|------|-----------|
+| `C` | 코드 | 코드·구현·함수·pylint·리팩토링·API·모듈 |
+| `D` | 문서 | 문서·PRD·가이드·README·주석·명세 |
+| `S` | 보안 | 보안·취약점·인증·권한·시크릿 |
+| `T` | 테스트 | 테스트·pytest·커버리지·검증 |
+| `E` | 환경 | 환경·설정·의존성·패키지·빌드·배포 |
+| `G` | 일반 | 위 미매칭 |
+
 ### cccheck run dXXXX (상세 문서 기반 체크)
 
-> oofeature 상세개발 또는 상세검증 단계에서 해당 기능 코드만 집중 체크할 때 사용.
+> ccfeature 상세개발 또는 상세검증 단계에서 해당 기능 코드만 집중 체크할 때 사용.
 > **자동 단계전환**: 상세개발 단계 → 상세검증으로 자동 전환 후 실행.
 
 > 코드 예시: references/guide.md §2.7 참조
@@ -103,7 +149,7 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 
 ## 표준용어 검증
 
-용어집: .claude/skills/cccheck/templates/oocheck_standard_word.md
+용어집: .agents/skills/cccheck/templates/oocheck_standard_word.md
 
 ## oo 모듈 검증
 
@@ -171,16 +217,16 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 | 페이즈 완료 검증 | `cccheck run` | `/gsd:validate-phase [N]` |
 | 작업 완료 확인 | `cccheck run` | `/gsd:verify-work` |
 | 디버깅 | `cccheck debug` | `/gsd:debug` |
-| 전체 건강 상태 | `ooenv run` | `/gsd:health` |
+| 전체 건강 상태 | `ccenv run` | `/gsd:health` |
 | 법의학적 버그 추적 | `cccheck debug --trace` | `/gsd:forensics` |
 
-**조합 패턴:** `oodev run` → `cccheck run` → `/gsd:verify-work`
+**조합 패턴:** `ccdev run` → `cccheck run` → `/gsd:verify-work`
 
 > 코드 예시: references/guide.md §5.5 참조
 
 ## 프레임워크 레퍼런스 참조
 
-> 코드 품질 체크 시, 대상 프로젝트가 알려진 프레임워크를 사용하는 경우 `.claude/reference/development/{framework}/` 문서를 참조하여 표준 패턴 준수 여부를 검증한다.
+> 코드 품질 체크 시, 대상 프로젝트가 알려진 프레임워크를 사용하는 경우 `.codex/reference/development/{framework}/` 문서를 참조하여 표준 패턴 준수 여부를 검증한다.
 
 | 프레임워크 | 감지 조건 | 참조 경로 | 체크 항목 |
 |-----------|----------|----------|---------|
@@ -191,7 +237,7 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 
 | 명령어 | 용도 |
 |--------|------|
-| .claude/skills/ootest/SKILL.md | 테스트 실행 |
+| .agents/skills/cctest/SKILL.md | 테스트 실행 |
 
 ## 서브에이전트
 
@@ -199,14 +245,14 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 |------|---------|------|:----:|
 | 코드 탐색 | `Explore` | haiku | O |
 | 에러 검사 | `code-error-checker` | opus | O |
-| 품질 분석 | `ooqa` | opus | O |
+| 품질 분석 | `ccqa` | opus | O |
 | 결과 검증 | `task-checker` | opus | - |
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -222,7 +268,7 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 ## Karpathy 코딩 가이드라인 (필수 준수)
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|
@@ -244,10 +290,10 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -258,7 +304,7 @@ SP!=00일 때 에러를 d0004 AND d{SP}0004 양쪽에 등록
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

@@ -5,11 +5,11 @@ oofeature_update.py
 plan.md 변경 기반 상세 문서 영향 분석 및 단계 롤백
 
 사용법:
-    uv run python .claude/skills/ccfeature/scripts/oofeature_update.py [--sp N] [--dry-run] [--apply]
+    uv run python .agents/skills/ccfeature/scripts/oofeature_update.py [--sp N] [--dry-run] [--apply]
 
 옵션:
     --from-plan    plan.md 변경 기반 분석 (기본 동작)
-    --sp N         특정 SP 지정 (기본: 현재 oocontext SP)
+    --sp N         특정 SP 지정 (기본: 현재 cccontext SP)
     --dry-run      분석만, 실제 수정 없음 (기본값)
     --apply        실제 파일 rename 실행
 """
@@ -27,7 +27,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
 DOC_DIR = PROJECT_ROOT / "00_doc"
-_SKILLS_DIR = Path(__file__).parent.parent.parent  # .claude/skills/
+_SKILLS_DIR = Path(__file__).parent.parent.parent  # .agents/skills/
 STATE_FILE = PROJECT_ROOT / ".omc" / "state" / "context.json"
 
 STAGES = ["기획", "설계", "구현", "검증"]
@@ -219,8 +219,8 @@ def run_from_plan(sp: str, dry_run: bool, apply: bool):
         print()
         print("다음 단계:")
         print("  1. 롤백된 상세 문서 내용 검토 및 수정")
-        print("  2. oodev run dXXXX  → 재구현")
-        print("  3. ooplan sync      → plan.md 8.2절 갱신")
+        print("  2. ccdev run dXXXX  → 재구현")
+        print("  3. ccplan sync      → plan.md 8.2절 갱신")
 
 
 def get_changed_files() -> list[str]:
@@ -240,8 +240,8 @@ def get_changed_files() -> list[str]:
 
 
 def run_oocheck(doc_num: str) -> tuple[bool, str]:
-    """oocheck run dXXXX 실행. Returns (has_issues: bool, output: str)"""
-    oocheck_script = _SKILLS_DIR / "oocheck" / "scripts" / "oocheck_run.py"
+    """cccheck run dXXXX 실행. Returns (has_issues: bool, output: str)"""
+    oocheck_script = _SKILLS_DIR / "cccheck" / "scripts" / "oocheck_run.py"
     if not oocheck_script.exists():
         return False, "[WARN] oocheck_run.py 없음 — 체크 생략"
     try:
@@ -254,14 +254,14 @@ def run_oocheck(doc_num: str) -> tuple[bool, str]:
         has_issues = bool(re.search(r'\[CRITICAL\]|\[ERROR\]', output))
         return has_issues, output
     except Exception as e:
-        return False, f"[ERROR] oocheck 실행 실패: {e}"
+        return False, f"[ERROR] cccheck 실행 실패: {e}"
 
 
 def run_from_doc(sp: str, dry_run: bool, apply: bool, skip_check: bool = False):
-    """상세구현 단계 문서 변경 감지 → oocheck 자동 실행 → 이슈 발견 시 기획 단계 롤백 제안"""
+    """상세구현 단계 문서 변경 감지 → cccheck 자동 실행 → 이슈 발견 시 기획 단계 롤백 제안"""
     print(f"[ccfeature update --from-doc] SP{int(sp):02d}")
     if skip_check:
-        print("(--skip-check: oocheck 생략 모드)")
+        print("(--skip-check: cccheck 생략 모드)")
     print()
 
     # 1. 변경된 파일 목록
@@ -304,10 +304,10 @@ def run_from_doc(sp: str, dry_run: bool, apply: bool, skip_check: bool = False):
     if skip_check:
         affected = candidates
     else:
-        # 4. oocheck 실행 → 이슈 있는 문서만 롤백 대상
+        # 4. cccheck 실행 → 이슈 있는 문서만 롤백 대상
         affected = []
         for doc_path, doc_num, stage, func_name in candidates:
-            print(f"oocheck run {doc_num} 실행 중...")
+            print(f"cccheck run {doc_num} 실행 중...")
             has_issues, output = run_oocheck(doc_num)
             lines = output.strip().splitlines()
             for line in lines[-8:]:
@@ -372,7 +372,7 @@ def run_from_doc(sp: str, dry_run: bool, apply: bool, skip_check: bool = False):
         print("다음 단계:")
         print("  1. 기획 내용 검토 및 보완")
         print("  2. ccfeature next dXXXX  → 기획→설계 재전환")
-        print("  3. ooplan sync           → plan.md 8.2절 갱신")
+        print("  3. ccplan sync           → plan.md 8.2절 갱신")
 
 
 # --- 코드파일 vs 상세 문서 교차검사 (인라인) ---
@@ -478,7 +478,7 @@ def _run_needed_check(sp: str):
         print(f"|{'-'*37}|{'-'*27}|")
         for m in missing:
             print(f"| {m['file']:<35} | {m['feature']:<25} |")
-        print(f"\n→ `oof new dXXXX \"기능명\"` 으로 상세 문서 생성하세요.")
+        print(f"\n→ `ccf new dXXXX \"기능명\"` 으로 상세 문서 생성하세요.")
 
 
 def get_git_last_modified(path: Path) -> str | None:
@@ -585,9 +585,9 @@ def detect_priority(sp: str) -> dict:
 
 
 def run_auto(sp: str, dry_run: bool, apply: bool):
-    """통합 변경 감지 → oocheck 검토 → 상세기획으로 롤백
+    """통합 변경 감지 → cccheck 검토 → 상세기획으로 롤백
     - plan.md 변경: 영향 doc 무조건 롤백 (계획이 바뀌면 재기획 필요)
-    - 상세 문서 변경: oocheck 실행 → CRITICAL/ERROR 있을 때만 롤백
+    - 상세 문서 변경: cccheck 실행 → CRITICAL/ERROR 있을 때만 롤백
     - 코드파일 교차검사: SP04/SP05 누락 문서 감지 (항상 실행)
     """
     print(f"[ccfeature update] SP{int(sp):02d}")
@@ -601,7 +601,7 @@ def run_auto(sp: str, dry_run: bool, apply: bool):
     for sig in priority["signals"]:
         print(f"  · {sig}")
     if priority["direction"] == "문서→코드":
-        print(f"  → 문서가 최신입니다. `oodev run`으로 코드를 문서에 맞춰 업데이트하세요.")
+        print(f"  → 문서가 최신입니다. `ccdev run`으로 코드를 문서에 맞춰 업데이트하세요.")
     elif priority["direction"] == "코드→문서":
         print(f"  → 코드가 최신입니다. 문서를 코드에 맞춰 롤백/업데이트합니다.")
     else:
@@ -621,7 +621,7 @@ def run_auto(sp: str, dry_run: bool, apply: bool):
                 if doc_num in plan_nums and stage != "기획":
                     affected[doc_num] = (doc_path, stage, func_name, "plan 변경")
 
-    # 2. 변경된 상세 문서 감지 → oocheck 실행 → 이슈 있는 것만 롤백 대상
+    # 2. 변경된 상세 문서 감지 → cccheck 실행 → 이슈 있는 것만 롤백 대상
     changed_files = get_changed_files()
     sp_folder = get_sp_folder(sp)
     doc_candidates: list[tuple] = []
@@ -643,10 +643,10 @@ def run_auto(sp: str, dry_run: bool, apply: bool):
             doc_candidates.append((abs_path, doc_num, stage, func_name))
 
     if doc_candidates:
-        print(f"상세 문서 변경 감지 → {len(doc_candidates)}개 oocheck 실행 중...")
+        print(f"상세 문서 변경 감지 → {len(doc_candidates)}개 cccheck 실행 중...")
         print()
         for doc_path, doc_num, stage, func_name in doc_candidates:
-            print(f"  oocheck run {doc_num} ({func_name}) ...")
+            print(f"  cccheck run {doc_num} ({func_name}) ...")
             has_issues, output = run_oocheck(doc_num)
             lines = output.strip().splitlines()
             for line in lines[-6:]:
@@ -710,13 +710,13 @@ def run_auto(sp: str, dry_run: bool, apply: bool):
                 print("다음 단계:")
                 print("  1. 상세기획 내용 검토 및 보완")
                 print("  2. ccfeature next dXXXX  → 기획→설계 재전환")
-                print("  3. ooplan sync           → plan.md 8.2절 갱신")
+                print("  3. ccplan sync           → plan.md 8.2절 갱신")
 
     # 항상: 코드파일 vs 상세 문서 교차검사
     _run_needed_check(sp)
 
 
-# ---- doc_id 모드: oof update <doc_id> [--sp N] ----
+# ---- doc_id 모드: ccf update <doc_id> [--sp N] ----
 
 def _find_detail_doc_by_id(doc_id: str, sp: str):
     """(path, stage, func_name) 반환, 없으면 None"""
@@ -796,16 +796,16 @@ def _next_doc_version(content: str) -> str:
 
 def run_update_doc(doc_id: str, sp: str, dry_run: bool):
     """
-    oof update <doc_id> [--sp N] [--dry-run]
+    ccf update <doc_id> [--sp N] [--dry-run]
 
     Phase 1: 상세문서 + 코드 비교 분석 컨텍스트 수집
     Phase 2: [DOC_UPDATE_NEEDED] 신호 -> Claude가 문서 현행화
-    Phase 3: [CODE_IMPL_NEEDED] 신호 -> Claude가 oodev 배치 실행
+    Phase 3: [CODE_IMPL_NEEDED] 신호 -> Claude가 ccdev 배치 실행
     """
     import datetime
     today = datetime.date.today().strftime("%Y-%m-%d")
 
-    print(f"[oof update] {doc_id}  SP{int(sp):02d}")
+    print(f"[ccf update] {doc_id}  SP{int(sp):02d}")
     if dry_run:
         print("(--dry-run: 분석만, 실제 변경 없음)")
     print()
@@ -816,7 +816,7 @@ def run_update_doc(doc_id: str, sp: str, dry_run: bool):
         sp_folder = get_sp_folder(sp)
         print(f"[ERROR] 상세문서 없음: {doc_id}")
         print(f"  경로: 00_doc/{sp_folder}/{doc_id}_상세*.md")
-        print(f"  -> oof new {doc_id} \"기능명\" --sp {sp}")
+        print(f"  -> ccf new {doc_id} \"기능명\" --sp {sp}")
         return
 
     doc_path, stage, func_name = found
@@ -881,7 +881,7 @@ def run_update_doc(doc_id: str, sp: str, dry_run: bool):
     print(f"  file={rel_path}")
     print(f"  date={today}  version={next_ver}")
     print()
-    print(f"  Claude 수행 항목 (상세문서 직접 편집):")
+    print(f"  Codex 수행 항목 (상세문서 직접 편집):")
     print(f"  1. ## 변경 이력에 {next_ver} {today} 항목 추가")
     if has_code_change:
         print(f"  2. 구현 완료 요구사항 항목에 체크 마킹 (코드 대조 후)")
@@ -899,17 +899,17 @@ def run_update_doc(doc_id: str, sp: str, dry_run: bool):
             print(f"  미구현 의심 요구사항 ({len(reqs)}개):")
             for req in reqs[:5]:
                 print(f"    [{req['id']}] {req['text'][:50]}")
-        print(f"  배치 실행: oodev run {doc_id} --sp {sp}")
+        print(f"  배치 실행: ccdev run {doc_id} --sp {sp}")
         print()
 
     print(f"[NEXT_STEP]")
     if dry_run:
-        print(f"  dry-run 완료. 실제 실행: oof update {doc_id} --sp {sp}")
+        print(f"  dry-run 완료. 실제 실행: ccf update {doc_id} --sp {sp}")
     else:
         print(f"  1. [DOC_UPDATE_NEEDED] 항목 반영 (상세문서 직접 편집)")
         if not has_code_change or not code_refs:
-            print(f"  2. [CODE_IMPL_NEEDED] -> oodev run {doc_id} --sp {sp}")
-        print(f"  3. oocommit commit")
+            print(f"  2. [CODE_IMPL_NEEDED] -> ccdev run {doc_id} --sp {sp}")
+        print(f"  3. cccommit commit")
 
 
 def main():
@@ -928,7 +928,7 @@ def main():
 
     skip_check = "--skip-check" in args
 
-    # doc_id 인수 감지: oof update <doc_id> --sp N
+    # doc_id 인수 감지: ccf update <doc_id> --sp N
     doc_id = None
     for a in args:
         if re.match(r'^d\d{4,}$', a, re.IGNORECASE):

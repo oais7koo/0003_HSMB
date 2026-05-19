@@ -1,14 +1,14 @@
 ---
 name: ccnote
-description: "공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/skills/oocontext/SKILL.md`"
+description: "공통 가이드: `.codex/guides/common_guide.md` | 컨텍스트: `.agents/skills/cccontext/SKILL.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccnote - 연구노트 관리 스킬
 
-> 공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트: `.claude/skills/oocontext/SKILL.md`
+> 공통 가이드: `.codex/guides/common_guide.md` | 컨텍스트: `.agents/skills/cccontext/SKILL.md`
 
 ## 0. 스킬 요약
 
@@ -16,7 +16,7 @@ description: "공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트:
 |------|------|
 | **핵심 역할** | 날짜/시간 기반 연구노트를 d{SP}0020_연구노트.md에 작성·조회 |
 | **하는 것** | 연구노트 항목 추가(타임스탬프 자동), 조회, 요약 |
-| **하지 않는 것** | 옵시디언 노트(→oosidi), 이력 관리(→oohistory), 연구 수행(→ooresearch) |
+| **하지 않는 것** | 옵시디언 노트(→ccsidi), 이력 관리(→cchistory), 연구 수행(→ccresearch) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 / 외부 프로젝트 자동 포함 안 함 |
 | **수정 대상** | `d{SP}0020_연구노트.md` |
 | **실행 레벨** | [자동] — 입력 내용 즉시 파일에 기록 |
@@ -56,7 +56,7 @@ description: "공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트:
 | `ccnote search "키워드"` | 키워드 전체 검색 |
 | `ccnote init` | 연구노트 파일 초기 생성 |
 
-실행: `uv run python .claude/skills/ccnote/scripts/oonote_run.py [args]`
+실행: `uv run python .agents/skills/ccnote/scripts/oonote_run.py [args]`
 
 ## 3. 노트 추가 워크플로우
 
@@ -124,13 +124,13 @@ description: "공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트:
 | 파일 탐색 | Explore (haiku) | 노트 파일 확인 | - |
 | 노트 작성 | 직접 처리 | 파일 편집 | - |
 
-> **관련 문서**: `00_doc/d{SP}0020_연구노트.md` | `.claude/skills/oocontext/SKILL.md`
+> **관련 문서**: `00_doc/d{SP}0020_연구노트.md` | `.agents/skills/cccontext/SKILL.md`
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -150,10 +150,10 @@ description: "공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트:
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -164,7 +164,7 @@ description: "공통 가이드: `.claude/guides/common_guide.md` | 컨텍스트:
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

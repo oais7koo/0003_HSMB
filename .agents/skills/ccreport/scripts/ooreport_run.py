@@ -20,7 +20,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -65,9 +65,9 @@ def print_usage():
     print("    --out [경로]               출력 경로 지정")
     print()
     print("예시:")
-    print("    python .claude/skills/ccreport/scripts/ooreport_run.py run --template weekly")
-    print("    python .claude/skills/ccreport/scripts/ooreport_run.py update weekly_report_2025_w01.md")
-    print("    python .claude/skills/ccreport/scripts/ooreport_run.py list")
+    print("    python .agents/skills/ccreport/scripts/ooreport_run.py run --template weekly")
+    print("    python .agents/skills/ccreport/scripts/ooreport_run.py update weekly_report_2025_w01.md")
+    print("    python .agents/skills/ccreport/scripts/ooreport_run.py list")
 
 
 def extract_todo_stats():

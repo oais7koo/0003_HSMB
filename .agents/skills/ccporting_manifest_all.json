@@ -261,11 +261,6 @@
       "target": "cctutorial"
     },
     {
-      "name": "oouser_to_ccuser",
-      "source": ".claude/skills/oouser",
-      "target": "ccuser"
-    },
-    {
       "name": "oouv_to_ccuv",
       "source": ".claude/skills/oouv",
       "target": "ccuv"

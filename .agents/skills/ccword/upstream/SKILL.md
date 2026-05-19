@@ -2,7 +2,7 @@
 name: ooword
 description: "Word 문서 생성 및 변환 스킬 'ooword', 'Word 변환', 'docx 생성', '견적서 생성' 등을 요청할 때 트리거된다"
 metadata:
-  version: "v02"
+  version: "v03"
   category: "content"
 ---
 
@@ -11,8 +11,10 @@ metadata:
 Markdown을 Word(.docx) 문서로 변환하는 전문 스킬.
 
 **2가지 처리 방식 지원:**
-- **기본**: python-docx, pandoc, Node.js docx 라이브러리 직접 사용 (빠름, 간단)
+- **기본 (pandoc)**: 수식(MathML)·이미지 완전 지원 — **항상 이 방식이 기본** ✅
 - 플러그인 (`--plugin`): document-skills:docx 플러그인 (변경추적, 주석, Redlining 지원)
+
+> **기본 실행 명령**: `cd <입력파일 폴더> && pandoc "<파일명>.md" -o "<파일명>.docx" --from markdown --to docx --mathml --resource-path="."`
 
 ## 0. 스킬 요약
 
@@ -27,6 +29,7 @@ Markdown을 Word(.docx) 문서로 변환하는 전문 스킬.
 | **에이전트 호환** | Claude Code 권장 — python-docx/pandoc `uv run` 자동 실행 / 다른 에이전트: `pandoc input.md -o output.docx` 수동 실행 |
 
 ## 문서 이력 관리
+- v03 2026-05-10 — 기본 변환 방식 pandoc으로 변경: `--mathml --resource-path` 옵션으로 수식·이미지 완전 지원. python-docx는 폴백 또는 quotation 전용
 - v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
 
 ---
@@ -44,9 +47,9 @@ Markdown을 Word(.docx) 문서로 변환하는 전문 스킬.
 | `ooword update --dry-run` | 변경 예정 내용 미리 출력 (실제 수정 안 함) | 터미널 |
 | `ooword show checklist` | 역할 수행 체크리스트 표시 | 터미널 |
 | `ooword add checklist "항목"` | 체크리스트 항목 추가 | checklist.md |
-| `convert` | Markdown -> Word 기본 변환 (python-docx) |
+| `convert` | Markdown -> Word 기본 변환 (**pandoc + --mathml**, 수식·이미지 완전 지원) |
 | **`convert this`** | **직전 MD 파일 Word 변환** (→ common_guide.md §9) |
-| `convert --pandoc` | Markdown -> Word (LaTeX 수식 + mermaid 지원) |
+| `convert --python-docx` | Markdown -> Word (python-docx, 경량·수식 미지원) |
 | `convert --plugin` | Markdown -> Word (플러그인, 고급 기능 지원) |
 | `quotation` | 견적서 마크다운 -> 워드 (표/스타일 자동 서식) |
 | `quotation --plugin` | 견적서 변환 (플러그인, 변경추적 지원) |
@@ -114,8 +117,8 @@ Markdown을 Word(.docx) 문서로 변환하는 전문 스킬.
 ### 기본 모드
 | 패키지 | 용도 | 필수 |
 |--------|------|:----:|
-| python-docx | 기본 MD->DOCX 변환 | O |
-| pandoc | LaTeX 수식/mermaid 지원 | - |
+| pandoc | **기본 MD->DOCX 변환** (수식·이미지 지원) | **O** |
+| python-docx | 폴백 / quotation 전용 | - |
 | mermaid-cli | mermaid -> PNG | - |
 | docx (npm) | quotation용 워드 생성 | - |
 

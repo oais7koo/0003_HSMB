@@ -109,10 +109,13 @@ def scan_duplicates(base_dir: Path) -> list[list[Path]]:
     for folder in base_dir.iterdir():
         if not folder.is_dir():
             continue
+        print(f"Scanning: {folder.name}")
         summaries = list(folder.glob("*_00_*서머리.md"))
         if not summaries:
+            print(f"  No summary found in {folder.name}")
             continue
         title = extract_title_from_summary(summaries[0])
+        print(f"  Title: {title}")
         if title and len(title) > 5:
             title_map[title].append(folder)
 

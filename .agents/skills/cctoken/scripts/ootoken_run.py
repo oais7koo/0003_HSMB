@@ -22,7 +22,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -39,7 +39,7 @@ def show_help_if_no_args(skill_name, args):
     return False
 # --- end oo_common inline ---
 
-CACHE_FILE = Path.home() / ".claude" / "plugins" / "oh-my-claudecode" / ".usage-cache.json"
+CACHE_FILE = Path.home() / ".codex" / "plugins" / "oh-my-claudecode" / ".usage-cache.json"
 WINDOW_5H  = timedelta(hours=5)
 WINDOW_7D  = timedelta(days=7)
 KST        = timezone(timedelta(hours=9))
@@ -116,7 +116,7 @@ def run():
         rows.append(("Opus 주간",   data["opusWeeklyPercent"],   parse_iso(data.get("opusWeeklyResetsAt")),   WINDOW_7D))
 
     # 모델 정보 읽기
-    model_cache = Path.home() / ".claude" / ".omc" / "model-cache.json"
+    model_cache = Path.home() / ".codex" / ".omc" / "model-cache.json"
     model_name = "unknown"
     if model_cache.exists():
         try:

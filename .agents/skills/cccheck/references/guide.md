@@ -1,6 +1,7 @@
 # oocheck_guide - 코드 품질 체크 가이드
 
 ## 문서 이력 관리
+- v04 2026-05-16 — oocheck run 2단계 + d0008 프로젝트 체크리스트 워크플로우(§2.9) 추가
 - v03 2026-04-02 — GSD 연계 추가
 - v02 2026-03-29 — Flutter/Dart 지원 추가 — 프로젝트 감지, dart analyze 워크플로우, 체크 대상/제외 패턴
 - v01 2026-02-05 — 초기 생성
@@ -417,6 +418,38 @@ if failed:
 
 **분류**: [ERROR] ModuleNotFoundError - 미설치 모듈 import
 **주의**: `pythoncom`, `win32api` 등 Windows 전용 모듈은 [WARNING] 플랫폼 의존성으로 추가 분류
+
+### 2.9 oocheck run 2단계 + d0008 프로젝트 체크리스트
+
+**체크리스트 2종 구분**:
+
+| 종류 | 위치 | 성격 |
+|------|------|------|
+| 스킬 체크리스트 | `.claude/skills/oo*/references/checklist.md` | 각 스킬 고유 — 특정 프로젝트 무관 |
+| 프로젝트 체크리스트 | `d{SP}0008_checklist.md` | 해당 프로젝트 전용 — `oocheck add`로 항목 추가 |
+
+**oocheck run 2단계 흐름**:
+
+```
+[1단계] 코드품질 분석 → 이슈 d{SP}0004 등록 (기존 동작 유지)
+[2단계] 체크리스트 실행
+   1. list_skill_checklists() — 체크리스트 보유 oo* 스킬 목록 확보
+   2. 사용자에게 "어떤 스킬 체크리스트를 체크할지" 질문 (AskUserQuestion)
+   3. 평가 대상: d0008 항목 + oocheck 스킬 체크리스트(항상) + 선택 스킬 체크리스트
+   4. 항목별 PASS/FAIL 판정 → FAIL 항목을 d{SP}0004 (및 d0004) 에 이슈 등록
+```
+
+**범위 옵션**: `oocheck run` = 전체 SP의 d0008 / `oocheck run --sp N` = SP N 만
+
+**oocheck add 코드 부여 로직** (`oocheck_run.py`):
+
+| 함수 | 역할 |
+|------|------|
+| `detect_checklist_category()` | 내용 키워드로 성격(C/D/S/T/E/G) 판정, 미매칭 G |
+| `get_next_checklist_id()` | 접두사별 다음 일련번호 부여 (C001·C002…) |
+| `ensure_d0008()` | d0008 없으면 `templates/d0008_checklist_template.md`로 생성 |
+
+> 체크 결과는 d0004 todo의 「대기 ToDo」에 이슈 블록으로 등록한다 (병행 등록 규칙 §3.2 적용).
 
 ## 3. 상세 사용법
 

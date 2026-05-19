@@ -1,13 +1,13 @@
 ---
 name: ccdev
-description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md"
+description: "공통 가이드: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .claude/skills/oocontext/SKILL.md
-> 상세 가이드: .claude/skills/ccdev/references/guide.md
+> 공통 가이드: .codex/guides/common_guide.md | 컨텍스트: .agents/skills/cccontext/SKILL.md
+> 상세 가이드: .agents/skills/ccdev/references/guide.md
 
 ## 0. 스킬 요약
 
@@ -15,24 +15,24 @@ description: "공통 가이드: .claude/guides/common_guide.md | 컨텍스트: .
 |------|------|
 | **핵심 역할** | TDD GREEN 단계 구현 — 테스트 통과하는 최소 코드 작성 + REFACTOR |
 | **하는 것** | d{SP}0003_test.md 초기 생성(INIT), GREEN 구현, REFACTOR |
-| **하지 않는 것** | TC 코드 작성(→ootest/RED), 정적 분석(→oocheck), 이슈 등록(→oocheck) |
+| **하지 않는 것** | TC 코드 작성(→cctest/RED), 정적 분석(→cccheck), 이슈 등록(→cccheck) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (plan.md, test.md, 코드) / 외부 프로젝트 자동 포함 안 함 |
 | **수정 대상** | 구현 코드 파일, `d{SP}0003_test.md` |
 | **실행 레벨** | [자동] — explore→executor→reviewer 서브에이전트 순서 자동 위임 |
-| **에이전트 호환** | Claude Code 권장 — Agent 도구 필수 / 다른 에이전트: 서브에이전트 위임 단계를 수동으로 실행 |
+| **에이전트 호환** | Codex 권장 — Agent 도구 필수 / 다른 에이전트: 서브에이전트 위임 단계를 수동으로 실행 |
 
 ## 문서 이력 관리
 - v09 2026-04-19 — optimize → check --fix 통합
 - v08 2026-04-07 — dXXXX 단계 감지 + 자동전환 — 설계단계 자동전환, 기획단계 차단, TC(RED) 통합
 - v03 2026-04-06 — 참조 문서 우선순위 표 명문화 (d0004→d0002→d0003→d0001)
 - v02 2026-04-06 — 상세기획 문서 지정 개발 추가: `ccdev run dXXXX`
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
 ## 1. 개요
 
-ooplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 시 테스트 문서 자동 생성.**
+ccplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 시 테스트 문서 자동 생성.**
 
 > ⚠️ **필수**: run/check --fix 명령 시 반드시 Agent 도구로
 > explore(haiku) 분석 → executor(opus) 구현 → quality-reviewer(opus) 리팩터 순서로 위임할 것.
@@ -55,12 +55,12 @@ ooplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 
 |------|------|------|
 | `ccdev help` | 서브명령어 목록 표시 | 터미널 |
 | `ccdev version` | 스킬 버전 정보 (v07) |
-| ooplan | 설계 | d{SP}0002_plan.md |
+| ccplan | 설계 | d{SP}0002_plan.md |
 | ccdev | **d{SP}0003 생성 (INIT)** + **GREEN + REFACTOR** | d{SP}0002_plan.md, d{SP}0003_test.md |
-| **ootest** | **RED: TC 코드 작성 + 반복 실행** | tests/, d{SP}0003 Part C |
-| oofix | 수정 | d{SP}0004_todo.md |
+| **cctest** | **RED: TC 코드 작성 + 반복 실행** | tests/, d{SP}0003 Part C |
+| ccfix | 수정 | d{SP}0004_todo.md |
 
-> **단일 문서**: 현재 SP의 d{SP}0004 사전 검토 (.claude/skills/oocontext/SKILL.md 섹션 8)
+> **단일 문서**: 현재 SP의 d{SP}0004 사전 검토 (.agents/skills/cccontext/SKILL.md 섹션 8)
 
 ### ccdev run 참조 문서 우선순위
 
@@ -105,17 +105,17 @@ ooplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 
 | 검증 | task-checker | - |
 | 에스컬레이션 | codebase_investigator | - |
 
-> RED 단계(TC 코드 작성)는 **ootest**가 담당
+> RED 단계(TC 코드 작성)는 **cctest**가 담당
 
 ## 4. TDD 사이클
 
 | 단계 | 담당 | 작업 | 산출물 |
 |------|------|------|--------|
 | INIT | **ccdev** | 테스트 문서 생성 | d{SP}0003_test.md (첫 실행 시) |
-| RED | **ootest** | TC 코드 작성 + 실패 확인 | tests/TC*.py, d{SP}0003 Part C |
+| RED | **cctest** | TC 코드 작성 + 실패 확인 | tests/TC*.py, d{SP}0003 Part C |
 | GREEN | **ccdev** | 최소 구현 | 테스트 통과 |
 | REFACTOR | **ccdev** | 품질 개선 | lint 통과 |
-| VERIFY | **ootest** | 런타임 검증 + 반복 루프 | import 테스트 통과 |
+| VERIFY | **cctest** | 런타임 검증 + 반복 루프 | import 테스트 통과 |
 | COMPLETE | **ccdev** | 문서 갱신 | d{SP}0003 [x] |
 
 ### 네이밍 규칙
@@ -133,7 +133,7 @@ ooplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 
 
 **첫 실행 시 d{SP}0003 존재 여부 확인 -> 없으면 자동 생성**
 
-> **컨텍스트 적용**: oocontext.md 규칙에 따라 d{SP}0003_test.md 생성
+> **컨텍스트 적용**: cccontext.md 규칙에 따라 d{SP}0003_test.md 생성
 > - SP=00: d0003_test.md (PRD: d0001_prd.md)
 > - SP=02: d20003_test.md (PRD: d20001_prd.md)
 
@@ -145,8 +145,8 @@ ooplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 
 |------|----------|----------|
 | A | 공통 에러체크 (고정) | - |
 | B | PRD 기능 -> 시나리오 도출 | PRD 변경 시 |
-| C | **ootest RED 단계에서 등록** | 개발 진행 시 |
-| D | SP별 분기 (아래 참조) | ootest refresh |
+| C | **cctest RED 단계에서 등록** | 개발 진행 시 |
+| D | SP별 분기 (아래 참조) | cctest refresh |
 
 **Part D 생성 규칙 (중복 방지):**
 
@@ -164,7 +164,7 @@ ooplan 태스크를 TDD 사이클(Red->Green->Refactor)로 구현. **첫 실행 
 | Could | P2 |
 | Won't | 제외 |
 
-**템플릿**: .claude/skills/ootest/templates/test/common_test_template.md
+**템플릿**: .agents/skills/cctest/templates/test/common_test_template.md
 
 ### 4.2 런타임 검증 (VERIFY) - 필수
 
@@ -176,8 +176,8 @@ uv run pytest tests/test_page_import.py -v
 
 실패 시 → GREEN 단계로 돌아가 수정. 통과 시 → COMPLETE 진행.
 
-> 상세 에러 유형 및 검증 방법: `.claude/skills/oocheck/SKILL.md` 런타임 검증 섹션 참조
-> 템플릿: `.claude/skills/ootest/templates/test_page_import_template.py`
+> 상세 에러 유형 및 검증 방법: `.agents/skills/cccheck/SKILL.md` 런타임 검증 섹션 참조
+> 템플릿: `.agents/skills/cctest/templates/test_page_import_template.py`
 
 ## 5. 상세기획 문서 기반 개발 (dXXXX 모드)
 
@@ -227,10 +227,10 @@ ccdev run d41001 F001-1   # 특정 Feature만 구현
 
 | 현재 단계 | `ccdev run dXXXX` 동작 |
 |----------|----------------------|
-| 상세기획 | ❌ 차단: "`oofeature next dXXXX`로 설계 전환 후 설계를 완료하세요" |
-| 상세설계 | ✅ 설계→개발 자동전환 + ootest write(RED) + GREEN→REFACTOR |
-| 상세개발 | ✅ ootest write(RED) + GREEN→REFACTOR |
-| 상세검증 | ⚠️ 안내: "이미 검증 단계. `oocheck run dXXXX` 실행" |
+| 상세기획 | ❌ 차단: "`ccfeature next dXXXX`로 설계 전환 후 설계를 완료하세요" |
+| 상세설계 | ✅ 설계→개발 자동전환 + cctest write(RED) + GREEN→REFACTOR |
+| 상세개발 | ✅ cctest write(RED) + GREEN→REFACTOR |
+| 상세검증 | ⚠️ 안내: "이미 검증 단계. `cccheck run dXXXX` 실행" |
 
 ## 6. 반복/에스컬레이션
 
@@ -247,7 +247,7 @@ ccdev check --fix --dry-run    # 분석만
 
 ## 7. 워크플로우
 
-ooplan -> ccdev run
+ccplan -> ccdev run
 
 ## 8. GSD 연계
 
@@ -266,7 +266,7 @@ ooplan -> ccdev run
 
 ## 9. 프레임워크 레퍼런스 참조
 
-> 대상 프로젝트가 알려진 프레임워크를 사용하는 경우 `.claude/reference/development/{framework}/` 문서를 사전 로드하여 구현에 반영한다.
+> 대상 프로젝트가 알려진 프레임워크를 사용하는 경우 `.codex/reference/development/{framework}/` 문서를 사전 로드하여 구현에 반영한다.
 
 | 프레임워크 | 감지 조건 | 참조 경로 | 구현 참조 항목 |
 |-----------|----------|----------|--------------|
@@ -275,13 +275,13 @@ ooplan -> ccdev run
 
 ## 10. 관련 문서
 
-- ooplan.md: 설계
-- ootest.md: 테스트 실행
-- oocheck.md: 코드 체크
+- ccplan.md: 설계
+- cctest.md: 테스트 실행
+- cccheck.md: 코드 체크
 - d{SP}0002_plan.md: 구현 계획
 - d{SP}0003_test.md: 테스트 케이스 (본 스킬에서 생성)
 - d{SP}0004_todo.md: 이슈
-- .claude/skills/ootest/templates/test/: 테스트 문서 템플릿
+- .agents/skills/cctest/templates/test/: 테스트 문서 템플릿
 
 > **관련 명령어**: `.claude/commands/sc/implement.md` | `.claude/commands/sc/build.md` | `.claude/commands/sc/test.md`
 
@@ -289,7 +289,7 @@ ooplan -> ccdev run
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -305,7 +305,7 @@ ooplan -> ccdev run
 ## Karpathy 코딩 가이드라인 (필수 준수)
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|
@@ -327,10 +327,10 @@ ooplan -> ccdev run
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -341,7 +341,7 @@ ooplan -> ccdev run
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

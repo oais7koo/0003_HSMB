@@ -3,10 +3,10 @@
 대상 파일의 성능 프로파일링, 복잡도 분석, 벤치마크를 수행한다.
 
 Usage:
-    uv run python .claude/skills/ccopti/scripts/ooopti_run.py profile <file>
-    uv run python .claude/skills/ccopti/scripts/ooopti_run.py complexity <file>
-    uv run python .claude/skills/ccopti/scripts/ooopti_run.py benchmark <file> <function>
-    uv run python .claude/skills/ccopti/scripts/ooopti_run.py status
+    uv run python .agents/skills/ccopti/scripts/ooopti_run.py profile <file>
+    uv run python .agents/skills/ccopti/scripts/ooopti_run.py complexity <file>
+    uv run python .agents/skills/ccopti/scripts/ooopti_run.py benchmark <file> <function>
+    uv run python .agents/skills/ccopti/scripts/ooopti_run.py status
 """
 
 import cProfile
@@ -29,7 +29,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)

@@ -22,7 +22,7 @@ STAGES = ["상세기획", "상세설계", "상세구현", "상세검증"]
 
 
 def get_current_sp() -> str:
-    context_file = PROJECT_ROOT / ".claude" / "skills" / "oocontext" / "references" / "current_context.json"
+    context_file = PROJECT_ROOT / ".codex" / "skills" / "cccontext" / "references" / "current_context.json"
     if context_file.exists():
         try:
             data = json.loads(context_file.read_text(encoding="utf-8"))
@@ -99,9 +99,9 @@ def main():
 
     if not args or args[0] in ("help", "-h", "--help"):
         print("Usage:")
-        print("  oof note dXXXX --find [--sp N]          # 파일 경로 출력")
-        print("  oof note dXXXX \"내용\" [--sp N]          # ## 메모에 직접 추가")
-        print("  oof note dXXXX --memo \"내용\" [--sp N]   # Claude 통합 후 이력 기록")
+        print("  ccf note dXXXX --find [--sp N]          # 파일 경로 출력")
+        print("  ccf note dXXXX \"내용\" [--sp N]          # ## 메모에 직접 추가")
+        print("  ccf note dXXXX --memo \"내용\" [--sp N]   # Codex 통합 후 이력 기록")
         return
 
     doc_num = None

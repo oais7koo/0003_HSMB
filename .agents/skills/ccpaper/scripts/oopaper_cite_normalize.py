@@ -4,7 +4,7 @@
 ccpaper 인용정규화 - 인용 형식 통일 및 중복 제거
 
 Usage:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_cite_normalize.py [--input FILE] [--output FILE] [--dry-run]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_cite_normalize.py [--input FILE] [--output FILE] [--dry-run]
 """
 
 import re

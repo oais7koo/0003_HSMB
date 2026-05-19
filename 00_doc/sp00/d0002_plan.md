@@ -1,11 +1,12 @@
 # HSMB v2 NR-IQA 논문 재투고 — 구현 계획
 
-> PRD: `00_doc/sp00/d0001_prd.md` v05 참조 | 생성: `ooplan run` (Track 1 전체)
+> PRD: `00_doc/sp00/d0001_prd.md` v07 참조 | 생성: `ooplan run` (Track 1 전체)
 
 ## 1. 문서이력관리
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| v04 | 2026-05-19 | d3000번대 상세구현·실제 코드 정합성 반영 — F002-2 완료, ps3010 520장, ps3010~ps3040·ps3100~ps3101 실제 스크립트/산출 경로로 갱신 |
 | v03 | 2026-05-18 | E3 실험군(F002-4~7) 실행 완료 반영 — ps1301/ps1302는 center crop 50% 적용. F002-5.1 샘플링 전략을 center crop 결정으로 갱신, R09 대응 완료, §7 의사결정 로그 추가 |
 | v02 | 2026-05-15 | PRD v06 동기화 — E002에 F002-4~7 (E3 실험군 4건) 추가, S1~S3 스프린트 재배치 |
 | v01 | 2026-04-26 | 초기 생성 — Track 1 전체(Phase 1~4) WBS 분해, 모두 미착수 가정 |
@@ -66,7 +67,7 @@
 | Feature ID | 기능명                   | PRD 매핑 | 우선순위 | 상태            |
 | ---------- | --------------------- | ------ | :--: | ------------- |
 | F002-1     | E1-1 NR-IQA 측정 (47조건) | F14a   | Must | ✅             |
-| F002-2     | E1-2 BEW 상관 분석        | F14b   | Must | ⚪             |
+| F002-2     | E1-2 BEW 상관 분석        | F14b   | Must | ✅             |
 | F002-3     | E2 HSMB-크랙검출 상관       | F15    | Must | ⚪             |
 | F002-4     | E3-1 ps1010 IQA 분석    | F16a   | Must | ✅             |
 | F002-5     | E3-2 ps1301 IQA 분석    | F16b   | Must | ✅             |
@@ -77,17 +78,17 @@
 
 | Task ID | 내용 | 산출물 |
 |---------|------|--------|
-| F002-1.1 | `ps2000_통합IQA.py` v04를 47조건 폴더 일괄 실행으로 확장 | `src/ps2000_batch_runner.py` |
-| F002-1.2 | NR-IQA 7종 스코어 산출 (HSMB + 비교 6종) | `data/exp/e1_iqa_scores.csv` |
-| F002-1.3 | 조건별(조도×ISO×셔터속도×속도) 집계표 생성 | `00_doc/sp00/d0040_e1_scores.md` |
+| F002-1.1 | `ps2000_통합IQA.py` v04 로직을 47조건 폴더 일괄 실행으로 확장 | `src/ps3100_e1_1_ps1204_iqa.py` |
+| F002-1.2 | NR-IQA 7종(9컬럼) 스코어 산출 (HSMB + 비교 6종, NIQE/BRISQUE 변형 포함) | `data/ps3100/01~04_*` |
+| F002-1.3 | 조건별(조도×ISO×셔터속도×속도) 집계표 생성 | `00_doc/sp00/d3100_상세구현_터널표준영상_IQA산출.md` §12 실험 결과 |
 
-#### F002-2. E1-2 BEW 상관 분석
+#### F002-2. E1-2 BEW 상관 분석 ✅
 
 | Task ID | 내용 | 산출물 |
 |---------|------|--------|
-| F002-2.1 | 47조건 BEW-H, BEW-V 측정 | `data/exp/e1_bew.csv` |
-| F002-2.2 | NR-IQA × BEW scatter + PLCC/SROCC 산출 | `00_doc/sp00/d0041_e1_correlation.md` + figures |
-| F002-2.3 | 이방성 분석 (BEW_H − BEW_V), defocus 케이스 검증 | 위 문서 §이방성 |
+| F002-2.1 | 47조건 BEW-H, BEW-V 측정 | `data/ps3101/01_bew_per_frame_*.csv`, `02_bew_per_condition_*.csv` |
+| F002-2.2 | NR-IQA × BEW scatter + PLCC/SROCC/KRCC 산출 | `data/ps3101/03_correlation_*.csv`, `04~05_*.png` |
+| F002-2.3 | 이방성 분석 (BEW_H − BEW_V), defocus 케이스 검증 | `data/ps3101/06_anisotropy_*.png`, `d3101` §11 |
 
 #### F002-3. E2 HSMB-크랙검출 상관
 
@@ -101,9 +102,9 @@
 
 | Task ID | 내용 | 산출물 |
 |---------|------|--------|
-| F002-4.1 | `ps2000_batch_runner.py` 입력 인자에 `ps1010_chungsong_MTF/` 추가 | runner 수정 |
-| F002-4.2 | 50조건 frame 507장 → 7종 NR-IQA 스코어 일괄 산출 | `data/exp/e3_1_ps1010_iqa.csv` |
-| F002-4.3 | 조건별·전체 기술통계 + 히스토그램 리포트 | `00_doc/sp00/d0043_e3_1_ps1010.md` |
+| F002-4.1 | `ps1010_chungsong_MTF/` 전용 메타 파서와 일괄 IQA 진입점 구현 | `src/ps3010_e3_1_ps1010_iqa.py` |
+| F002-4.2 | 50조건 frame 520장 → 7종(9컬럼) NR-IQA 스코어 일괄 산출 | `data/ps3010/01~04_*` |
+| F002-4.3 | 조건별·전체 기술통계 + 히스토그램 리포트 | `00_doc/sp00/d3010_상세구현_청송MTF_IQA산출.md` §11 실험 결과 |
 
 #### F002-5. E3-2 ps1301 IQA 분석 (PRD F16b)
 
@@ -111,22 +112,22 @@
 |---------|------|--------|
 | F002-5.1 | ps1301 대용량 대응 — 가로·세로 가운데 50%(면적 25%) center crop 후 전수(737장) 산출 (`center_crop=True`) | d3020 §4 R08 |
 | F002-5.2 | 7종 NR-IQA 일괄 산출 (GPU 메모리·런타임 모니터) | `data/ps3020/01~04_*.{xlsx,png}` |
-| F002-5.3 | 기술통계 + 히스토그램 리포트 | `00_doc/sp00/d0044_e3_2_ps1301.md` |
+| F002-5.3 | 기술통계 + 히스토그램 리포트 | `00_doc/sp00/d3020_상세구현_실제크랙_IQA산출.md` §11 실험 결과 |
 
 #### F002-6. E3-3 ps1302 IQA 분석 (PRD F16c)
 
 | Task ID | 내용 | 산출물 |
 |---------|------|--------|
 | F002-6.1 | ps1302 7종 NR-IQA 일괄 산출 — 가로·세로 가운데 50% center crop 적용 (E3-2와 동일 기준) | `data/ps3030/01·04_*.{xlsx,png}` |
-| F002-6.2 | 기술통계 + 히스토그램 리포트 (controlled 비교군) | `00_doc/sp00/d0045_e3_3_ps1302.md` |
+| F002-6.2 | 기술통계 + 히스토그램 리포트 (controlled 비교군) | `00_doc/sp00/d3030_상세구현_인쇄크랙_IQA산출.md` §11 실험 결과 |
 
 #### F002-7. E3-4 ps1010+ps1301 통합 풀 IQA (PRD F16d)
 
 | Task ID | 내용 | 산출물 |
 |---------|------|--------|
-| F002-7.1 | ps1010 + ps1301 이미지 풀 통합 입력 경로 구성 (심볼릭/manifest CSV) | `data/exp/e3_4_pool_manifest.csv` |
-| F002-7.2 | 통합 풀에 대한 7종 NR-IQA 일괄 산출 | `data/exp/e3_4_pool_iqa.csv` |
-| F002-7.3 | 개별 E3-1·E3-2 결과 vs 통합 풀 분포 대조 리포트 (혼합 풀 특성 분석) | `00_doc/sp00/d0046_e3_4_pool.md` |
+| F002-7.1 | ps1010 + ps1301 이미지 풀 통합 manifest 구성 (`source_ps` 포함) | `data/ps3040/e3_4_pool_manifest.csv` |
+| F002-7.2 | 이미지별 IQA 독립성을 이용해 E3-1·E3-2 결과 concat 후 통합 풀 7종(9컬럼) 테이블 생성 | `data/ps3040/01_통합풀데이터_*.xlsx` |
+| F002-7.3 | 개별 E3-1·E3-2 결과 vs 통합 풀 분포 대조 리포트 (혼합 풀 특성 분석) | `00_doc/sp00/d3040_상세구현_통합풀_IQA분석.md` §11 실험 결과 |
 
 ### E003. 논문 보강 (Phase 2)
 
@@ -237,22 +238,28 @@ src/hsmb/                        # 알고리즘 코어 (모듈화 신규)
   ├── ablation.py                # 파라미터 grid 실행
   └── benchmark.py               # 데이터셋 평가 파이프라인
 
-src/                              # 실행 스크립트 (현재 ps2000 존재)
+src/                              # 실행 스크립트
   ├── ps2000_통합IQA.py          # 단일 실행 (기존 v04, 유지)
-  ├── ps2000_batch_runner.py     # 47조건 일괄 실행 (신규)
+  ├── ps3010_e3_1_ps1010_iqa.py  # E3-1 ps1010 IQA 산출
+  ├── ps3011_e3_1_sfr_correlation.py  # E3-1 SFR↔IQA 상관분석
+  ├── ps3020_e3_2_ps1301_iqa.py  # E3-2 ps1301 IQA 산출
+  ├── ps3030_e3_3_ps1302_iqa.py  # E3-3 ps1302 IQA 산출
+  ├── ps3040_e3_4_pool_iqa.py    # E3-4 통합 풀 분석
+  ├── ps3100_e1_1_ps1204_iqa.py  # E1-1 터널표준영상 IQA 산출
+  ├── ps3101_e1_2_bew_correlation.py  # E1-2 BEW↔IQA 상관분석
   ├── crack_detector/            # E2 DL 모델 래퍼 (신규)
   └── ps5101_pytorch_gpu_test_v01.py  # GPU 검증 (기존)
 
-data/exp/                         # 실험 결과 누적 폴더 (신규)
+data/                             # 실험 결과 누적 폴더
   ├── ablation_results.csv
-  ├── e1_iqa_scores.csv
-  ├── e1_bew.csv
+  ├── ps3100/                      # E1-1 터널표준영상 IQA 결과
+  ├── ps3101/                      # E1-2 BEW↔IQA 상관 결과
   ├── e2_crack_f1.csv
-  ├── e3_1_ps1010_iqa.csv          # E3-1 ps1010 7종 NR-IQA
-  ├── e3_2_ps1301_iqa.csv          # E3-2 ps1301 7종 NR-IQA
-  ├── e3_3_ps1302_iqa.csv          # E3-3 ps1302 7종 NR-IQA
-  ├── e3_4_pool_manifest.csv       # E3-4 ps1010+ps1301 통합 풀 manifest
-  ├── e3_4_pool_iqa.csv            # E3-4 통합 풀 7종 NR-IQA
+  ├── ps3010/                      # E3-1 ps1010 7종(9컬럼) NR-IQA
+  ├── ps3011/                      # E3-1 SFR↔IQA 상관분석
+  ├── ps3020/                      # E3-2 ps1301 7종(9컬럼) NR-IQA
+  ├── ps3030/                      # E3-3 ps1302 7종(9컬럼) NR-IQA
+  ├── ps3040/                      # E3-4 ps1010+ps1301 통합 풀
   ├── v1_50_results.csv
   └── complex_blur_subset/
 
@@ -292,7 +299,13 @@ tests/                            # pytest (신규)
 | `src/hsmb/metrics.py` | `compute_all_nr_iqa(img) -> dict[str, float]` | 7종 NR-IQA 일괄 |
 | `src/hsmb/ablation.py` | `run_ablation_grid(dataset, grid) -> DataFrame` | 파라미터 그리드 실행 |
 | `src/hsmb/benchmark.py` | `evaluate_on_dataset(metric_fn, gt) -> dict` | PLCC/SROCC 산출 |
-| `src/ps2000_batch_runner.py` | `__main__` | E1-1 실행 진입점 |
+| `src/ps3100_e1_1_ps1204_iqa.py` | `__main__` | E1-1 실행 진입점 |
+| `src/ps3101_e1_2_bew_correlation.py` | `__main__` | E1-2 BEW↔IQA 상관분석 진입점 |
+| `src/ps3010_e3_1_ps1010_iqa.py` | `__main__` | E3-1 ps1010 IQA 산출 진입점 |
+| `src/ps3011_e3_1_sfr_correlation.py` | `__main__` | E3-1 SFR↔IQA 상관분석 진입점 |
+| `src/ps3020_e3_2_ps1301_iqa.py` | `__main__` | E3-2 ps1301 IQA 산출 진입점 |
+| `src/ps3030_e3_3_ps1302_iqa.py` | `__main__` | E3-3 ps1302 IQA 산출 진입점 |
+| `src/ps3040_e3_4_pool_iqa.py` | `__main__` | E3-4 통합 풀 분석 진입점 |
 
 ### 5.5 DB 스키마
 
@@ -328,7 +341,7 @@ tests/                            # pytest (신규)
 | 2026-04-26 | Plan 범위 = Track 1 전체, 모두 미착수 가정 | 사용자 확인 (ooplan run) |
 | 2026-04-26 | `src/hsmb/` 패키지 신설 (현재 단일 스크립트 → 모듈화) | 단위테스트·재사용성 + PRD §8 목표 구조 |
 | 2026-04-26 | 스프린트 단위 = 명목 2주, 협업자 일정 시 trigger 방식 | TBD-5 일정 미정 대응 |
-| 2026-05-15 | E3 4건(F16a~d)을 E002 Epic에 통합 — 별도 Epic 신설 대신 기존 신규 실험 그룹 확장 | E1·E2와 동일 인프라(ps2000_batch_runner) 재사용 가능 |
+| 2026-05-15 | E3 4건(F16a~d)을 E002 Epic에 통합 — 별도 Epic 신설 대신 기존 신규 실험 그룹 확장 | E1·E2와 동일한 `common_iqa7.py` 기반 IQA 산출 로직 재사용 가능 |
 | 2026-05-15 | E3-4 "결합"의 의미를 데이터 통합 풀로 확정 (분포 대조 아님) | PRD v06 §2.7.2 사용자 확인 (2026-05-15) |
 | 2026-05-17 | E3는 `ps2000_batch_runner` 대신 `ps3010~ps3040` 개별 스크립트 + `common_iqa7.py`로 구현 | 데이터셋별 폴더 구조·메타 파서 상이 — 개별 진입점이 단순 |
 | 2026-05-17 | ps1301·ps1302 IQA 산출 시 가로·세로 가운데 50%(면적 25%) center crop 적용 | 대용량 이미지(ps1301 ~55MB/8K) 처리 비용 절감 — 사용자 지시. ps1010(E3-1)은 전체 유지 → E3-4 통합 풀은 crop 기준 혼재 (d3040 §3.1) |
@@ -345,7 +358,7 @@ tests/                            # pytest (신규)
 | F001-2 | 선행연구 서베이 | E001 | Must | F02 | ⚪ |
 | F001-3 | v1 ablation study | E001 | Must | F03 | ⚪ |
 | F002-1 | E1-1 NR-IQA 측정 | E002 | Must | F14a | ✅ |
-| F002-2 | E1-2 BEW 상관 분석 | E002 | Must | F14b | ⚪ |
+| F002-2 | E1-2 BEW 상관 분석 | E002 | Must | F14b | ✅ |
 | F002-3 | E2 HSMB-크랙검출 상관 | E002 | Must | F15 | ⚪ |
 | F002-4 | E3-1 ps1010 IQA 분석 | E002 | Must | F16a | ✅ |
 | F002-5 | E3-2 ps1301 IQA 분석 | E002 | Must | F16b | ✅ |
@@ -371,13 +384,14 @@ tests/                            # pytest (신규)
 | d9010 | v1 코드 서머리 | ⚪ | F001-1 | `d9010_상세기획_v1_코드_서머리.md` |
 | d9020 | 선행연구 서베이 | ⚪ | F001-2 | `d9020_상세기획_선행연구_서베이.md` |
 | d9030 | v1 ablation study | ⚪ | F001-3 | `d9030_상세기획_v1_ablation_study.md` |
-| d3100 | E1-1 NR-IQA 측정 | 🔵 | F002-1 | `d3100_상세구현_E1_1_NR_IQA_측정.md` |
-| d9050 | E1-2 BEW 상관 분석 | ⚪ | F002-2 | `d9050_상세기획_E1_2_BEW_상관_분석.md` |
+| d3100 | E1-1 NR-IQA 측정 | ✅ | F002-1 | `d3100_상세구현_터널표준영상_IQA산출.md` |
+| d3101 | E1-2 BEW↔IQA 상관분석 | ✅ | F002-2 | `d3101_상세구현_터널표준영상_BEW상관분석.md` |
 | d9060 | E2 HSMB-크랙검출 상관 | ⚪ | F002-3 | `d9060_상세기획_E2_HSMB_크랙검출_상관.md` |
-| d3010 | E3-1 ps1010 IQA 분석 | ✅ | F002-4 | `d3010_상세구현_E3_1_ps1010_IQA.md` |
-| d3020 | E3-2 ps1301 IQA 분석 | ✅ | F002-5 | `d3020_상세구현_E3_2_ps1301_IQA.md` |
-| d3030 | E3-3 ps1302 IQA 분석 | ✅ | F002-6 | `d3030_상세구현_E3_3_ps1302_IQA.md` |
-| d3040 | E3-4 ps1010+ps1301 통합 풀 IQA | ✅ | F002-7 | `d3040_상세구현_E3_4_pool_IQA.md` |
+| d3010 | E3-1 ps1010 IQA 분석 | ✅ | F002-4 | `d3010_상세구현_청송MTF_IQA산출.md` |
+| d3011 | E3-1 SFR↔IQA 상관분석 | ✅ | F002-4 | `d3011_상세구현_청송MTF_SFR상관분석.md` |
+| d3020 | E3-2 ps1301 IQA 분석 | ✅ | F002-5 | `d3020_상세구현_실제크랙_IQA산출.md` |
+| d3030 | E3-3 ps1302 IQA 분석 | ✅ | F002-6 | `d3030_상세구현_인쇄크랙_IQA산출.md` |
+| d3040 | E3-4 ps1010+ps1301 통합 풀 IQA | ✅ | F002-7 | `d3040_상세구현_통합풀_IQA분석.md` |
 | d9070 | v1 50조건 벤치마크 | ⚪ | F003-1 | `d9070_상세기획_v1_50조건_벤치마크.md` |
 | d9080 | Complex-blur stress test | ⚪ | F003-2 | `d9080_상세기획_complex_blur_stress_test.md` |
 | d9090 | downstream 분석 지원 | ⚪ | F004-1 | `d9090_상세기획_downstream_분석_지원.md` |
@@ -390,4 +404,4 @@ tests/                            # pytest (신규)
 
 ---
 
-> 참조: `00_doc/sp00/d0001_prd.md` (PRD v05) | `00_doc/sp00/d0004_todo.md` (이슈) | `00_doc/sp00/d0009_env.md` (환경) | `00_doc/sp00/d0010_history.md` (이력)
+> 참조: `00_doc/sp00/d0001_prd.md` (PRD v07) | `00_doc/sp00/d0004_todo.md` (이슈) | `00_doc/sp00/d0009_env.md` (환경) | `00_doc/sp00/d0010_history.md` (이력)

@@ -4,7 +4,7 @@ nvidia-smi 기반 GPU 사용률/메모리 실시간 모니터링.
 JSON 형식으로 결과를 출력하여 에이전트가 파싱할 수 있도록 한다.
 
 Usage:
-    uv run python .claude/skills/ccdeep/scripts/oodeep_monitor.py [subcommand] [options]
+    uv run python .agents/skills/ccdeep/scripts/oodeep_monitor.py [subcommand] [options]
 
 Subcommands:
     status      GPU 현재 상태 1회 조회

@@ -229,7 +229,6 @@ def check_sync_target():
 # - 참고 문서는 on-demand로 Read 도구로 로드
 # - Context 효율성: 필수 2개 = ~6k tokens, 참고 6개 = ~24k tokens
 DOCS_TO_CHECK = [
-    "d0000_manual.md",   # 전체 사용 매뉴얼
     "d0001_prd.md",      # PRD - 프로젝트 요구사항
     "d0004_todo.md",     # TODO/디버깅 - 이슈 추적
 ]

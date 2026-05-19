@@ -21,7 +21,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -66,7 +66,7 @@ def _detect_sp_cwd() -> int:
     return 0
 
 def resolve_sp(sp_arg=None) -> int:
-    """SP 번호 결정: --sp 인자 > oocontext 상태 > CWD 감지 > 기본값 0"""
+    """SP 번호 결정: --sp 인자 > cccontext 상태 > CWD 감지 > 기본값 0"""
     if sp_arg is not None:
         return int(sp_arg)
     ctx = _get_sp_from_state()
@@ -111,7 +111,7 @@ def print_usage():
     print("    cchistory create           d0010_history.md 신규 생성")
     print("    cchistory search [키워드]  이력 검색")
     print("    cchistory version          버전 목록 조회")
-    print("    cchistory sync             oofix 완료 항목 동기화")
+    print("    cchistory sync             ccfix 완료 항목 동기화")
     print()
     print("태그 종류:")
     print("    HOTFIX   - 긴급 수정")
@@ -128,10 +128,10 @@ def print_usage():
     print("    --force                 create 시 기존 파일 덮어쓰기")
     print()
     print("예시:")
-    print("    python .claude/skills/cchistory/scripts/oohistory_run.py run")
-    print("    python .claude/skills/cchistory/scripts/oohistory_run.py run BUGFIX \"API 버그 수정\"")
-    print("    python .claude/skills/cchistory/scripts/oohistory_run.py search DB")
-    print("    python .claude/skills/cchistory/scripts/oohistory_run.py sync --dry-run")
+    print("    python .agents/skills/cchistory/scripts/oohistory_run.py run")
+    print("    python .agents/skills/cchistory/scripts/oohistory_run.py run BUGFIX \"API 버그 수정\"")
+    print("    python .agents/skills/cchistory/scripts/oohistory_run.py search DB")
+    print("    python .agents/skills/cchistory/scripts/oohistory_run.py sync --dry-run")
 
 
 def parse_history_entries(content):
@@ -436,7 +436,7 @@ def cmd_version():
 
 
 def cmd_sync():
-    """oofix 완료 항목 동기화 (sync 서브명령어)"""
+    """ccfix 완료 항목 동기화 (sync 서브명령어)"""
     dry_run = "--dry-run" in sys.argv
     print("# cchistory sync\n")
     if dry_run:

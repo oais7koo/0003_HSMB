@@ -1,14 +1,14 @@
 ---
 name: ccskill
-description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `agents.md`"
+description: "공통: `.codex/guides/common_guide.md` | 에이전트 참조: `agents.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccskill - 스킬 최적화 검증
 
-> 공통: `.claude/guides/common_guide.md` | 에이전트 참조: `agents.md`
+> 공통: `.codex/guides/common_guide.md` | 에이전트 참조: `agents.md`
 
 ## 문서 이력 관리
 - v04 2026-04-19 — validate/validate-checklist → check/check --checklist 통합
@@ -19,11 +19,11 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 |------|------|
 | **핵심 역할** | oo 스킬 파일들의 서브에이전트·명령어 활용 최적화 검증 및 개선 |
 | **하는 것** | SKILL.md 검증, 서브에이전트 위임 최적화, 스킬 문서 이력 자동 추가 |
-| **하지 않는 것** | 코드 구현(→oodev), 환경 점검(→ooenv), 스킬 직접 실행 |
-| **참조 범위** | `.claude/skills/oo*/SKILL.md` 파일들 / 외부 스킬 저장소 자동 포함 안 함 |
-| **수정 대상** | `.claude/skills/oo*/SKILL.md` |
+| **하지 않는 것** | 코드 구현(→ccdev), 환경 점검(→ooenv), 스킬 직접 실행 |
+| **참조 범위** | `.agents/skills/oo*/SKILL.md` 파일들 / 외부 스킬 저장소 자동 포함 안 함 |
+| **수정 대상** | `.agents/skills/oo*/SKILL.md` |
 | **실행 레벨** | [반자동] — 검증 결과 확인 후 수정 적용 |
-| **에이전트 호환** | Claude Code 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
+| **에이전트 호환** | Codex 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
 
 ## 개요
 
@@ -31,12 +31,12 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 > explore(haiku) 스킬 파일 스캔 → executor(sonnet) 검증 및 수정 순서로 위임할 것.
 > 53개 스킬 파일 직접 스캔 금지 — 메인 컨텍스트 보호.
 
-`.claude/skills/oo*/SKILL.md` 스킬 파일들이 서브에이전트 위임 및 명령어 활용을 최적화하고 있는지 검증/개선하는 스킬.
+`.agents/skills/oo*/SKILL.md` 스킬 파일들이 서브에이전트 위임 및 명령어 활용을 최적화하고 있는지 검증/개선하는 스킬.
 
-> **바이브셋**: oosync로 동기화 관리하는 바이브 코딩 환경 파일 일체. `.claude/skills/`(스킬)은 바이브셋의 핵심 구성 요소이며, ooskill은 바이브셋 중 스킬 파트의 품질을 관리한다.
+> **바이브셋**: oosync로 동기화 관리하는 바이브 코딩 환경 파일 일체. `.agents/skills/`(스킬)은 바이브셋의 핵심 구성 요소이며, ooskill은 바이브셋 중 스킬 파트의 품질을 관리한다.
 
 **검증 항목**:
-1. `.claude/agents/` 서브에이전트 적절한 활용 여부
+1. `.codex/agents/` 서브에이전트 적절한 활용 여부
 2. `.claude/commands/sc/` 명령어 적절한 활용 여부
 
 ## 서브명령어
@@ -56,7 +56,7 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 | `ccskill update` | 등록된 모든 현행화 타겟 일괄 실행 (catalog + run-update-ref + gemma) | 수정된 파일 |
 | `ccskill update <타겟>` | 특정 타겟만 현행화 (예: `ccskill update catalog`) | 수정된 파일 |
 | `ccskill update <타겟> --dry-run` | 변경 예정 내용만 출력 | 터미널 |
-| `ccskill backup` | ~~제거~~ → `oosync backup` 사용 | - |
+| `ccskill backup` | ~~제거~~ → `ccsync backup` 사용 | - |
 
 ### run과 update 역할 분리 원칙
 
@@ -76,7 +76,7 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 | `run-update-ref` | 모든 oo* 스킬에 run/update 분리 원칙 참조 블록(`<!-- RUN-UPDATE-REF:START/END -->`) 삽입/갱신 | `scripts/ooskill_run_update_ref.py` |
 | `gemma` | 모든 oo* 스킬에 Gemma 위임 참조 블록(`<!-- GEMMA-REF:START/END -->`) 삽입/갱신 | `scripts/ooskill_gemma_ref.py` |
 
-> 새 타겟 추가 시 `ooskill_run.py`의 `UPDATE_TARGETS` 딕셔너리에 `{kind, call|script, desc}` 추가
+> 새 타겟 추가 시 `ccskill_run.py`의 `UPDATE_TARGETS` 딕셔너리에 `{kind, call|script, desc}` 추가
 
 ## help 서브명령어 표준
 
@@ -85,7 +85,7 @@ description: "공통: `.claude/guides/common_guide.md` | 에이전트 참조: `a
 ### 실행 방법
 
 ```
-uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
+uv run python .agents/skills/{스킬명}/scripts/{스킬명}_run.py help
 ```
 
 > Claude가 `oo* help` 요청을 받으면 위 명령을 **직접 실행**하고 그 출력을 보여준다. SKILL.md를 직접 읽어 출력하는 것은 C14 위반.
@@ -164,7 +164,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 
 ### skill-creator 구조 검증 (통합)
 
-> 기준: `skill-creator` SKILL.md (Claude 공식 스킬 표준)
+> 기준: `skill-creator` SKILL.md (Codex 공식 스킬 표준)
 
 | 항목 | 기준 | 심각도 |
 |------|------|--------|
@@ -195,7 +195,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 | 코드 구현/수정 | `task-executor` |
 | Python 리뷰 | `python-code-reviewer` |
 | 구현 검증 | `task-checker` |
-| 품질/중복 분석 | `ooqa` |
+| 품질/중복 분석 | `ccqa` |
 | 에러 분석 | `code-error-checker` |
 | E2E 웹 테스트 | `oo-web-test-orchestrator` |
 | 데이터 분석 | `data-analyst` |
@@ -207,12 +207,12 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 
 | 명령어 | 용도 | 연관 스킬 |
 |--------|------|----------|
-| `analyze` | 코드 분석 | oocheck, oolib |
-| `build` | 프로젝트 빌드 | oodev |
-| `implement` | 구현 | oodev |
-| `improve` | 개선 | oofix |
-| `test` | 테스트 | oocheck |
-| `troubleshoot` | 트러블슈팅 | oocheck, oofix |
+| `analyze` | 코드 분석 | cccheck, cclib |
+| `build` | 프로젝트 빌드 | ccdev |
+| `implement` | 구현 | ccdev |
+| `improve` | 개선 | ccfix |
+| `test` | 테스트 | cccheck |
+| `troubleshoot` | 트러블슈팅 | cccheck, ccfix |
 
 ### oo 스킬 룰셋 검증 (R01-R10)
 
@@ -228,7 +228,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 | R06 | 참조 인용 블록 | INFO | `> 참조\|공통\|ref` |
 | R07 | 서브에이전트 테이블 | INFO | `\| 단계 \| 에이전트 \|` 존재 |
 | R08 | 관련 문서 섹션 | WARNING | `## 관련 문서\|경로\|명령어` |
-| R09 | 실행 스크립트 | INFO | `uv run python .claude/skills/oo` |
+| R09 | 실행 스크립트 | INFO | `uv run python .agents/skills/oo` |
 | R10 | 명령어 테이블 | ERROR | `\| 명령어 \| 설명 \|` 존재 |
 
 ## 워크플로우
@@ -246,7 +246,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 | 단계 | 에이전트 | 모델 | 역할 | 병렬 |
 |------|----------|------|------|:----:|
 | 스킬 분석 | `Explore` | haiku | 파일 탐색, 패턴 추출 | O |
-| 최적화 검토 | `ooqa` | sonnet | 중복/누락 분석 | O |
+| 최적화 검토 | `ccqa` | sonnet | 중복/누락 분석 | O |
 | 파일 수정 | `task-executor` | sonnet | 스킬 파일 수정 | O |
 | 검증 | `task-checker` | sonnet | 수정 결과 검증 | - |
 
@@ -254,7 +254,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -274,10 +274,10 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -288,7 +288,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |
@@ -301,7 +301,7 @@ uv run python .claude/skills/{스킬명}/scripts/{스킬명}_run.py help
 | 문서 | 용도 |
 |------|------|
 | `agents.md` | 에이전트 검색 경로, 역할, 위임 규칙 |
-| `.claude/agents/*.md` | 서브에이전트 정의 |
+| `.codex/agents/*.md` | 서브에이전트 정의 |
 | `.claude/commands/sc/*.md` | 명령어 정의 |
-| `.claude/guides/common_guide.md` | 에이전트 활용 원칙 |
-| `skill-creator` (Claude 공식) | skill-creator 스킬 구조 표준 참조 |
+| `.codex/guides/common_guide.md` | 에이전트 활용 원칙 |
+| `skill-creator` (Codex 공식) | skill-creator 스킬 구조 표준 참조 |

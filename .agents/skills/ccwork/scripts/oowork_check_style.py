@@ -5,12 +5,12 @@
 실제로 적용하고 있는지, 항목 내 ①②③④+→ 화살표 체인 표현을 사용하는지,
 원문자(①~⑳)를 단독으로 사용하는지 확인하여 BLOCK/PASS 결과를 반환한다.
 
-Reference: .claude/skills/ccwork/references/checklist_common.md (G20·G21·G25·G26)
-           .claude/skills/ccwork/references/writing_styles.md (S01)
+Reference: .agents/skills/ccwork/references/checklist_common.md (G20·G21·G25·G26)
+           .agents/skills/ccwork/references/writing_styles.md (S01)
 
 Usage:
-    uv run python .claude/skills/ccwork/scripts/oowork_check_style.py <대상.md>
-    uv run python .claude/skills/ccwork/scripts/oowork_check_style.py <대상.md> --strict
+    uv run python .agents/skills/ccwork/scripts/oowork_check_style.py <대상.md>
+    uv run python .agents/skills/ccwork/scripts/oowork_check_style.py <대상.md> --strict
 
 Exit codes:
     0 — PASS (개조식 준수)

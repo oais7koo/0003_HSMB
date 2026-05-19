@@ -9,10 +9,10 @@ ooref_run.py
 - ccref run [framework]: 특정 프레임워크 강제 지정
 
 Usage:
-    uv run python .claude/skills/ccref/scripts/ooref_run.py list
-    uv run python .claude/skills/ccref/scripts/ooref_run.py run
-    uv run python .claude/skills/ccref/scripts/ooref_run.py run D:/resilio/3_code/0002_CCone
-    uv run python .claude/skills/ccref/scripts/ooref_run.py run fast-api
+    uv run python .agents/skills/ccref/scripts/ooref_run.py list
+    uv run python .agents/skills/ccref/scripts/ooref_run.py run
+    uv run python .agents/skills/ccref/scripts/ooref_run.py run D:/resilio/3_code/0002_CCone
+    uv run python .agents/skills/ccref/scripts/ooref_run.py run fast-api
 """
 
 import sys
@@ -28,7 +28,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -291,12 +291,12 @@ def cmd_run(args: list[str]):
 
     ref_path = REF_DIR / framework
     if not ref_path.exists():
-        print(f"\n[ERROR] 레퍼런스 없음: `.claude/reference/development/{framework}/`")
-        print("→ `oosync` 로 레퍼런스 동기화 후 재시도")
+        print(f"\n[ERROR] 레퍼런스 없음: `.codex/reference/development/{framework}/`")
+        print("→ `ccsync` 로 레퍼런스 동기화 후 재시도")
         return
 
     doc_count = len(list(ref_path.glob("*.md")))
-    print(f"**레퍼런스**: `.claude/reference/development/{framework}/` ({doc_count}개 문서)")
+    print(f"**레퍼런스**: `.codex/reference/development/{framework}/` ({doc_count}개 문서)")
     print()
     print("---\n")
 
@@ -304,7 +304,7 @@ def cmd_run(args: list[str]):
     checker = FRAMEWORK_CHECKERS.get(framework)
     if not checker:
         print(f"[INFO] `{framework}` 체크 로직 미구현 — 레퍼런스 문서 수동 확인 필요")
-        print(f"→ `.claude/reference/development/{framework}/` 참조")
+        print(f"→ `.codex/reference/development/{framework}/` 참조")
         return
 
     issues = checker(project_path)
@@ -344,7 +344,7 @@ def cmd_run(args: list[str]):
         print()
 
     print("---")
-    print(f"레퍼런스: `.claude/reference/development/{framework}/`")
+    print(f"레퍼런스: `.codex/reference/development/{framework}/`")
 
 
 # ─────────────────────────────────────────

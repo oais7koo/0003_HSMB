@@ -1,6 +1,6 @@
 """
 cccheck run --all: 모든 oo 스킬의 checklist.md 기반 체크 일괄 실행
-- .claude/skills/oo*/references/checklist.md 스캔
+- .agents/skills/oo*/references/checklist.md 스캔
 - 각 스킬의 체크 항목 수 + 필수 파일 존재 여부 검증
 """
 
@@ -63,7 +63,7 @@ def check_skill_health(skill_name, skill_dir):
 
 def main():
     print("# cccheck run --all")
-    print(f"대상: .claude/skills/oo*/")
+    print(f"대상: .agents/skills/oo*/")
     print()
 
     total_ok = 0

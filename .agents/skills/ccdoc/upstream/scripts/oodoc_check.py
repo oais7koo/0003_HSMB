@@ -162,10 +162,60 @@ def check_cross_references(sp_num: int) -> tuple:
     return ok, warn, err
 
 
+def check_todo_index_detail_sync(sp_num: int) -> tuple:
+    """R163: todo/ 폴더 인덱스↔상세 정합성 체크.
+    - 대기 ToDo 표(`| R### |`)의 ID마다 todo/{ID}.md 존재 + 상태/우선순위 일치
+    - 활성(OPEN/IN_PROGRESS/HOLD) 상세가 인덱스 대기 ToDo에 등재되어 있는지
+    """
+    ok, warn, err = [], [], []
+    if sp_num == 0:
+        return ok, warn, err
+    sp_dir = get_sp_dir(sp_num)
+    todo_dir = sp_dir / "todo"
+    index_file = sp_dir / f"d{sp_num}0004_todo.md"
+    if not todo_dir.exists() or not index_file.exists():
+        return ok, warn, err
+    idx_text = load_text(index_file)
+    # 대기 ToDo 표 행 파싱: | ID | 우선순위 | 상태 | 제목 | 상세 |
+    row_re = re.compile(
+        r"^\|\s*(R\d+(?:-\d+)?(?:\.\d+)?)\s*\|\s*([^|]+?)\s*\|\s*([A-Z_]+)\s*\|",
+        re.MULTILINE,
+    )
+    index_rows = {m.group(1): (m.group(2).strip(), m.group(3).strip()) for m in row_re.finditer(idx_text)}
+    # 상세 파일 헤더 파싱
+    head_re = re.compile(r"^>\s*우선순위:\s*([^|]+?)\s*\|\s*상태:\s*([A-Z_]+)", re.MULTILINE)
+    detail_states = {}  # id → (priority, state)
+    for fp in todo_dir.glob("*.md"):
+        if fp.stem in ("_template", "README"):
+            continue
+        text = load_text(fp)
+        m = head_re.search(text)
+        if m:
+            detail_states[fp.stem] = (m.group(1).strip(), m.group(2).strip())
+    # 1) 인덱스 ID마다 상세 존재 + 일치
+    for tid, (idx_pri, idx_state) in index_rows.items():
+        if tid not in detail_states:
+            warn.append(f"  [WARN]  인덱스 대기 ToDo {tid}: todo/{tid}.md 없음")
+            continue
+        d_pri, d_state = detail_states[tid]
+        if d_state != idx_state:
+            warn.append(f"  [WARN]  {tid}: 상태 불일치 (인덱스={idx_state} / 상세={d_state})")
+        if d_pri.upper() != idx_pri.upper():
+            warn.append(f"  [WARN]  {tid}: 우선순위 불일치 (인덱스={idx_pri} / 상세={d_pri})")
+    # 2) 활성 상세이지만 인덱스 미참조
+    for tid, (_, d_state) in detail_states.items():
+        if d_state in ("OPEN", "IN_PROGRESS", "HOLD") and tid not in index_rows:
+            warn.append(f"  [WARN]  활성 상세 {tid}({d_state})가 인덱스 대기 ToDo에 미등재")
+    if not warn:
+        ok.append(f"  [OK]    todo/ 인덱스↔상세 정합성 일치 ({len(detail_states)}개 상세, {len(index_rows)}개 대기)")
+    return ok, warn, err
+
+
 def part1_cross_consistency(sp_num: int) -> tuple:
     all_ok, all_warn, all_err = [], [], []
     for fn in [check_required_docs, check_history_tables,
-               check_todo_history_sync, check_cross_references]:
+               check_todo_history_sync, check_cross_references,
+               check_todo_index_detail_sync]:
         o, w, e = fn(sp_num)
         all_ok.extend(o)
         all_warn.extend(w)

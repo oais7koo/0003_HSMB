@@ -1,10 +1,10 @@
 ---
 name: ccstop
-description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
+description: "Git 규칙: `.codex/guides/common_guide.md` 3.2절"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccstop - 세션 종료 워크플로우
 
@@ -21,7 +21,7 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 | **에이전트 호환** | 범용 — 파일 읽기·요약 중심으로 모든 에이전트 처리 가능 |
 
 ## 문서 이력 관리
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -35,7 +35,7 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 | `ccstop check` | references/checklist.md 기반 체크 및 리포팅 | 터미널 |
 | `ccstop show checklist` | 역할 수행 체크리스트 표시 | 터미널 |
 | `ccstop add checklist "항목"` | 체크리스트 항목 추가 | checklist.md |
-| `ccstop run` | **전체 종료 실행 (기본): cleanup → readme → sync → oocommit run** |
+| `ccstop run` | **전체 종료 실행 (기본): cleanup → readme → sync → cccommit run** |
 | `ccstop cleanup` | MCP 좀비 node 프로세스 정리 (Windows) |
 | `ccstop readme` | README.md만 (1단계) |
 | `ccstop sync` | 00_doc/*.md만 (2단계) |
@@ -43,7 +43,7 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 ## 종료 워크플로우
 
 ```
-1단계: README.md → 2단계: 00_doc/*.md → 3단계: oocommit run
+1단계: README.md → 2단계: 00_doc/*.md → 3단계: cccommit run
 (작업내역, 다음작업)  (d0001~d0010)      (git 커밋)
 ```
 
@@ -77,7 +77,7 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 
 ## 커밋
 
-> Git 규칙: `.claude/guides/common_guide.md` 3.2절
+> Git 규칙: `.codex/guides/common_guide.md` 3.2절
 
 | 타입 | 형식 |
 |------|------|
@@ -89,8 +89,8 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 
 | 단계 | 에이전트 | 모델 | 병렬 조합 |
 |------|----------|------|----------|
-| 검증 | `task-checker` | sonnet | + `ooqa` (다수 파일) |
-| 품질 | `ooqa` | sonnet | + `task-checker` |
+| 검증 | `task-checker` | sonnet | + `ccqa` (다수 파일) |
+| 품질 | `ccqa` | sonnet | + `task-checker` |
 | 탐색 | `Explore` | haiku | + `task-executor` (문서 갱신) |
 | 갱신 | `task-executor` | sonnet | + `Explore` |
 
@@ -105,7 +105,7 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -125,10 +125,10 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -139,7 +139,7 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |
@@ -149,6 +149,6 @@ description: "Git 규칙: `.claude/guides/common_guide.md` 3.2절"
 
 ## 관련 문서
 
-- `.claude/skills/oostart/SKILL.md` - 세션 시작
+- `.agents/skills/ccstart/SKILL.md` - 세션 시작
 - `00_doc/d{SP}0004_todo.md` - 할 일/디버깅
 - `00_doc/d{SP}0010_history.md` - 변경 이력

@@ -13,7 +13,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="repla
 
 
 def find_skills_root() -> Path:
-    # .claude/skills/ccbatch/scripts/oobatch_run.py → .claude/skills/
+    # .agents/skills/ccbatch/scripts/oobatch_run.py → .agents/skills/
     return Path(__file__).parent.parent.parent
 
 

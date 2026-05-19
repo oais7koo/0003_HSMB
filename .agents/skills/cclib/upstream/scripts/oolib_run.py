@@ -49,9 +49,9 @@ def show_help_if_no_args(skill_name, args):
 # --- end oo_common inline ---
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent.parent
-OAIS_DIR = PROJECT_ROOT / "oo"
-DOC_DIR = PROJECT_ROOT / "doc"
+PROJECT_ROOT = SCRIPT_DIR.parents[3]   # scripts -> oolib -> skills -> .claude -> 프로젝트 루트
+OAIS_DIR = PROJECT_ROOT / "oais"
+DOC_DIR = PROJECT_ROOT / "00_doc" / "sp00"
 TMP_DIR = PROJECT_ROOT / "tmp"
 TODO_FILE = DOC_DIR / "d0004_todo.md"
 LIB_DOC_FILE = DOC_DIR / "d0005_lib.md"

@@ -2,7 +2,7 @@
 """
 oopaper_auto.py - ccpaper 자동화 헬퍼 (v04+)
 
-토큰 절감을 위해 Claude AI 대신 로컬 Python으로 처리하는 작업들.
+토큰 절감을 위해 Codex AI 대신 로컬 Python으로 처리하는 작업들.
 
 서브명령어:
   organize  : 00_down/*.pdf → YYMMDD-HHMM 폴더 자동 생성·이동
@@ -11,9 +11,9 @@ oopaper_auto.py - ccpaper 자동화 헬퍼 (v04+)
   ref-match : 참고문헌 내부 폴더 매칭 (rapidfuzz)
 
 실행 예:
-  uv run python .claude/skills/ccpaper/scripts/oopaper_auto.py organize --dry-run
-  uv run python .claude/skills/ccpaper/scripts/oopaper_auto.py dedup
-  uv run python .claude/skills/ccpaper/scripts/oopaper_auto.py meta --folder 260428-0001
+  uv run python .agents/skills/ccpaper/scripts/oopaper_auto.py organize --dry-run
+  uv run python .agents/skills/ccpaper/scripts/oopaper_auto.py dedup
+  uv run python .agents/skills/ccpaper/scripts/oopaper_auto.py meta --folder 260428-0001
 """
 import argparse
 import re
@@ -24,7 +24,7 @@ from pathlib import Path
 
 # 프로젝트 루트 자동 감지
 _HERE = Path(__file__).resolve()
-PROJECT_ROOT = _HERE.parents[4]  # scripts → ccpaper → skills → .claude → root
+PROJECT_ROOT = _HERE.parents[4]  # scripts → ccpaper → skills → .codex → root
 PAPER_BASE = PROJECT_ROOT / "03_paper" if (PROJECT_ROOT / "03_paper").exists() else PROJECT_ROOT
 DOWN_DIR = PAPER_BASE / "00_down"
 PAPER_DIR = PAPER_BASE / "11_paper_en"

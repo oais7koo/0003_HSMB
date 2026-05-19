@@ -12,7 +12,7 @@ description: "⚠️ **필수**: run/read 명령 시 반드시 Agent 도구로"
 |------|------|
 | **핵심 역할** | 유튜브 STT·다운로드 및 웹 기사 전문 스크래핑 통합 스킬 |
 | **하는 것** | 유튜브 URL→STT/자막 추출, 웹 기사 전문 스크래핑, 결과 MD 저장 |
-| **하지 않는 것** | 도서 서머리(→oobook), 논문 수집(→oopaper), 데이터 분석(→ooresearch) |
+| **하지 않는 것** | 도서 서머리(→ccbook), 논문 수집(→ccpaper), 데이터 분석(→ccresearch) |
 | **참조 범위** | 지정 URL(유튜브/일반 웹) + 현재 프로젝트 저장 경로 |
 | **수정 대상** | 스크래핑 결과 MD 파일, 다운로드 파일 |
 | **실행 레벨** | [자동] — URL 입력 후 자동 처리 |
@@ -20,8 +20,8 @@ description: "⚠️ **필수**: run/read 명령 시 반드시 Agent 도구로"
 
 ## 문서 이력 관리
 - v12 2026-04-12 — 채널 처리 로직 변경: 일괄 STT → 영상 목록 전개 후 ## 다운 추가 + 이력파일 번호 02/03/04→12/13/14 반영
-- v02 2026-03-26 — ooscrap add 서브명령어 추가 (다운로드 리스트 URL 추가)
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v02 2026-03-26 — ccscrap add 서브명령어 추가 (다운로드 리스트 URL 추가)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -40,7 +40,7 @@ description: "⚠️ **필수**: run/read 명령 시 반드시 Agent 도구로"
 - 채널 메타 관리 (00_down/13_유튜브채널리스트.md, 채널명/처리일/영상수)
 - CUDA/CPU 자동 폴백 (Whisper 사용 시)
 - 00_down/01_다운로드.md 자동 정리 (성공 제거, 실패 주석+사유)
-- 유튜브팩토리.md 인덱스 자동 갱신 (옵시디언 링크, ooscrap run 완료 시)
+- 유튜브팩토리.md 인덱스 자동 갱신 (옵시디언 링크, ccscrap run 완료 시)
 
 **참조 스크립트**:
 - `02_pycode/ps80_app/ps8035_noscript_youtube_STT.py` (원본 파이프라인)
@@ -249,7 +249,7 @@ Codex Code가 직접 웹페이지를 읽고 마크다운 전문을 생성한다 
 - CUDA 실패: CPU/int8로 자동 폴백 (Whisper 사용 시)
 - 자막 다운로드 실패: Whisper STT로 폴백
 
-> **관련 명령어**: analyze, implement (`.codex/commands/sc/`)
+> **관련 명령어**: analyze, implement (`.claude/commands/sc/`)
 
 ## 6. 변경 이력
 
@@ -294,7 +294,7 @@ Codex Code가 직접 웹페이지를 읽고 마크다운 전문을 생성한다 
 |------|------|
 | 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .codex/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
 | 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
@@ -306,7 +306,7 @@ Codex Code가 직접 웹페이지를 읽고 마크다운 전문을 생성한다 
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.codex/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

@@ -1,7 +1,7 @@
 """hwp_to_md.py - HWP/HWPX → 구조화된 마크다운 변환 스크립트
 
 사용법:
-    uv run python .claude/skills/ccwork/scripts/hwp_to_md.py <입력파일> [출력파일]
+    uv run python .agents/skills/ccwork/scripts/hwp_to_md.py <입력파일> [출력파일]
 
 입력: .hwp 또는 .hwpx 파일
 출력: 구조화된 마크다운 (.md) 파일

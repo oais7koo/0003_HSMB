@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ################################################################################
-# Title: ooscrap STT - 유튜브 음성→텍스트 변환
+# Title: ccscrap STT - 유튜브 음성→텍스트 변환
 # Author: ookoo
 # Date: 2026.02.19
 # Version: v06
@@ -54,14 +54,14 @@ warnings.filterwarnings("default")
 
 # CLI 인자 파싱
 import argparse
-parser = argparse.ArgumentParser(description="ooscrap STT")
+parser = argparse.ArgumentParser(description="ccscrap STT")
 parser.add_argument("command", nargs="?", default="stt", help="서브명령어")
 parser.add_argument("--force", action="store_true", help="중복 URL도 재처리")
 parser.add_argument("--subtitle-only", action="store_true", help="자막만 처리 (Whisper STT 스킵)")
 cli_args = parser.parse_args()
 
 if cli_args.command in ("help", "-h"):
-    print("ooscrap [summary|read|run|add|sync|status|help]\n콘텐츠 스크래핑 통합")
+    print("ccscrap [summary|read|run|add|sync|status|help]\n콘텐츠 스크래핑 통합")
     sys.exit(0)
 
 # 경로 설정
@@ -510,7 +510,7 @@ def cleanup_url_file(filepath, processed_urls, failed_urls):
 def main():
     print(f"\n{'='*60}")
     mode = "자막 전용" if cli_args.subtitle_only else "자막 우선"
-    print(f"ooscrap STT 시작 (v05: {mode})")
+    print(f"ccscrap STT 시작 (v05: {mode})")
     print(f"{'='*60}")
 
     # 1) URL 읽기

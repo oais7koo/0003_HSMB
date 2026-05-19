@@ -20,7 +20,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -226,7 +226,7 @@ def extract(input_path_str: str, output_path_str: str | None = None) -> None:
 
     elif ext in PDF_EXTS:
         print("PDF 추출 안내:")
-        print("  pdfplumber 또는 Claude Read 도구를 사용하여 직접 추출하세요.")
+        print("  pdfplumber 또는 Codex Read 도구를 사용하여 직접 추출하세요.")
         print()
         print("  예시 (pdfplumber):")
         print("    import pdfplumber")
@@ -234,7 +234,7 @@ def extract(input_path_str: str, output_path_str: str | None = None) -> None:
         print("        text = '\\n'.join(p.extract_text() or '' for p in pdf.pages)")
         print(f"    Path('{output_path}').write_text(text, encoding='utf-8')")
         print()
-        print("  또는 Claude Read 도구로 PDF를 직접 읽은 뒤 마크다운으로 저장하세요.")
+        print("  또는 Codex Read 도구로 PDF를 직접 읽은 뒤 마크다운으로 저장하세요.")
 
     elif ext in DOCX_EXTS:
         print("DOCX 추출 안내:")

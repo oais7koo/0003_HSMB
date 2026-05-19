@@ -1,14 +1,14 @@
 ---
 name: ccuv
-description: "중앙 안내: `.claude/guides/common_guide.md`"
+description: "중앙 안내: `.codex/guides/common_guide.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccuv - UV 기반 의존성 관리 워크플로우
 
-> 중앙 안내: `.claude/guides/common_guide.md`
+> 중앙 안내: `.codex/guides/common_guide.md`
 
 ## 0. 스킬 요약
 
@@ -16,28 +16,28 @@ description: "중앙 안내: `.claude/guides/common_guide.md`"
 |------|------|
 | **핵심 역할** | UV 기반 Python 의존성 관리 (추가·업데이트·취약점 검사) |
 | **하는 것** | uv add/remove/update, 취약점 스캔, pyproject.toml/uv.lock 관리 |
-| **하지 않는 것** | 환경 전체 점검(→ooenv), 코드 수정(→oofix), GPU 설치(→oodeep) |
+| **하지 않는 것** | 환경 전체 점검(→ooenv), 코드 수정(→ccfix), GPU 설치(→ccdeep) |
 | **참조 범위** | 현재 프로젝트 `pyproject.toml`, `uv.lock` / 외부 레지스트리 접속 가능 |
 | **수정 대상** | `pyproject.toml`, `uv.lock` |
 | **실행 레벨** | [반자동] — 변경 대상 패키지 확인 후 실행 |
-| **에이전트 호환** | Claude Code 권장 — `uv` CLI 자동 실행 / 다른 에이전트: `uv add`, `uv sync` 등 수동 실행 |
+| **에이전트 호환** | Codex 권장 — `uv` CLI 자동 실행 / 다른 에이전트: `uv add`, `uv sync` 등 수동 실행 |
 
 ## 문서 이력 관리
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
 ## 개요
 
 `uv` 도구를 활용하여 프로젝트의 Python 의존성을 체계적으로 관리하는 워크플로우.
-`oocheck` 스킬에서 분리되어 의존성 관리에 특화된 기능을 제공.
+`cccheck` 스킬에서 분리되어 의존성 관리에 특화된 기능을 제공.
 
 **핵심 기능**:
 - 의존성 상태 확인 (최신 버전 여부, 보안 취약점)
 - 의존성 업데이트 제안 및 실행
 - `uv run`을 통한 Python 스크립트 실행 지침
 
-> **스코프 경계**: oouv는 **Python 패키지 의존성 관리** 전담. 환경 전반 점검(MCP, 스킬 정합성, 환경변수)은 `ooenv` 담당.
+> **스코프 경계**: oouv는 **Python 패키지 의존성 관리** 전담. 환경 전반 점검(MCP, 스킬 정합성, 환경변수)은 `ccenv` 담당.
 
 ## 서브명령어
 
@@ -74,10 +74,10 @@ description: "중앙 안내: `.claude/guides/common_guide.md`"
 uv run python src/main.py
 ```
 
-## oocheck 연동
+## cccheck 연동
 
 ```
-oocheck 실행 시:
+cccheck 실행 시:
   - (선택적) ccuv check를 호출하여 의존성 상태를 확인
   - 문제가 발견되면 00_doc/sp00/d0004_todo.md에 기록
 ```
@@ -110,7 +110,7 @@ oocheck 실행 시:
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -130,10 +130,10 @@ oocheck 실행 시:
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -144,7 +144,7 @@ oocheck 실행 시:
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |
@@ -155,4 +155,4 @@ oocheck 실행 시:
 ## 관련 문서
 
 - `00_doc/sp00/d0004_todo.md` - Todo 및 디버깅 관리
-- `.claude/skills/oocheck/SKILL.md` - 통합 코드 품질 체크 워크플로우 (연동)
+- `.agents/skills/cccheck/SKILL.md` - 통합 코드 품질 체크 워크플로우 (연동)

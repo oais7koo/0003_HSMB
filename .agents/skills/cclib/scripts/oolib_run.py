@@ -31,7 +31,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -49,9 +49,9 @@ def show_help_if_no_args(skill_name, args):
 # --- end oo_common inline ---
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent.parent
-OAIS_DIR = PROJECT_ROOT / "oo"
-DOC_DIR = PROJECT_ROOT / "doc"
+PROJECT_ROOT = SCRIPT_DIR.parents[3]   # scripts -> cclib -> skills -> .codex -> 프로젝트 루트
+OAIS_DIR = PROJECT_ROOT / "oais"
+DOC_DIR = PROJECT_ROOT / "00_doc" / "sp00"
 TMP_DIR = PROJECT_ROOT / "tmp"
 TODO_FILE = DOC_DIR / "d0004_todo.md"
 LIB_DOC_FILE = DOC_DIR / "d0005_lib.md"
@@ -78,9 +78,9 @@ def print_usage():
     print("    --report                 리포트 생성 (tmp/)")
     print()
     print("예시:")
-    print("    uv run python .claude/skills/cclib/scripts/oolib_run.py run")
-    print("    uv run python .claude/skills/cclib/scripts/oolib_run.py optimize --module config")
-    print("    uv run python .claude/skills/cclib/scripts/oolib_run.py status")
+    print("    uv run python .agents/skills/cclib/scripts/oolib_run.py run")
+    print("    uv run python .agents/skills/cclib/scripts/oolib_run.py optimize --module config")
+    print("    uv run python .agents/skills/cclib/scripts/oolib_run.py status")
 
 
 def extract_oo_issues_from_todo():

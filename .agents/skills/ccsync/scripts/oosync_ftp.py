@@ -12,7 +12,7 @@ sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 # 프로젝트 루트 (ccsync 스킬 기준 4단계 상위)
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
-CONFIG_PATH = PROJECT_ROOT / ".claude" / "skills" / "ccsync" / "references" / "ftp_config.json"
+CONFIG_PATH = PROJECT_ROOT / ".codex" / "skills" / "ccsync" / "references" / "ftp_config.json"
 ENV_PATH = PROJECT_ROOT / ".env"
 
 
@@ -487,7 +487,7 @@ def cmd_help():
     print()
     print("SP 생략 시 전체 프로필 대상. --dry-run은 push/pull에서 미리보기.")
     print()
-    print("설정: .claude/skills/ccsync/references/ftp_config.json")
+    print("설정: .agents/skills/ccsync/references/ftp_config.json")
     print("비밀번호: .env의 FTP_PASS")
 
 

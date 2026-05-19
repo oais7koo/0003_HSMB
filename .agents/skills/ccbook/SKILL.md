@@ -4,7 +4,7 @@ description: "⚠️ **필수**: run 명령 시 반드시 Agent 도구로"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 ## 0. 스킬 요약
 
@@ -12,15 +12,15 @@ description: "⚠️ **필수**: run 명령 시 반드시 Agent 도구로"
 |------|------|
 | **핵심 역할** | 도서 내용을 구조화된 서머리 MD 문서로 생성 |
 | **하는 것** | 도서 내용 분석, 챕터별 요약, 핵심 개념 정리, 서머리 MD 생성 |
-| **하지 않는 것** | 유튜브 콘텐츠 처리(→ooscrap), 논문 요약(→oopaper), 리포트 생성(→ooreport) |
+| **하지 않는 것** | 유튜브 콘텐츠 처리(→ccscrap), 논문 요약(→ccpaper), 리포트 생성(→ccreport) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (도서 텍스트) / 외부 전자책 서비스 자동 접속 안 함 |
 | **수정 대상** | 서머리 MD 파일 |
 | **실행 레벨** | [반자동] — 서머리 구조 확인 후 생성 |
-| **에이전트 호환** | Claude Code 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
+| **에이전트 호환** | Codex 권장 — Agent 도구로 서브에이전트 위임 필수 (메인 컨텍스트 보호) |
 
 ## 문서 이력 관리
-- v02 2026-03-29 — 유튜브 서머리 기능 제거 → 도서 전용으로 한정 (유튜브는 ooscrap 관할)
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v02 2026-03-29 — 유튜브 서머리 기능 제거 → 도서 전용으로 한정 (유튜브는 ccscrap 관할)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -168,7 +168,7 @@ ccbook word
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -188,10 +188,10 @@ ccbook word
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -202,7 +202,7 @@ ccbook word
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

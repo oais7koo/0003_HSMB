@@ -21,7 +21,7 @@ Python은 함수 스코프 전체를 컴파일 타임에 스캔하여 `import X`
     python check_inner_imports.py --json           # JSON 출력
 
 예시:
-    uv run python .claude/skills/cccheck/scripts/check_inner_imports.py 02_poc_server/pages/
+    uv run python .agents/skills/cccheck/scripts/check_inner_imports.py 02_poc_server/pages/
 """
 
 import ast

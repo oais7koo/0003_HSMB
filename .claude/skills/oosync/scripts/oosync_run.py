@@ -96,6 +96,7 @@ SYNC_TARGETS = [
     ".mcp.json",
     ".codex/",
     ".agents/",
+    ".gemini/",
     "cclaude.bat",
     "cclaude.sh",
     "ccodex.bat",
@@ -112,11 +113,14 @@ EXCLUDE_PATTERNS = [
     "tmp",
     ".venv",
     "node_modules",
+    "worktrees",  # git/에이전트 격리 worktree 디렉토리 (.claude/worktrees/ — 동기화 대상 아님)
     "settings.local.json",  # 프로젝트별 로컬 설정
     "last_model.json",  # gemma 모델 선택 (머신별 로컬 설정)
     "sp_config.json",  # 프로젝트별 SP 목록 (oocontext/references/sp_config.json)
     "scheduled_tasks.lock",  # OMC 스케줄러 lock 파일 (프로젝트별 로컬)
     "skills_to_codex",  # ccporting 산출물 (대상 프로젝트별 독립 생성)
+    ".ccporting_state",  # ccporting 포팅 상태 (머신별 로컬)
+    ".ccporting_audit_report.json",  # ccporting 감사 결과 (머신별 로컬)
 ]
 
 # Vibe 환경 판별 기준 (.claude/ 존재 여부로 Full 판정)
@@ -1116,70 +1120,6 @@ def check_push_only(target_project: Path, allow_delete: bool = False, allow_add:
     return push_files, skip_files, delete_files
 
 
-def sync_project(target_project: Path, dry_run: bool = False) -> bool:
-    """
-    Sync files to target project (push only).
-    동기화 완료 시 git 커밋 해시를 기록하여 다음 동기화 시 변경분만 감지.
-
-    Args:
-        target_project: Target project path
-        dry_run: If True, only show what would be done without actual sync
-
-    Returns:
-        True if successful
-    """
-    project_name = target_project.name
-
-    # git 기반: 마지막 동기화 이후 변경된 파일만 추출
-    git_changed, last_hash, current_hash = get_git_changed_since_sync(project_name)
-    if git_changed:
-        print(f"    [GIT] 마지막 동기화({last_hash[:8]}) 이후 변경: {len(git_changed)}개 파일")
-
-    for target in SYNC_TARGETS:
-        source_path = CURRENT_PROJECT / target.rstrip("/")
-        target_path = target_project / target.rstrip("/")
-
-        if not source_path.exists():
-            continue
-
-        if dry_run:
-            if source_path.is_file():
-                print(f"    [DRY-RUN] 복사 예정: {source_path.name} -> {target_path}")
-            else:
-                print(f"    [DRY-RUN] 폴더 복사 예정: {target}/ -> {target_project.name}/{target}/")
-        else:
-            if source_path.is_file():
-                # Single file copy
-                shutil.copy2(source_path, target_path)
-            else:
-                # Directory copy
-                if target_path.exists():
-                    shutil.rmtree(target_path)
-                shutil.copytree(source_path, target_path,
-                              ignore=shutil.ignore_patterns(*[p.replace("*", "") for p in EXCLUDE_PATTERNS if "*" in p]))
-
-    # 동기화 완료 시 커밋 해시 + 파일 해시 기록
-    if not dry_run:
-        all_hashes = {}
-        for sync_target in SYNC_TARGETS:
-            tp = target_project / sync_target.rstrip("/")
-            if tp.exists():
-                if tp.is_file():
-                    all_hashes[sync_target.rstrip("/")] = get_file_hash(tp)
-                else:
-                    for f in tp.rglob("*"):
-                        if f.is_file() and not is_excluded(f):
-                            rel = str(f.relative_to(target_project)).replace("\\", "/")
-                            all_hashes[rel] = get_file_hash(f)
-        save_sync_state(project_name, current_hash or "", all_hashes)
-        if current_hash:
-            print(f"    [GIT] 동기화 상태 기록: {current_hash[:8]} ({len(all_hashes)}개 파일 해시)")
-        else:
-            print(f"    [HASH] 동기화 상태 기록: {len(all_hashes)}개 파일 해시")
-
-    return True
-
-
 def sync_project_files(target_project: Path, push_files: list, delete_files: list = None, dry_run: bool = False) -> bool:
     """파일 단위로 push_files만 동기화 (skip_files는 건너뜀)."""
     project_name = target_project.name
@@ -1199,6 +1139,7 @@ def sync_project_files(target_project: Path, push_files: list, delete_files: lis
                 shutil.copy2(source_path, target_path)
 
     if delete_files:
+        deleted_parents = set()
         for rel_path in delete_files:
             target_path = target_project / rel_path
             if dry_run:
@@ -1206,6 +1147,18 @@ def sync_project_files(target_project: Path, push_files: list, delete_files: lis
             else:
                 if target_path.exists():
                     target_path.unlink()
+                    deleted_parents.add(target_path.parent)
+        # 삭제로 비어버린 디렉터리 정리 (target_project 위로는 올라가지 않음)
+        if not dry_run:
+            for parent in deleted_parents:
+                d = parent
+                while d != target_project and d.is_dir():
+                    try:
+                        next(d.iterdir())
+                        break  # 비어있지 않음 → 중단
+                    except StopIteration:
+                        d.rmdir()
+                        d = d.parent
 
     # 복사된 파일의 해시 업데이트
     if not dry_run:
@@ -1291,6 +1244,46 @@ def cmd_run_push_only(dry_run: bool = False, allow_delete: bool = False, allow_a
         project_results.append((proj, push_files, skip_files, delete_files))
 
     print()
+
+    # 대상에만 있는 파일(ONLY_TARGET) 삭제 여부 확인
+    # --delete: check_push_only가 이미 delete_files로 분류 (질문 생략)
+    # --add   : check_push_only가 무시하여 유지 (질문 생략)
+    # 둘 다 없으면: 사용자에게 삭제 여부를 물어봄 (기본 N=유지)
+    if not dry_run and not allow_delete and not allow_add:
+        only_target = []  # (proj, rel_path)
+        for proj, pf, sf, df in project_results:
+            for rel_path, status in sf:
+                if status == "ONLY_TARGET":
+                    only_target.append((proj, rel_path))
+        if only_target:
+            print(f"## 대상에만 있는 파일 ({len(only_target)}개)\n")
+            print("소스에 없고 대상 프로젝트에만 존재하는 파일입니다.\n")
+            _cur = None
+            for proj, rel_path in only_target:
+                if proj.name != _cur:
+                    print(f"### {proj.name}")
+                    _cur = proj.name
+                print(f"  - {rel_path}")
+            print()
+            try:
+                answer = input("위 파일들을 대상에서 삭제할까요? (y/N): ").strip().lower()
+            except EOFError:
+                answer = "n"
+            print()
+            if answer == "y":
+                # ONLY_TARGET 파일을 skip_files → delete_files 로 이동
+                project_results = [
+                    (
+                        proj,
+                        pf,
+                        [(rp, st) for rp, st in sf if st != "ONLY_TARGET"],
+                        df + [rp for rp, st in sf if st == "ONLY_TARGET"],
+                    )
+                    for proj, pf, sf, df in project_results
+                ]
+                print(f"[DELETE] 대상 전용 파일 {len(only_target)}개를 삭제합니다.\n")
+            else:
+                print("[KEEP] 대상 전용 파일을 유지합니다 (삭제 안 함).\n")
 
     sync_targets = [(proj, pf, sf, df) for proj, pf, sf, df in project_results if len(pf) + len(df) > 0]
     ok_count = sum(1 for _, pf, sf, df in project_results if len(pf) + len(df) == 0 and len(sf) == 0)

@@ -1,2 +1,2 @@
 @echo off
-codex --dangerously-bypass-approvals-and-sandbox %*
+codex --model gpt-5.5 --dangerously-bypass-approvals-and-sandbox %*

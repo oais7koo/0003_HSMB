@@ -26,7 +26,6 @@ TARGET_FILES = [
     ".claude/skills/oaisstart/SKILL.md",
     ".claude/skills/oaisstop/SKILL.md",
     ".claude/skills/oaistest/SKILL.md",
-    ".claude/skills/oaisuser/SKILL.md",
 ]
 
 def clean_version_history(file_path: str) -> bool:

@@ -45,6 +45,5 @@ document [target] [--type inline|external|api|guide] [--style brief|detailed]
 ## 6. 관련 스킬
 
 - `.claude/skills/oaisdoc/SKILL.md` - 프로젝트 문서 관리 가이드
-- `.claude/skills/oaisuser/SKILL.md` - 사용자 가이드 문서 관리
 
 ---

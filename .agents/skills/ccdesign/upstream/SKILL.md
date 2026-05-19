@@ -1,6 +1,6 @@
 ---
 name: oodesign
-description: "디자인 통합 스킬 'oodesign', '디자인 시스템', '토큰 생성', '컴포넌트 생성', '테마 생성', '레퍼런스 분석', 'URL 레퍼런스', 'AI 디자인', '디자인투코드' 등 모든 디자인 작업을 요청할 때 사용한다"
+description: "디자인 통합 스킬 'oodesign', '디자인 시스템', '토큰 생성', '컴포넌트 생성', '테마 생성', '레퍼런스 분석', 'URL 레퍼런스', 'AI 디자인', '디자인투코드', 'd42500', 'd42500 적용', 'SP04 web 표준 디자인' 등 모든 디자인 작업을 요청할 때 사용한다. SP04 web 페이지에 표준 디자인을 적용하려면 d42500 SSOT 문서를 참조한다."
 metadata:
   version: "v11"
   category: "content"
@@ -30,6 +30,8 @@ metadata:
 > 공통 가이드라인: `.claude/guides/common_guide.md` 참조
 > 디자인 원칙: `00_doc/sp07/d70300_디자인원칙.md`
 > 방법론 참조: `00_doc/sp07/d70200~d70240`
+> **SP04 web 표준 디자인 SSOT**: `00_doc/sp04/d42500_상세설계_web_base_표준디자인시스템.md` — `tokens.css`·`components.css`·`_components.html` 매크로·신규 페이지 체크리스트 + DO/DON'T 가이드. SP04 web 페이지 마이그레이션 시 이 문서를 참조한다.
+> 명령 패턴 예: `oodesign d42500 적용 — stamp/create.html` → d42500 §7 체크리스트 따라 마이그레이션 수행 + 회귀 검증
 
 ---
 

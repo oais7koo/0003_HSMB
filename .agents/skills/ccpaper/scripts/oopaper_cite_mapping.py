@@ -4,7 +4,7 @@
 ccpaper 인용매핑 - 논문 코드 매핑 테이블 생성
 
 Usage:
-    uv run python .claude/skills/ccpaper/scripts/oopaper_cite_mapping.py [--output FILE] [--group GROUP]
+    uv run python .agents/skills/ccpaper/scripts/oopaper_cite_mapping.py [--output FILE] [--group GROUP]
 """
 
 import re

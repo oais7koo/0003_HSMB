@@ -26,21 +26,21 @@ oolib help
 
 ## 3. 전체 서브명령어
 
-| 명령어 | 설명 |
-|--------|------|
-| `oolib help` | 서브명령어 목록 표시 |
-| `oolib version` | 스킬 버전 정보 (v01) |
-| `oolib status` | 서브명령어 리스트, 상태/미해결 이슈 |
-| `oolib check` | references/checklist.md 기반 체크 및 리포팅 | 터미널 |
-| `oolib show checklist` | 역할 수행 체크리스트 표시 | 터미널 |
-| `oolib add checklist "항목"` | 체크리스트 항목 추가 | checklist.md |
-| `oolib run` | Phase 1+2 (분석->수정->문서) |
-| `oolib update` | 현행화 — 모듈 현황 재스캔 → 라이브러리 문서 갱신 | d0005_lib.md |
-| `oolib update --dry-run` | 변경 예정 내용 미리 출력 (실제 수정 안 함) | 터미널 |
-| **`oolib run this`** | **직전 작업 모듈 최적화** (→ common_guide.md §9) |
-| `oolib optimize` | run + 최적화 |
-| `oolib doc` | d0005_lib.md 문서화만 |
-| `oolib cleanup [대상]` | 코드/import/파일 정리 (cleanup 흡수) |
+| 명령어                        | 설명                                      |              |
+| -------------------------- | --------------------------------------- | ------------ |
+| `oolib help`               | 서브명령어 목록 표시                             |              |
+| `oolib version`            | 스킬 버전 정보 (v01)                          |              |
+| `oolib status`             | 서브명령어 리스트, 상태/미해결 이슈                    |              |
+| `oolib check`              | references/checklist.md 기반 체크 및 리포팅     | 터미널          |
+| `oolib show checklist`     | 역할 수행 체크리스트 표시                          | 터미널          |
+| `oolib add checklist "항목"` | 체크리스트 항목 추가                             | checklist.md |
+| `oolib run`                | Phase 1+2 (분석->수정->문서)                  |              |
+| `oolib update`             | 현행화 — 모듈 현황 재스캔 → 라이브러리 문서 갱신           | d0005_lib.md |
+| `oolib update --dry-run`   | 변경 예정 내용 미리 출력 (실제 수정 안 함)              | 터미널          |
+| **`oolib run this`**       | **직전 작업 모듈 최적화** (→ common_guide.md §9) |              |
+| `oolib optimize`           | run + 최적화                               |              |
+| `oolib doc`                | d0005_lib.md 문서화만                       |              |
+| `oolib cleanup [대상]`       | 코드/import/파일 정리 (cleanup 흡수)            |              |
 
 옵션: `--module [name]`, `--dry-run`, `--interactive`, `--report`
 cleanup 옵션: `--type code\|imports\|files\|all`, `--safe`, `--aggressive`

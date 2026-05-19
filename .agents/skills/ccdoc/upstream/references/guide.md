@@ -1,6 +1,9 @@
 # oodoc_guide - 문서 생성 통합 가이드
 
 ## 문서 이력 관리
+- v05 2026-05-17 — §13 d0007_data 행 추가 + DOC_SKILL_MAPPING/SP_DOC_DEFINITIONS에서 d0007 제거 (d0007 = data/oodata 확정, 구 oohelp/command 매핑 정리)
+- v04 2026-05-17 — §6.4 추가: run 스킬 실행 하이브리드(oohistory 스크립트 직접 실행 / 그 외 LLM 위임)
+- v03 2026-05-17 — §6.3 SP 스코프 추가: oodoc run 기본=현재 컨텍스트, --all=전체 SP
 - v02 2026-04-26 — SKILL.md 축소를 위한 상세 워크플로우/코드 예시 통합 (§6~§14 추가)
 - v01 2026-02-05 — 초기 생성
 
@@ -34,12 +37,10 @@ Phase 3: 기술 문서 (병렬 가능)
     d0005_lib (oolib)
     d{SP}0003_test (ootest)
     ↓
-Phase 4: 사용자 문서
-    d{SP}0008_user (oouser)
 ```
 
 **의존 관계**:
-- d{SP}0001_prd → d{SP}0002_plan, d{SP}0003_test, d{SP}0008_user
+- d{SP}0001_prd → d{SP}0002_plan, d{SP}0003_test
 - d{SP}0004_todo → d{SP}0010_history
 - d0006_db → d{SP}0003_test
 
@@ -150,7 +151,7 @@ uv run python .claude/skills/oodoc/scripts/oodoc_run.py validate --fix
 | .claude/skills/oo*/SKILL.md | 스킬 문서 |
 
 **에이전트**: Explore, task-executor, task-checker
-**연동 스킬**: ooprd, ooplan, oocheck, oohistory, oolib, oodb, ootest, oouser
+**연동 스킬**: ooprd, ooplan, oocheck, oohistory, oolib, oodb, ootest
 
 **문서 번호 체계**:
 | 범위 | 용도 |
@@ -168,13 +169,45 @@ uv run python .claude/skills/oodoc/scripts/oodoc_run.py validate --fix
 1. d{SP}0004_todo (oocheck)
 2. d{SP}0010_history (oohistory)
 3. d0005_lib, d0006_db, d{SP}0003_test (병렬 가능)
-4. d{SP}0008_user, d{SP}0001_prd, d{SP}0002_plan
+4. d{SP}0001_prd, d{SP}0002_plan
 
 ### 6.2 병렬 실행
 
 독립적 스킬 병렬 호출:
 - Phase 3: oolib, oodb, ootest
-- Phase 4: oouser, ooprd
+- Phase 4: ooprd
+
+### 6.3 SP 스코프
+
+`oodoc run`은 **현재 oocontext SP만** 처리한다. SP 번호 결정 우선순위:
+
+| 우선순위 | 기준 |
+|:--------:|------|
+| 1 | `--sp N` 명시 |
+| 2 | oocontext 상태 (`.omc/state/context.json`) |
+| 3 | CWD 경로의 `0N_*` 패턴 |
+| 4 | 기본값 SP00 |
+
+| 옵션 | 처리 범위 |
+|------|----------|
+| (기본) | 현재 컨텍스트 SP의 d{SP}0001~d{SP}0010 |
+| `--sp N` | 지정한 SP만 |
+| `--all` | `00_doc/sp*` 전체 SP 순회 처리 |
+
+> `--all`은 `00_doc/` 아래 `sp??` 디렉토리를 스캔(SP00 항상 포함)하여 각 SP를 순차 처리한다.
+
+### 6.4 스킬 실행 방식 (하이브리드)
+
+`oodoc run`은 9개 매핑 스킬을 `execute_skill()`에서 두 방식으로 처리한다:
+
+| 방식 | 대상 | 동작 |
+|------|------|------|
+| 스크립트 직접 실행 | `oohistory sync` | subprocess로 즉시 실행 (완료 TODO → 이력 이동) |
+| LLM 위임 | ooprd·ooplan·oolib·oodb·oocheck·ootest 등 | 문서 *내용* 생성에 LLM 추론 필요 → 계획만 출력, Claude가 처리 |
+
+- 스크립트 직접 실행 대상은 `SCRIPT_EXECUTABLE` 딕셔너리에 등록된 명령에 한한다.
+- 직접 실행 시 `--sp`·`--dry-run`이 하위 스크립트로 그대로 전달된다.
+- 신규 등록 조건: 해당 스킬 명령이 LLM 추론 없이 스크립트만으로 대상 문서를 완결 갱신할 수 있어야 한다.
 
 ## 7. oodoc check --fix 상세 (SKILL.md §6에서 이동)
 
@@ -369,14 +402,15 @@ SKILL.md에서 5개 초과로 외부화된 옛 이력:
 
 | 00_doc/ 문서 | 용도 | 생성 방법 | 필수 |
 |-----------|------|----------|:----:|
-| d0000_manual.md | 전체 사용 매뉴얼 | oodoc manual | - |
+| d0000_list.md | 00_doc 문서 링크 인덱스 | oodoc run/update | - |
 | d0001_prd.md | PRD | ooprd run | O |
 | d0002_plan.md | 개발 계획 | ooplan run | O |
 | d0003_test.md | 테스트 케이스 | ootest run | O |
 | d0004_todo.md | TODO/디버깅 | oocheck | O |
 | d0005_lib.md | 라이브러리 | oolib run | - |
 | d0006_db.md | DB 구조 | oodb run | - |
-| d0008_user.md | 사용자 가이드 | oouser run | - |
+| d0007_data.md | data/ 폴더 구조·설명 (SP 공통, oodata 전용) | oodata run | - |
+| d0008_checklist.md | 프로젝트 체크리스트 | oocheck add / oocheck run | - |
 | d0009_env.md | 환경/명령어 집계 | ooenv run | - |
 | d0010_history.md | 변경 이력 | oohistory run | O |
 | d0020_연구노트.md | 연구노트 | oonote run | - |

@@ -1,12 +1,12 @@
 """cctutorial - 프로젝트 튜토리얼 생성 스크립트
 
 OAIS 프로젝트의 oo 스킬, SC 명령어, 플러그인에 대한
-튜토리얼 문서를 .claude/tutorial/에 생성한다.
+튜토리얼 문서를 .codex/tutorial/에 생성한다.
 
 Usage:
-    uv run python .claude/skills/cctutorial/scripts/ootutorial_run.py [run|status]
-    uv run python .claude/skills/cctutorial/scripts/ootutorial_run.py run --skill <name>
-    uv run python .claude/skills/cctutorial/scripts/ootutorial_run.py run --category <cat>
+    uv run python .agents/skills/cctutorial/scripts/ootutorial_run.py [run|status]
+    uv run python .agents/skills/cctutorial/scripts/ootutorial_run.py run --skill <name>
+    uv run python .agents/skills/cctutorial/scripts/ootutorial_run.py run --category <cat>
 """
 
 import argparse
@@ -30,7 +30,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -54,9 +54,9 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 # 프로젝트 루트
-ROOT = Path(__file__).resolve().parents[4]  # .claude/skills/cctutorial/scripts/ → ROOT
-SKILLS_DIR = ROOT / ".claude" / "skills"
-COMMANDS_DIR = ROOT / ".claude" / "commands" / "sc"
+ROOT = Path(__file__).resolve().parents[4]  # .agents/skills/cctutorial/scripts/ → ROOT
+SKILLS_DIR = ROOT / ".codex" / "skills"
+COMMANDS_DIR = ROOT / ".codex" / "commands" / "sc"
 MCP_JSON = ROOT / ".mcp.json"
 TUTORIAL_DIR = ROOT / "00_doc" / "tutorial"
 SKILLS_OUT = TUTORIAL_DIR / "skills"
@@ -536,7 +536,7 @@ def generate_overview() -> str:
 
     overview = f"""# OAIS 프로젝트 튜토리얼
 
-> OAIS (One AI System) 프로젝트의 Claude Code 환경 사용 가이드
+> OAIS (One AI System) 프로젝트의 Codex 환경 사용 가이드
 
 ## 프로젝트 구조
 
@@ -547,13 +547,13 @@ def generate_overview() -> str:
 | `02_pycode/` | Python/알고리즘 코드 (SP02) |
 | `03_paper/` | 논문 관리 (SP03) |
 | `04_scraping/` | 스크래핑/유튜브 (SP04) |
-| `.claude/` | Claude Code 설정, 스킬, 에이전트 |
+| `.codex/` | Codex 설정, 스킬, 에이전트 |
 
 ## 시작하기
 
-1. **세션 시작**: `oostart run` (매 세션 첫 실행)
-2. **도움말**: `oohelp` (전체 스킬 목록)
-3. **환경 점검**: `ooenv run` (환경 검증)
+1. **세션 시작**: `ccstart run` (매 세션 첫 실행)
+2. **도움말**: `cchelp` (전체 스킬 목록)
+3. **환경 점검**: `ccenv run` (환경 검증)
 
 ## oo 스킬 ({len(skills)}개)
 
@@ -776,7 +776,7 @@ def cmd_run(args):
     print(f"  오류: {stats['errors']}건")
     if stats.get("deleted"):
         print(f"  삭제(orphan): {stats['deleted']}건")
-    print(f"  출력: .claude/tutorial/")
+    print(f"  출력: .codex/tutorial/")
 
 
 def cmd_status():

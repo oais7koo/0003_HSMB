@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 oonow_run.py - ccnow 스킬 스크립트 (현재 작업 상태 확인)
-Usage: uv run python .claude/skills/ccnow/scripts/oonow_run.py [help|version|status]
+Usage: uv run python .agents/skills/ccnow/scripts/oonow_run.py [help|version|status]
 """
 import sys
 from pathlib import Path
@@ -15,7 +15,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -45,10 +45,75 @@ def cmd_version():
     print(f"[{SKILL_NAME}] 버전: {VERSION}")
 
 
+def _get_current_sp() -> str:
+    """cccontext 상태에서 현재 SP 번호 문자열 반환 (없으면 "00")."""
+    import json
+    state_file = Path(".") / ".omc" / "state" / "context.json"
+    if state_file.exists():
+        try:
+            return json.loads(state_file.read_text(encoding="utf-8")).get("sp", "00")
+        except Exception:
+            pass
+    return "00"
+
+
+def _scan_todo_states(sp_str: str) -> dict:
+    """todo/{ID}.md 상세 파일에서 상태별 항목 수집 — R163."""
+    todo_dir = Path(".") / "00_doc" / f"sp{int(sp_str):02d}" / "todo"
+    items = {"IN_PROGRESS": [], "OPEN": [], "HOLD": []}
+    if not todo_dir.exists():
+        return items
+    head_re = _re.compile(r"^>\s*우선순위:\s*([^|]+?)\s*\|\s*상태:\s*([A-Z_]+)", _re.MULTILINE)
+    title_re = _re.compile(r"^#\s*([^\n]+)", _re.MULTILINE)
+    for fp in sorted(todo_dir.glob("*.md")):
+        if fp.stem in ("_template", "README"):
+            continue
+        try:
+            text = fp.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        m_head = head_re.search(text)
+        if not m_head:
+            continue
+        state = m_head.group(2).strip()
+        if state not in items:
+            continue
+        priority = m_head.group(1).strip()
+        m_title = title_re.search(text)
+        title = m_title.group(1).strip() if m_title else fp.stem
+        items[state].append({"id": fp.stem, "title": title, "priority": priority, "path": str(fp.as_posix())})
+    return items
+
+
 def cmd_status():
-    print(f"[{SKILL_NAME} status]\n")
-    _print_skill_help(SKILL_NAME)
-    print(f"\n버전: {VERSION}")
+    print(f"# ccnow - 현재 작업 상황\n")
+    sp_str = _get_current_sp()
+    sp_num = int(sp_str) if sp_str.isdigit() else 0
+    print(f"현재 컨텍스트: **SP{sp_num:02d}**\n")
+    if sp_num == 0:
+        print("[INFO] SP00 (공통) — todo 폴더 점검 생략")
+        return
+    items = _scan_todo_states(sp_str)
+    # IN_PROGRESS 우선 표시
+    if items["IN_PROGRESS"]:
+        print(f"## 🔄 진행 중 ({len(items['IN_PROGRESS'])}건)\n")
+        for it in items["IN_PROGRESS"]:
+            print(f"- **{it['id']}** [{it['priority']}] — {it['title']}")
+            print(f"  → [{it['path']}]({it['path']})")
+        print()
+    else:
+        print("## 🔄 진행 중\n")
+        print("- (없음)\n")
+    # OPEN/HOLD 요약
+    if items["OPEN"] or items["HOLD"]:
+        print(f"## 📋 대기/보류 (OPEN {len(items['OPEN'])} · HOLD {len(items['HOLD'])})\n")
+        for it in items["OPEN"][:5]:
+            print(f"- {it['id']} [{it['priority']}] — {it['title']}")
+        if len(items["OPEN"]) > 5:
+            print(f"- ... 외 {len(items['OPEN']) - 5}건")
+        for it in items["HOLD"]:
+            print(f"- ⏸ {it['id']} [{it['priority']}] — {it['title']}")
+        print()
 
 
 def cmd_show_checklist():

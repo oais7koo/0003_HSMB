@@ -1,14 +1,14 @@
 ---
 name: ccdb
-description: "공통 원칙: `.claude/guides/common_guide.md` 참조"
+description: "공통 원칙: `.codex/guides/common_guide.md` 참조"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccdb - DB 수정 및 최적화 스킬
 
-> 공통 원칙: `.claude/guides/common_guide.md` 참조
+> 공통 원칙: `.codex/guides/common_guide.md` 참조
 
 ## 0. 스킬 요약
 
@@ -16,7 +16,7 @@ description: "공통 원칙: `.claude/guides/common_guide.md` 참조"
 |------|------|
 | **핵심 역할** | DB 문제 발견→기록→수정 3단계 워크플로우 (Python/Flutter 지원) |
 | **하는 것** | 스키마 검증, 마이그레이션 생성, DB 이슈 수정, d{SP}0004 등록 |
-| **하지 않는 것** | 코드 로직 수정(→oofix), oo 모듈 수정(→oolib), 의존성 관리(→oouv) |
+| **하지 않는 것** | 코드 로직 수정(→ccfix), oo 모듈 수정(→cclib), 의존성 관리(→ccuv) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 (DB 파일, 마이그레이션) / 외부 DB 서버 자동 접속 안 함 |
 | **수정 대상** | DB 스키마 파일, 마이그레이션 파일, `d{SP}0004_todo.md` |
 | **실행 레벨** | [반자동] — 스키마 변경 확인 후 실행 |
@@ -24,7 +24,7 @@ description: "공통 원칙: `.claude/guides/common_guide.md` 참조"
 
 ## 문서 이력 관리
 - v05 2026-04-19 — validate/optimize → check/check --fix 통합
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -61,7 +61,7 @@ DB 문제점 발견 -> 기록 -> 수정하는 3-Phase 워크플로우.
 
 **옵션**: `--db [path]`, `--table [name]`, `--dry-run`, `--path [code_path]`, `--sp [num]`
 
-실행: `uv run python .claude/skills/ccdb/scripts/oodb_run.py [args]`
+실행: `uv run python .agents/skills/ccdb/scripts/oodb_run.py [args]`
 
 ## 3. 서브프로젝트 DB 문서 규칙
 
@@ -183,7 +183,7 @@ PRAGMA integrity_check; PRAGMA foreign_key_check;
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -203,10 +203,10 @@ PRAGMA integrity_check; PRAGMA foreign_key_check;
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -217,7 +217,7 @@ PRAGMA integrity_check; PRAGMA foreign_key_check;
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

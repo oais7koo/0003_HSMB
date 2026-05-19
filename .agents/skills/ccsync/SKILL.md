@@ -1,20 +1,20 @@
 ---
 name: ccsync
-description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides/common_guide.md`"
+description: "프로젝트 간 **바이브셋** 동기화 | ref: `.codex/guides/common_guide.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccsync - Vibe 환경 동기화 (바이브셋 동기화)
 
 
 
-> 프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides/common_guide.md`
+> 프로젝트 간 **바이브셋** 동기화 | ref: `.codex/guides/common_guide.md`
 
 >
 
-> **바이브셋**: oosync로 동기화 관리하는 바이브 코딩 환경 파일 일체 (`.claude/`, `CLAUDE.md`, `.mcp.json`, `.claudeignore` 등). oosync는 바이브셋을 프로젝트 간에 배포·동기화하는 전담 스킬이다.
+> **바이브셋**: oosync로 동기화 관리하는 바이브 코딩 환경 파일 일체 (`.codex/`, `CLAUDE.md`, `.mcp.json`, `.claudeignore` 등). oosync는 바이브셋을 프로젝트 간에 배포·동기화하는 전담 스킬이다.
 
 
 
@@ -28,13 +28,13 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 | **핵심 역할** | OAIS 프로젝트와 3_code/ 독립 프로젝트 간 vibe 파일 동기화 |
 
-| **하는 것** | .claude/ 파일 비교·복사, .claudeignore 적용, 동기화 결과 보고 |
+| **하는 것** | .codex/ 파일 비교·복사, .claudeignore 적용, 동기화 결과 보고 |
 
-| **하지 않는 것** | 코드 수정(→oodev), Git 커밋(→oocommit), 환경 점검(→ooenv) |
+| **하지 않는 것** | 코드 수정(→ccdev), Git 커밋(→cccommit), 환경 점검(→ooenv) |
 
 | **참조 범위** | 현재 프로젝트 + `OAIS_SYNC_TARGET` 환경변수 경로 (기본: `3_code/`) |
 
-| **수정 대상** | 대상 프로젝트의 `.claude/` 관련 파일 |
+| **수정 대상** | 대상 프로젝트의 `.codex/` 관련 파일 |
 
 | **실행 레벨** | [반자동] — 동기화 대상 확인 후 실행 |
 
@@ -60,7 +60,7 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 | `ccsync help` | 서브명령어 목록 표시 |
 
-| `ccsync version` | 스킬 버전 정보 (v13) |
+| `ccsync version` | 스킬 버전 정보 (v15) |
 
 | `ccsync status` | 서브명령어 리스트, 동기화 대상 현황 |
 
@@ -84,9 +84,11 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 | `ccsync run [project]` | 동기화 실행 (대화형) |
 
-| `ccsync run --push-only` | push만 필요한 모든 프로젝트 일괄 동기화 |
+| `ccsync run --push-only` | push만 필요한 모든 프로젝트 일괄 동기화 (대상 전용 파일은 삭제 여부를 대화형으로 질문) |
 
-| `ccsync run --push-only --add` | push 동기화 + 대상에만 있는 파일 삭제 없이 유지 |
+| `ccsync run --push-only --add` | push 동기화 + 대상에만 있는 파일을 질문 없이 유지 |
+
+| `ccsync run --push-only --delete` | push 동기화 + 대상에만 있는 파일을 질문 없이 삭제 |
 
 | `ccsync pipeline` | 표준 검증(ooenv standard) → 배포(run --push-only) 파이프라인 |
 
@@ -96,7 +98,7 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 | `ccsync pipeline --skip-standard` | 표준 검증 건너뛰고 바로 배포 |
 
-| `ccsync backup` | Claude 환경 파일을 data/04_claude_backup/YYMMDD-HHMMSS.zip으로 백업 |
+| `ccsync backup` | Codex 환경 파일을 data/04_claude_backup/YYMMDD-HHMMSS.zip으로 백업 |
 
 | `ccsync restore` | 백업 목록 조회 |
 
@@ -114,7 +116,7 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 
 
-실행: `uv run python .claude/skills/ccsync/scripts/oosync_run.py [subcommand] [args]`
+실행: `uv run python .agents/skills/ccsync/scripts/oosync_run.py [subcommand] [args]`
 
 
 
@@ -152,7 +154,7 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 
 
-실행: `uv run python .claude/skills/ccsync/scripts/oosync_ftp.py [command] [SP] [--dry-run]`
+실행: `uv run python .agents/skills/ccsync/scripts/oosync_ftp.py [command] [SP] [--dry-run]`
 
 
 
@@ -176,7 +178,7 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 - **비밀번호**: `.env`의 `FTP_PASS` (프로필별 개별 설정 가능: `password_env` 필드)
 
-- **설정 파일**: `.claude/skills/ccsync/references/ftp_config.json`
+- **설정 파일**: `.agents/skills/ccsync/references/ftp_config.json`
 
 - **프로필 추가**: config에 SP 키 추가로 확장 가능
 
@@ -190,9 +192,9 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 |------|------|
 
-| `.claude/` | 폴더 통째로 (skills, agents, guides, templates, settings 등) |
+| `.codex/` | 폴더 통째로 (skills, agents, guides, templates, settings 등) |
 
-| `00_doc/tutorial/` | OAIS 튜토리얼 문서 (동기화 제외, 백업만) |
+| `00_doc/tutorial/` | OAIS 튜토리얼 문서 (동기화·백업 대상) |
 
 | `CLAUDE.md` | 프로젝트 루트 설정 파일 |
 
@@ -202,11 +204,11 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 | `pyproject.toml` | uv 의존성/프로젝트 설정 |
 
-| `cclaude.bat` | Windows Claude 실행 스크립트 |
+| `cclaude.bat` | Windows Codex 실행 스크립트 |
 
-| `cclaude.sh` | Linux/Mac Claude 실행 스크립트 |
+| `cclaude.sh` | Linux/Mac Codex 실행 스크립트 |
 
-| `qqlaude.bat` | Windows Ollama qwen3.5 Claude 실행 스크립트 |
+| `qqlaude.bat` | Windows Ollama qwen3.5 Codex 실행 스크립트 |
 
 | `gemma.ps1` | Windows Ollama gemma4:e4b 실행 스크립트 (PowerShell) |
 
@@ -218,9 +220,9 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 | `AGENTS.md` | 에이전트 설정 루트 파일 |
 
-| `.claudeignore` | Claude Code 컨텍스트 제외 설정 (토큰 절감) |
+| `.claudeignore` | Codex 컨텍스트 제외 설정 (토큰 절감) |
 
-| `~/.claude/.omc/hud-config.json` | HUD 표준 설정 (글로벌, `_home/` 아래 저장) |
+| `~/.codex/.omc/hud-config.json` | HUD 표준 설정 (글로벌, `_home/` 아래 저장) |
 
 
 
@@ -232,7 +234,7 @@ description: "프로젝트 간 **바이브셋** 동기화 | ref: `.claude/guides
 
 YYMMDD-HHMMSS.zip
 
-├── .claude/          # 폴더 통째로
+├── .codex/          # 폴더 통째로
 
 │   ├── skills/
 
@@ -264,7 +266,7 @@ YYMMDD-HHMMSS.zip
 
 └── _home/            # HOME 기준 글로벌 파일
 
-    └── .claude/.omc/hud-config.json  # HUD 표준 설정
+    └── .codex/.omc/hud-config.json  # HUD 표준 설정
 
 ```
 
@@ -280,15 +282,17 @@ YYMMDD-HHMMSS.zip
 
 
 
-**.claude/**: *.md, settings.json, commands/, skills/, agents/, guides/
+**.codex/**: *.md, settings.json, commands/, skills/, agents/, guides/
 
 
 
-**루트 설정**: CLAUDE.md, AGENTS.md, .mcp.json, .claudeignore, cclaude.bat, cclaude.sh, oclaude.bat, gemma.ps1, gemma.sh
+**루트 설정**: CLAUDE.md, AGENTS.md, .mcp.json, .claudeignore, cclaude.bat, cclaude.sh, gemma.ps1, gemma.sh
 
-**Codex/Agents**: .codex/, .agents/
+**Codex/Agents**: .codex/, .agents/, .gemini/
 
 **GitHub**: .github/
+
+**튜토리얼**: 00_doc/tutorial/
 
 
 
@@ -358,7 +362,7 @@ YYMMDD-HHMMSS.zip
 
     "obsidian@obsidian-skills": true,
 
-    "paper-search-tools@claude-settings": true
+    "paper-search-tools@codex-settings": true
 
   }
 
@@ -372,7 +376,7 @@ YYMMDD-HHMMSS.zip
 
 
 
-`__pycache__/`, `*.pyc`, `.git/`, `tmp/`, `data/`, `.venv/`, `node_modules/`, `.claude/settings.local.json`, `scheduled_tasks.lock`
+`__pycache__/`, `*.pyc`, `.git/`, `tmp/`, `data/`, `.venv/`, `node_modules/`, `worktrees/`, `.codex/settings.local.json`, `scheduled_tasks.lock`
 
 
 
@@ -388,7 +392,7 @@ YYMMDD-HHMMSS.zip
 
 | 별도 요약 금지 | 에이전트가 임의로 요약/통계 추가하지 않음 |
 
-| 템플릿 형식 준수 | 각 명령어별 템플릿(`.claude/skills/ccsync/templates/oosync_*.md`) 형식 따름 |
+| 템플릿 형식 준수 | 각 명령어별 템플릿(`.agents/skills/ccsync/templates/oosync_*.md`) 형식 따름 |
 
 
 
@@ -416,7 +420,7 @@ YYMMDD-HHMMSS.zip
 
 
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 
 
@@ -456,13 +460,13 @@ YYMMDD-HHMMSS.zip
 
 |------|------|
 
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
 
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
 
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 
 
@@ -484,7 +488,7 @@ YYMMDD-HHMMSS.zip
 
 |------|------|
 
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 
@@ -504,5 +508,5 @@ YYMMDD-HHMMSS.zip
 
 
 
-`.claude/skills/oostart/SKILL.md` | `.claude/skills/ooenv/SKILL.md` | `.claude/guides/common_guide.md`
+`.agents/skills/ccstart/SKILL.md` | `.agents/skills/ooenv/SKILL.md` | `.codex/guides/common_guide.md`
 

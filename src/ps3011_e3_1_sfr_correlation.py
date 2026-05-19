@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """
-ps3011_e3_1_sfr_correlation.py  —  E3-1 SFR↔IQA 상관분석
+ps3011_e3_1_sfr_correlation.py  —  E3-1 SFR↔IQA 상관분석 (속도 그룹별)
 
 입력:
   data/ps1010_chungsong_MTF/{조건}/Results/SFR_cypx.csv  (50개)
   data/ps3010/03_그룹별평균_*.xlsx  (IQA 9컬럼, 50조건)
 
-산출:
-  data/ps3010/e3_1_sfr_metrics.csv      조건별 R1090/MTF50 H·V 평균 (50행)
-  data/ps3010/e3_1_correlation.csv      IQA 9 × SFR 4 상관 매트릭스 (PLCC/SROCC/KRCC)
-  data/ps3010/e3_1_scatter_hsmb.png     HSMB vs SFR 4종 scatter (2×2)
-  data/ps3010/e3_1_scatter_r1090h.png   전체 IQA vs R1090_H scatter (3×3)
+산출 (data/ps3011/):
+  e3_1_sfr_metrics.csv      조건별 R1090/MTF50 H·V 평균 (50행)
+  e3_1_merged.csv           SFR+IQA 조인 + speed_kmh (50조건)
+  e3_1_correlation.csv      speed_group(all/60km/80km) × IQA9 × SFR4 상관
+  e3_1_scatter_hsmb.png     HSMB vs SFR 4종 scatter (속도별 색 구분)
+  e3_1_scatter_r1090h.png   전체 IQA vs R1090_H scatter (속도별 색 구분)
+
+청송 MTF 50조건 = 거리 5종 × 속도 2종(60·80km/h) × ISO 5종.
+속도는 모션블러 커널 길이를 결정하는 교란변수이므로 상관은 속도 그룹별로
+분리 산출한다 (all 그룹은 비교 참고용).
 
 ref: d3010 §9
 """
@@ -18,6 +23,7 @@ from __future__ import annotations
 
 import glob
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -34,11 +40,21 @@ import common_corr as corr
 # ── 경로 ──────────────────────────────────────────────────────────────────────
 BASE_DIR  = Path(__file__).parent.parent
 SFR_BASE  = BASE_DIR / "data" / "ps1010_chungsong_MTF"
-OUT_DIR   = BASE_DIR / "data" / "ps3010"
+IQA_DIR   = BASE_DIR / "data" / "ps3010"    # 입력: ps3010 IQA 산출물
+OUT_DIR   = BASE_DIR / "data" / "ps3011"    # 출력: ps3011 표준 폴더
 
 IQA_COLS = ["hsmb", "cpbd", "niqe", "niqe_matlab", "piqe",
             "brisque", "brisque_matlab", "dbcnn", "arniqa"]
 SFR_COLS = ["R1090_H", "R1090_V", "MTF50_H", "MTF50_V"]
+
+_SPEED_RE = re.compile(r"_(\d+)km_")
+_SPEED_COLORS = {60: "steelblue", 80: "indianred"}
+
+
+def parse_speed(condition: str) -> float:
+    """조건명에서 속도(km/h) 추출. 예: low_2.5m_60km_2.5m_ISO100 → 60."""
+    m = _SPEED_RE.search(str(condition))
+    return float(m.group(1)) if m else np.nan
 
 
 # ── SFR 파싱 ──────────────────────────────────────────────────────────────────
@@ -79,38 +95,77 @@ def load_sfr_metrics() -> pd.DataFrame:
 # ── IQA 로드 ──────────────────────────────────────────────────────────────────
 def load_iqa_means() -> pd.DataFrame:
     """ps3010 03_그룹별평균.xlsx → 조건별 IQA 9컬럼"""
-    xlsx_files = sorted(glob.glob(str(OUT_DIR / "03_*.xlsx")))
+    xlsx_files = sorted(glob.glob(str(IQA_DIR / "03_*.xlsx")))
     if not xlsx_files:
-        raise FileNotFoundError(f"03_*.xlsx 없음: {OUT_DIR}")
+        raise FileNotFoundError(f"03_*.xlsx 없음: {IQA_DIR}")
     df = pd.read_excel(xlsx_files[-1])
     df = df.rename(columns={df.columns[0]: "condition"})
     keep = ["condition"] + [c for c in IQA_COLS if c in df.columns]
     return df[keep]
 
 
+# ── 상관 분석 (속도 그룹별) ────────────────────────────────────────────────────
+def speed_groups(merged: pd.DataFrame) -> list[tuple[str, pd.DataFrame]]:
+    """(all, 60km, 80km, ...) 그룹 목록. all은 비교 참고용."""
+    groups: list[tuple[str, pd.DataFrame]] = [("all", merged)]
+    for spd in sorted(merged["speed_kmh"].dropna().unique()):
+        sub = merged[merged["speed_kmh"] == spd]
+        groups.append((f"{int(spd)}km", sub))
+    return groups
+
+
+def build_correlation(merged: pd.DataFrame) -> pd.DataFrame:
+    """속도 그룹별 IQA×SFR 상관 매트릭스 → speed_group 컬럼 포함 DataFrame."""
+    frames: list[pd.DataFrame] = []
+    for label, sub in speed_groups(merged):
+        cdf = corr.correlation_matrix(sub, IQA_COLS, SFR_COLS,
+                                      col_x="IQA", col_y="SFR")
+        cdf.insert(0, "speed_group", label)
+        frames.append(cdf)
+        print(f"  {label}: N={len(sub)}")
+    return pd.concat(frames, ignore_index=True)
+
+
 # ── Scatter plot ──────────────────────────────────────────────────────────────
 def _scatter_ax(ax: plt.Axes, x: np.ndarray, y: np.ndarray,
-                xlabel: str, ylabel: str) -> None:
-    mask = ~(np.isnan(x) | np.isnan(y))
-    ax.scatter(x[mask], y[mask], alpha=0.75, s=45, edgecolors="none")
-    if mask.sum() >= 3:
-        r, _ = stats.pearsonr(x[mask], y[mask])
-        sr, _ = stats.spearmanr(x[mask], y[mask])
-        ax.set_title(f"{xlabel} vs {ylabel}\nPLCC={r:.3f}  SROCC={sr:.3f}", fontsize=9)
-    else:
-        ax.set_title(f"{xlabel} vs {ylabel}", fontsize=9)
+                speed: np.ndarray, xlabel: str, ylabel: str) -> None:
+    """속도 그룹별 색 구분 scatter. title에 all·속도별 PLCC 표기."""
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    speed = np.asarray(speed, dtype=float)
+
+    title_parts: list[str] = []
+    mask_all = ~(np.isnan(x) | np.isnan(y))
+    if mask_all.sum() >= 3:
+        r_all, _ = stats.pearsonr(x[mask_all], y[mask_all])
+        title_parts.append(f"all r={r_all:.3f}")
+
+    for spd in sorted(s for s in set(speed) if not np.isnan(s)):
+        m = (speed == spd) & ~(np.isnan(x) | np.isnan(y))
+        if m.sum() == 0:
+            continue
+        ax.scatter(x[m], y[m], alpha=0.75, s=45, edgecolors="none",
+                   color=_SPEED_COLORS.get(int(spd)), label=f"{int(spd)}km/h")
+        if m.sum() >= 3:
+            r, _ = stats.pearsonr(x[m], y[m])
+            title_parts.append(f"{int(spd)}km r={r:.3f}")
+
+    ax.set_title(f"{xlabel} vs {ylabel}\n" + "  ".join(title_parts), fontsize=8)
     ax.set_xlabel(xlabel, fontsize=8)
     ax.set_ylabel(ylabel, fontsize=8)
+    ax.legend(fontsize=7)
 
 
 def plot_scatter(merged: pd.DataFrame, out_dir: Path) -> None:
+    speed = merged["speed_kmh"].values
+
     # (A) HSMB vs 4 SFR
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
     for ax, sfr in zip(axes.flat, SFR_COLS):
         _scatter_ax(ax,
                     pd.to_numeric(merged["hsmb"], errors="coerce").values,
                     pd.to_numeric(merged[sfr],   errors="coerce").values,
-                    "HSMB", sfr)
+                    speed, "HSMB", sfr)
     plt.tight_layout()
     p = out_dir / "e3_1_scatter_hsmb.png"
     plt.savefig(p, dpi=150)
@@ -125,7 +180,7 @@ def plot_scatter(merged: pd.DataFrame, out_dir: Path) -> None:
             _scatter_ax(ax,
                         pd.to_numeric(merged[present[i]], errors="coerce").values,
                         pd.to_numeric(merged["R1090_H"],  errors="coerce").values,
-                        present[i], "R1090_H")
+                        speed, present[i], "R1090_H")
         else:
             ax.set_visible(False)
     plt.tight_layout()
@@ -138,8 +193,9 @@ def plot_scatter(merged: pd.DataFrame, out_dir: Path) -> None:
 # ── main ──────────────────────────────────────────────────────────────────────
 def main() -> None:
     print("=" * 60)
-    print("E3-1 SFR↔IQA 상관분석  (ps3011)")
+    print("E3-1 SFR↔IQA 상관분석  (ps3011, 속도 그룹별)")
     print("=" * 60)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. SFR 파싱
     print("\n[1/5] SFR_cypx.csv 파싱...")
@@ -155,38 +211,45 @@ def main() -> None:
     iqa_df = load_iqa_means()
     print(f"  IQA 조건: {len(iqa_df)}개  컬럼: {[c for c in IQA_COLS if c in iqa_df.columns]}")
 
-    # 3. 조인
-    print("\n[3/5] SFR ↔ IQA 조건명 조인...")
+    # 3. 조인 + 속도 파싱
+    print("\n[3/5] SFR ↔ IQA 조건명 조인 + 속도 파싱...")
     merged = pd.merge(sfr_df, iqa_df, on="condition", how="inner")
     print(f"  매칭: {len(merged)}개  (SFR {len(sfr_df)} / IQA {len(iqa_df)})")
     if len(merged) == 0:
-        # 디버그: 샘플 조건명 출력
         print("  [DEBUG] SFR 조건 샘플:", sfr_df["condition"].head(3).tolist())
         print("  [DEBUG] IQA 조건 샘플:", iqa_df["condition"].head(3).tolist())
         raise RuntimeError("조인 결과 0행 — 조건명 불일치 확인 필요")
+    merged["speed_kmh"] = merged["condition"].map(parse_speed)
+    n_nospeed = int(merged["speed_kmh"].isna().sum())
+    if n_nospeed:
+        print(f"  [WARN] 속도 파싱 실패 {n_nospeed}건 — all 그룹에만 포함됨")
+    print("  속도 분포:",
+          merged["speed_kmh"].value_counts(dropna=False).to_dict())
     merged.to_csv(OUT_DIR / "e3_1_merged.csv", index=False, encoding="utf-8-sig")
 
-    # 4. 상관 분석
-    print("\n[4/5] 상관 분석 (PLCC/SROCC/KRCC)...")
-    corr_df = corr.correlation_matrix(merged, IQA_COLS, SFR_COLS, col_x="IQA", col_y="SFR")
+    # 4. 상관 분석 (속도 그룹별: all / 60km / 80km)
+    print("\n[4/5] 상관 분석 (속도 그룹별 PLCC/SROCC/KRCC)...")
+    corr_df = build_correlation(merged)
     corr_out = OUT_DIR / "e3_1_correlation.csv"
     corr_df.to_csv(corr_out, index=False, encoding="utf-8-sig")
     print(f"  [SAVE] {corr_out.name}")
 
     # 5. Scatter
-    print("\n[5/5] Scatter plot 생성...")
+    print("\n[5/5] Scatter plot 생성 (속도별 색 구분)...")
     plot_scatter(merged, OUT_DIR)
 
     # ── 요약 ──────────────────────────────────────────────────────────────────
     print("\n" + "=" * 60)
-    print("HSMB 상관 요약 (N={})".format(len(merged)))
+    print("HSMB 상관 요약 (속도 그룹별)")
     print("=" * 60)
-    hsmb_row = corr_df[corr_df["IQA"] == "hsmb"][["SFR", "PLCC", "SROCC", "KRCC"]]
-    print(hsmb_row.to_string(index=False))
+    hsmb_rows = corr_df[corr_df["IQA"] == "hsmb"][
+        ["speed_group", "SFR", "N", "PLCC", "SROCC", "KRCC"]]
+    print(hsmb_rows.to_string(index=False))
 
-    print("\n전체 IQA × R1090_H PLCC 요약:")
-    r1090h = corr_df[corr_df["SFR"] == "R1090_H"][["IQA", "PLCC", "SROCC"]].sort_values("PLCC")
-    print(r1090h.to_string(index=False))
+    print("\nARNIQA 상관 요약 (속도 그룹별):")
+    arniqa_rows = corr_df[corr_df["IQA"] == "arniqa"][
+        ["speed_group", "SFR", "N", "PLCC", "SROCC", "KRCC"]]
+    print(arniqa_rows.to_string(index=False))
 
     print("\n완료.")
 

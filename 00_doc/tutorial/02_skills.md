@@ -144,7 +144,6 @@ oocontext      # 현재 SP 확인
 | `oodoc optimize` | 문서 최적화 (크기/품질) |
 | `oodoc check` | 품질+정합성 통합 검사 |
 | `oodoc clear` | 이력 5개 초과 행 제거 |
-| `oodoc manual --update` | d0000_manual.md 업데이트 |
 
 ### ooenv - 개발 환경 관리
 
@@ -178,12 +177,6 @@ oocontext      # 현재 SP 확인
 | `ootodo add "내용"` | TODO 추가 → d0004 |
 | `ootodo done [ID]` | 항목 완료 처리 |
 | `ootodo list` | 목록 확인 |
-
-### oouser - 사용자 가이드
-
-| 명령 | 설명 |
-|------|------|
-| `oouser run` | 사용자 가이드 생성 → d0008_user.md |
 
 ---
 

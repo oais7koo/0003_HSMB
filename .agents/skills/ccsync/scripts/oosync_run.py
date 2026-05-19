@@ -25,7 +25,7 @@ def _print_skill_help(skill_name):
         sys.stdout.reconfigure(encoding='utf-8')
     _sf = _SKILLS_DIR / skill_name / "SKILL.md"
     if not _sf.exists():
-        print(f"[ERROR] .claude/skills/{skill_name}/SKILL.md not found")
+        print(f"[ERROR] .agents/skills/{skill_name}/SKILL.md not found")
         return
     _c = _sf.read_text(encoding="utf-8")
     _m = _re.search(r"##[^\n]*(?:서브명령어|명령어)\n\n((?:\|.+\n)+)", _c)
@@ -53,10 +53,10 @@ PARENT_DIR = CURRENT_PROJECT.parent
 if not (CURRENT_PROJECT / ".oais_root").exists():
     print("[ERROR] oosync는 OAIS(1_oais) 프로젝트에서만 실행 가능합니다.")
     print(f"  현재 위치: {CURRENT_PROJECT}")
-    print(f"  OAIS가 .claude/ 의 정본(source of truth)이므로, 동기화는 OAIS에서만 수행하세요.")
+    print(f"  OAIS가 .codex/ 의 정본(source of truth)이므로, 동기화는 OAIS에서만 수행하세요.")
     sys.exit(1)
 SCRIPT_DIR = Path(__file__).parent
-TEMPLATE_DIR = SCRIPT_DIR.parent / "templates"  # .claude/skills/ccsync/templates
+TEMPLATE_DIR = SCRIPT_DIR.parent / "templates"  # .agents/skills/ccsync/templates
 
 # 동기화 대상 스캔 경로 (.env의 OAIS_SYNC_TARGET 또는 기본값)
 _sync_target_env = os.environ.get("OAIS_SYNC_TARGET", "")
@@ -87,18 +87,19 @@ if _sync_config_path.exists():
         pass
 
 # 동기화 대상 파일/폴더 (v/는 제외 - 레거시, 최초 삭제 후 동기화 불필요)
-# NOTE: tutorial은 .claude/tutorial/로 이동되어 .claude/에 포함됨 (별도 항목 불필요)
 SYNC_TARGETS = [
-    ".claude/",
+    ".codex/",
+    "00_doc/tutorial/",
     "CLAUDE.md",
     "AGENTS.md",
     "GEMINI.md",
     ".mcp.json",
     ".codex/",
     ".agents/",
+    ".gemini/",
     "cclaude.bat",
     "cclaude.sh",
-    "oclaude.bat",
+    "ccodex.bat",
     "gemma.ps1",
     "gemma.sh",
     ".github/",
@@ -112,16 +113,19 @@ EXCLUDE_PATTERNS = [
     "tmp",
     ".venv",
     "node_modules",
+    "worktrees",  # git/에이전트 격리 worktree 디렉토리 (.codex/worktrees/ — 동기화 대상 아님)
     "settings.local.json",  # 프로젝트별 로컬 설정
     "last_model.json",  # gemma 모델 선택 (머신별 로컬 설정)
-    "sp_config.json",  # 프로젝트별 SP 목록 (oocontext/references/sp_config.json)
+    "sp_config.json",  # 프로젝트별 SP 목록 (cccontext/references/sp_config.json)
     "scheduled_tasks.lock",  # OMC 스케줄러 lock 파일 (프로젝트별 로컬)
     "skills_to_codex",  # ccporting 산출물 (대상 프로젝트별 독립 생성)
+    ".ccporting_state",  # ccporting 포팅 상태 (머신별 로컬)
+    ".ccporting_audit_report.json",  # ccporting 감사 결과 (머신별 로컬)
 ]
 
-# Vibe 환경 판별 기준 (.claude/ 존재 여부로 Full 판정)
+# Vibe 환경 판별 기준 (.codex/ 존재 여부로 Full 판정)
 VIBE_INDICATORS = {
-    "claude_dir": ".claude",
+    "claude_dir": ".codex",
 }
 
 
@@ -146,7 +150,7 @@ def _get_git_commit_hash() -> str:
 
 
 def _get_git_changed_files(since_hash: str) -> set[str]:
-    """since_hash 이후 .claude/ 및 SYNC_TARGETS에서 변경된 파일 목록"""
+    """since_hash 이후 .codex/ 및 SYNC_TARGETS에서 변경된 파일 목록"""
     import subprocess
     changed = set()
     try:
@@ -393,7 +397,7 @@ def get_status_symbol(status: str) -> str:
 import re
 
 # 공용 template_loader import (스킬 간 공유)
-_shared_dir = str(SCRIPT_DIR.parent.parent)  # .claude/skills
+_shared_dir = str(SCRIPT_DIR.parent.parent)  # .codex/skills
 if _shared_dir not in sys.path:
     sys.path.insert(0, _shared_dir)
 from _shared.template_loader import load_template_block  # noqa: E402
@@ -412,7 +416,7 @@ TEMPLATE_VIEW_HEADER = """# ccsync view - 차이점 비교
 | 소스 (현재) | `{source_project}` |
 | 대상 | `{target_project}` |
 | 대상 Vibe 상태 | {env_status} |
-| .claude/ | {has_claude} |
+| .codex/ | {has_claude} |
 """
 
 TEMPLATE_VIEW_SUMMARY_HEADER = """
@@ -596,8 +600,8 @@ def render_view_output(data: dict) -> str:
             - source_project: 소스 프로젝트명
             - target_project: 대상 프로젝트명
             - env_status: 환경 상태
-            - has_claude: .claude/ 존재 여부
-            - has_claude: .claude/ 존재 여부
+            - has_claude: .codex/ 존재 여부
+            - has_claude: .codex/ 존재 여부
             - same_count: 동일 파일 수
             - status_counts: 상태별 개수 딕셔너리
             - comparison_results: 비교 결과 리스트
@@ -668,7 +672,7 @@ def render_box_table(projects: list) -> str:
         "idx": 4,
         "name": max(7, max((len(p["name"]) for p in projects), default=7)) + 2,
         "status": 9,
-        "claude": 10,
+        "codex": 10,
         "push": 6,
         "pull": 6,
     }
@@ -677,7 +681,7 @@ def render_box_table(projects: list) -> str:
         return (left + "─" * col_widths["idx"] + mid +
                 "─" * col_widths["name"] + mid +
                 "─" * col_widths["status"] + mid +
-                "─" * col_widths["claude"] + mid +
+                "─" * col_widths["codex"] + mid +
                 "─" * col_widths["push"] + mid +
                 "─" * col_widths["pull"] + right)
 
@@ -687,7 +691,7 @@ def render_box_table(projects: list) -> str:
     header = ("│" + " # ".center(col_widths["idx"]) +
               "│" + " Project".ljust(col_widths["name"]) +
               "│" + " Status ".center(col_widths["status"]) +
-              "│" + " .claude/ ".center(col_widths["claude"]) +
+              "│" + " .codex/ ".center(col_widths["codex"]) +
               "│" + " Push ".center(col_widths["push"]) +
               "│" + " Pull ".center(col_widths["pull"]) + "│")
     lines.append(header)
@@ -697,7 +701,7 @@ def render_box_table(projects: list) -> str:
         row = ("│" + str(idx).rjust(col_widths["idx"] - 1) + " " +
                "│" + " " + proj["name"].ljust(col_widths["name"] - 1) +
                "│" + proj["status"].center(col_widths["status"]) +
-               "│" + proj["has_claude"].center(col_widths["claude"]) +
+               "│" + proj["has_claude"].center(col_widths["codex"]) +
                "│" + proj["push"].center(col_widths["push"]) +
                "│" + proj["pull"].center(col_widths["pull"]) + "│")
         lines.append(row)
@@ -733,7 +737,7 @@ def render_list_output(data: dict) -> str:
 총 {total_count}개 프로젝트 발견
 
 ## 상태 설명
-- Full: vibe 환경 구축 완료 (.claude/ 존재)
+- Full: vibe 환경 구축 완료 (.codex/ 존재)
 - None: vibe 환경 없음 (새로 구축 가능)
 
 ## Sync 컬럼
@@ -971,8 +975,8 @@ def cmd_files():
                 print(f"  {item.name}")
         print("```")
 
-    print("\n## .claude/ 폴더 상세\n")
-    claude_path = CURRENT_PROJECT / ".claude"
+    print("\n## .codex/ 폴더 상세\n")
+    claude_path = CURRENT_PROJECT / ".codex"
     if claude_path.exists():
         print("```")
         for item in sorted(claude_path.iterdir()):
@@ -1116,70 +1120,6 @@ def check_push_only(target_project: Path, allow_delete: bool = False, allow_add:
     return push_files, skip_files, delete_files
 
 
-def sync_project(target_project: Path, dry_run: bool = False) -> bool:
-    """
-    Sync files to target project (push only).
-    동기화 완료 시 git 커밋 해시를 기록하여 다음 동기화 시 변경분만 감지.
-
-    Args:
-        target_project: Target project path
-        dry_run: If True, only show what would be done without actual sync
-
-    Returns:
-        True if successful
-    """
-    project_name = target_project.name
-
-    # git 기반: 마지막 동기화 이후 변경된 파일만 추출
-    git_changed, last_hash, current_hash = get_git_changed_since_sync(project_name)
-    if git_changed:
-        print(f"    [GIT] 마지막 동기화({last_hash[:8]}) 이후 변경: {len(git_changed)}개 파일")
-
-    for target in SYNC_TARGETS:
-        source_path = CURRENT_PROJECT / target.rstrip("/")
-        target_path = target_project / target.rstrip("/")
-
-        if not source_path.exists():
-            continue
-
-        if dry_run:
-            if source_path.is_file():
-                print(f"    [DRY-RUN] 복사 예정: {source_path.name} -> {target_path}")
-            else:
-                print(f"    [DRY-RUN] 폴더 복사 예정: {target}/ -> {target_project.name}/{target}/")
-        else:
-            if source_path.is_file():
-                # Single file copy
-                shutil.copy2(source_path, target_path)
-            else:
-                # Directory copy
-                if target_path.exists():
-                    shutil.rmtree(target_path)
-                shutil.copytree(source_path, target_path,
-                              ignore=shutil.ignore_patterns(*[p.replace("*", "") for p in EXCLUDE_PATTERNS if "*" in p]))
-
-    # 동기화 완료 시 커밋 해시 + 파일 해시 기록
-    if not dry_run:
-        all_hashes = {}
-        for sync_target in SYNC_TARGETS:
-            tp = target_project / sync_target.rstrip("/")
-            if tp.exists():
-                if tp.is_file():
-                    all_hashes[sync_target.rstrip("/")] = get_file_hash(tp)
-                else:
-                    for f in tp.rglob("*"):
-                        if f.is_file() and not is_excluded(f):
-                            rel = str(f.relative_to(target_project)).replace("\\", "/")
-                            all_hashes[rel] = get_file_hash(f)
-        save_sync_state(project_name, current_hash or "", all_hashes)
-        if current_hash:
-            print(f"    [GIT] 동기화 상태 기록: {current_hash[:8]} ({len(all_hashes)}개 파일 해시)")
-        else:
-            print(f"    [HASH] 동기화 상태 기록: {len(all_hashes)}개 파일 해시")
-
-    return True
-
-
 def sync_project_files(target_project: Path, push_files: list, delete_files: list = None, dry_run: bool = False) -> bool:
     """파일 단위로 push_files만 동기화 (skip_files는 건너뜀)."""
     project_name = target_project.name
@@ -1199,6 +1139,7 @@ def sync_project_files(target_project: Path, push_files: list, delete_files: lis
                 shutil.copy2(source_path, target_path)
 
     if delete_files:
+        deleted_parents = set()
         for rel_path in delete_files:
             target_path = target_project / rel_path
             if dry_run:
@@ -1206,6 +1147,18 @@ def sync_project_files(target_project: Path, push_files: list, delete_files: lis
             else:
                 if target_path.exists():
                     target_path.unlink()
+                    deleted_parents.add(target_path.parent)
+        # 삭제로 비어버린 디렉터리 정리 (target_project 위로는 올라가지 않음)
+        if not dry_run:
+            for parent in deleted_parents:
+                d = parent
+                while d != target_project and d.is_dir():
+                    try:
+                        next(d.iterdir())
+                        break  # 비어있지 않음 → 중단
+                    except StopIteration:
+                        d.rmdir()
+                        d = d.parent
 
     # 복사된 파일의 해시 업데이트
     if not dry_run:
@@ -1291,6 +1244,46 @@ def cmd_run_push_only(dry_run: bool = False, allow_delete: bool = False, allow_a
         project_results.append((proj, push_files, skip_files, delete_files))
 
     print()
+
+    # 대상에만 있는 파일(ONLY_TARGET) 삭제 여부 확인
+    # --delete: check_push_only가 이미 delete_files로 분류 (질문 생략)
+    # --add   : check_push_only가 무시하여 유지 (질문 생략)
+    # 둘 다 없으면: 사용자에게 삭제 여부를 물어봄 (기본 N=유지)
+    if not dry_run and not allow_delete and not allow_add:
+        only_target = []  # (proj, rel_path)
+        for proj, pf, sf, df in project_results:
+            for rel_path, status in sf:
+                if status == "ONLY_TARGET":
+                    only_target.append((proj, rel_path))
+        if only_target:
+            print(f"## 대상에만 있는 파일 ({len(only_target)}개)\n")
+            print("소스에 없고 대상 프로젝트에만 존재하는 파일입니다.\n")
+            _cur = None
+            for proj, rel_path in only_target:
+                if proj.name != _cur:
+                    print(f"### {proj.name}")
+                    _cur = proj.name
+                print(f"  - {rel_path}")
+            print()
+            try:
+                answer = input("위 파일들을 대상에서 삭제할까요? (y/N): ").strip().lower()
+            except EOFError:
+                answer = "n"
+            print()
+            if answer == "y":
+                # ONLY_TARGET 파일을 skip_files → delete_files 로 이동
+                project_results = [
+                    (
+                        proj,
+                        pf,
+                        [(rp, st) for rp, st in sf if st != "ONLY_TARGET"],
+                        df + [rp for rp, st in sf if st == "ONLY_TARGET"],
+                    )
+                    for proj, pf, sf, df in project_results
+                ]
+                print(f"[DELETE] 대상 전용 파일 {len(only_target)}개를 삭제합니다.\n")
+            else:
+                print("[KEEP] 대상 전용 파일을 유지합니다 (삭제 안 함).\n")
 
     sync_targets = [(proj, pf, sf, df) for proj, pf, sf, df in project_results if len(pf) + len(df) > 0]
     ok_count = sum(1 for _, pf, sf, df in project_results if len(pf) + len(df) == 0 and len(sf) == 0)
@@ -1767,7 +1760,7 @@ def cmd_merge(project_name: str | None, filename: str | None, direction: str = "
 
 
 def cmd_backup():
-    """Claude 환경 파일을 zip으로 백업."""
+    """Codex 환경 파일을 zip으로 백업."""
     import zipfile
 
     now = datetime.now().strftime("%y%m%d-%H%M%S")
@@ -1776,7 +1769,7 @@ def cmd_backup():
     zip_path = backup_dir / f"{now}.zip"
 
     targets = [
-        ".claude/",
+        ".codex/",
         "00_doc/tutorial/",
         "CLAUDE.md",
         "GEMINI.md",
@@ -1786,6 +1779,7 @@ def cmd_backup():
         "cclaude.bat",
         "cclaude.sh",
         "oclaude.bat",
+        "ccodex.bat",
         "gemma.ps1",
         "gemma.sh",
         ".github/",
@@ -1794,7 +1788,7 @@ def cmd_backup():
     ]
     # HOME 기준 글로벌 파일 (~ 접두사): zip 내 _home/ 아래 저장
     home_targets = [
-        "~/.claude/.omc/hud-config.json",
+        "~/.codex/.omc/hud-config.json",
     ]
     exclude_dirs = {"__pycache__", "data", "00_data", "sessions", ".git"}
 

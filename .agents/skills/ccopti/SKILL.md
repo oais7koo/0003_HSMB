@@ -1,14 +1,14 @@
 ---
 name: ccopti
-description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행한다 | ref: `.claude/guides/common_guide.md`"
+description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행한다 | ref: `.codex/guides/common_guide.md`"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
 # ccopti - 알고리즘/코드 최적화
 
-> 코드 성능 분석, 알고리즘 개선, 병목 제거를 수행한다 | ref: `.claude/guides/common_guide.md`
+> 코드 성능 분석, 알고리즘 개선, 병목 제거를 수행한다 | ref: `.codex/guides/common_guide.md`
 
 ## 0. 스킬 요약
 
@@ -16,7 +16,7 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 |------|------|
 | **핵심 역할** | 알고리즘 분석 및 코드 성능 최적화 (시간복잡도·메모리·병목 제거) |
 | **하는 것** | 성능 프로파일링, 알고리즘 개선, 병목 분석, 최적화 코드 적용 |
-| **하지 않는 것** | GPU 딥러닝 최적화(→oodeep), 코드 에러 수정(→oofix), 코드 품질 체크(→oocheck) |
+| **하지 않는 것** | GPU 딥러닝 최적화(→ccdeep), 코드 에러 수정(→ccfix), 코드 품질 체크(→cccheck) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 / 외부 벤치마크 자동 포함 안 함 |
 | **수정 대상** | 최적화 대상 코드 파일 |
 | **실행 레벨** | [반자동] — 프로파일링 결과 확인 후 최적화 적용 |
@@ -44,7 +44,7 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 | `ccopti benchmark [대상]` | 최적화 전후 벤치마크 비교 |
 | `ccopti report` | 최적화 리포트 생성 (d{SP}0012_optimization.md) |
 
-실행: `uv run python .claude/skills/ccopti/scripts/ooopti_run.py [subcommand] [args]`
+실행: `uv run python .agents/skills/ccopti/scripts/ooopti_run.py [subcommand] [args]`
 
 ## 워크플로우
 
@@ -52,8 +52,8 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 
 ```
 1. 대상 식별
-  - 파일/모듈/함수 지정 또는 oocheck 결과에서 [WARNING] 성능 이슈 추출
-  - SP 컨텍스트 반영 (oocontext N)
+  - 파일/모듈/함수 지정 또는 cccheck 결과에서 [WARNING] 성능 이슈 추출
+  - SP 컨텍스트 반영 (cccontext N)
 
 2. 프로파일링 (측정 우선)
   - cProfile로 함수별 호출 횟수, 누적 시간 측정
@@ -157,13 +157,13 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 
 ## 관련
 
-`.claude/skills/oocheck/SKILL.md` | `.claude/skills/oodev/SKILL.md` | `.claude/skills/oodeep/SKILL.md`
+`.agents/skills/cccheck/SKILL.md` | `.agents/skills/ccdev/SKILL.md` | `.agents/skills/ccdeep/SKILL.md`
 
 <!-- RUN-UPDATE-REF:START -->
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -179,7 +179,7 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 ## Karpathy 코딩 가이드라인 (필수 준수)
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|
@@ -201,10 +201,10 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -215,7 +215,7 @@ description: "코드 성능 분석, 알고리즘 개선, 병목 제거를 수행
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |

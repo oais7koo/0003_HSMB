@@ -2,7 +2,7 @@
 name: oodoc
 description: "문서 생성 통합 스킬 'oodoc', '문서 생성', '문서 업데이트', '문서 검증', '스킬 최적화', '문서 귀속 검사' 등을 요청할 때 사용한다"
 metadata:
-  version: "v15"
+  version: "v18"
   category: "doc-env"
 ---
 
@@ -21,11 +21,11 @@ metadata:
 | **에이전트 호환** | 범용 — 파일 읽기·쓰기 작업 중심으로 모든 에이전트 처리 가능 |
 
 ## 문서 이력 관리
+- v18 2026-05-17 — run의 execute_skill 하이브리드화: `oohistory sync`는 스크립트 직접 실행, ooprd·ooplan 등은 LLM 위임
+- v17 2026-05-17 — run에 `--all` 추가: 기본은 현재 컨텍스트 SP만 처리, `--all`로 전체 SP 일괄 처리
+- v16 2026-05-15 — run/update 시 `d0000_list.md` 자동 생성: 00_doc/sp{N}/ 최상위 문서를 `## SP{N}` 그룹 + `[[위키링크]]` 목록으로 정리
 - v15 2026-04-19 — optimize → check --fix 통합 (check 명령으로 일원화)
 - v14 2026-04-11 — std 추가: 문서 번호 체계 조회·편집 서브명령어
-- v13 2026-04-04 — update 추가: 코드 작업 후 변경 영향 문서 자동 탐지 및 업데이트
-- v12 2026-04-03 — list/gen SP-aware 추가: SP별 문서 현황 조회 및 빈 문서 일괄 생성
-- v11 2026-03-02 — optimize 재정의: SKILL.md → 00_doc/ 문서(d0001~d0010) 최적화로 변경
 
 > 공통: `.claude/guides/common_guide.md` / 옛 이력: `references/guide.md §12`
 
@@ -34,9 +34,9 @@ metadata:
 | 명령어 | 설명 |
 |--------|------|
 | `oodoc help` | 서브명령어 목록 표시 |
-| `oodoc version` | 스킬 버전 정보 (v12) |
+| `oodoc version` | 스킬 버전 정보 (v18) |
 | `oodoc status` | 서브명령어 리스트, 스킬/문서 현재 상태 |
-| `oodoc run [--doc 문서\|--required-only\|--dry-run\|--compact]` | d0001~d0010 문서 생성/업데이트 |
+| `oodoc run [--all\|--sp N\|--doc 문서\|--required-only\|--dry-run]` | d{SP}0001~d{SP}0010 문서 생성/업데이트 + `d0000_list.md` 자동 갱신 — **기본: 현재 컨텍스트 SP만**, `--all`: 전체 SP, `--sp N`: 지정 SP |
 | `oodoc create [문서ID]` | 특정 문서 생성 |
 | `oodoc explain [대상]` | 코드/함수/모듈/시스템 설명 생성 (explain 흡수) |
 | `oodoc check --fix [문서ID\|--content\|--size]` | 00_doc/ 문서(d0001~d0010) 최적화 (구 `optimize`) |
@@ -46,9 +46,8 @@ metadata:
 | `oodoc add checklist "항목"` | 체크리스트 항목 추가 |
 | `oodoc list [--sp N]` | SP별 문서 현황 조회 (존재/미생성 상태) |
 | `oodoc gen [--sp N] [--dry-run]` | SP별 미생성 문서를 빈 템플릿으로 일괄 생성 |
-| `oodoc update [--scope 범위] [--commit HEAD~N] [--dry-run]` | 코드 작업 후 관련 문서 자동 업데이트 |
+| `oodoc update [--scope 범위] [--commit HEAD~N] [--dry-run]` | 코드 작업 후 관련 문서 자동 업데이트 + `d0000_list.md` 자동 갱신 |
 | **`oodoc update this`** | **직전 작업 영향 문서 업데이트** (→ common_guide.md §9) |
-| `oodoc manual [--update]` | d0000_manual.md 업데이트 (수동 관리 문서) |
 | `oodoc numbering` | 문서 번호 체계(SSOT) 조회 |
 | `oodoc numbering add [번호] [파일명패턴] [용도] [생성스킬]` | 새 번호 항목 추가 |
 | `oodoc numbering remove [번호]` | 번호 항목 제거 |

@@ -1777,6 +1777,47 @@ def _try_fix_pdf_url(url):
     return None
 
 
+def _norm_title_for_dedup(title):
+    """중복 비교용 제목 정규화: 소문자 + 영숫자만 남김."""
+    import re as _r
+    return _r.sub(r"[^a-z0-9]+", "", (title or "").lower())
+
+
+def _collect_existing_paper_titles():
+    """11_paper_en 폴더 전체에서 기수집 논문의 정규화 제목 목록을 수집한다 (T015).
+
+    서머리 H1 제목 우선, 없으면 PDF(_01_) 파일명을 사용한다.
+    """
+    import re as _r
+    titles = []
+    if not PAPER_DIR.exists():
+        return titles
+    for d in PAPER_DIR.iterdir():
+        if not d.is_dir() or not _r.match(r"\d{6}-\d{4}", d.name):
+            continue
+        title = None
+        summ = list(d.glob("*_00_*서머리.md"))
+        if summ:
+            try:
+                content = summ[0].read_text(encoding="utf-8", errors="ignore")
+                m = _r.search(r"^#\s+(.+)$", content, _r.MULTILINE)
+                if m:
+                    title = m.group(1).strip()
+            except Exception:
+                pass
+        if not title:
+            pdfs = list(d.glob("*_01_*.pdf"))
+            if pdfs:
+                m = _r.match(r"\d{6}-\d{4}_01_(.+)\.pdf", pdfs[0].name)
+                if m:
+                    title = m.group(1).replace("_", " ")
+        if title:
+            norm = _norm_title_for_dedup(title)
+            if norm:
+                titles.append(norm)
+    return titles
+
+
 def do_download(args):
     """다운로드 리스트 기반 PDF 자동 다운로드."""
     sys.stdout.reconfigure(encoding='utf-8')
@@ -1806,6 +1847,19 @@ def do_download(args):
     total_success = 0
     total_fail = 0
     total_skip = 0
+    total_dup = 0
+
+    # 전역 중복 탐지 (T015): 11_paper_en 기수집 논문 제목 수집
+    existing_norm_titles = _collect_existing_paper_titles()
+    try:
+        from rapidfuzz import fuzz as _dfuzz
+        _dedup_fuzzy = True
+    except ImportError:
+        _dfuzz = None
+        _dedup_fuzzy = False
+    if existing_norm_titles:
+        _mode = "유사도 90%+" if _dedup_fuzzy else "정규화 완전일치"
+        print(f"전역 중복 탐지 활성: 기수집 {len(existing_norm_titles)}편 대비 검사 ({_mode})\n", flush=True)
 
     for list_file in list_files:
         print(f"## {list_file.name}\n", flush=True)
@@ -1827,6 +1881,18 @@ def do_download(args):
             if pdf_path.exists() and not args.force:
                 total_skip += 1
                 continue
+            # 전역 중복 탐지 (T015): 11_paper_en에 동일/유사 논문이 이미 있으면 스킵
+            if not args.force and existing_norm_titles:
+                norm = _norm_title_for_dedup(item['title'])
+                if norm:
+                    if _dedup_fuzzy:
+                        is_dup = any(_dfuzz.ratio(norm, et) >= 90 for et in existing_norm_titles)
+                    else:
+                        is_dup = norm in existing_norm_titles
+                    if is_dup:
+                        print(f"  [중복 스킵] 기수집 논문과 중복: {item['title']}", flush=True)
+                        total_dup += 1
+                        continue
             to_download.append(item)
 
         if not to_download:
@@ -1942,7 +2008,8 @@ def do_download(args):
     print(f"| 성공 | {total_success} |", flush=True)
     print(f"| 실패 | {total_fail} |", flush=True)
     print(f"| 스킵 | {total_skip} |", flush=True)
-    print(f"| **합계** | **{total_success + total_fail + total_skip}** |", flush=True)
+    print(f"| 중복 스킵 | {total_dup} |", flush=True)
+    print(f"| **합계** | **{total_success + total_fail + total_skip + total_dup}** |", flush=True)
     print("", flush=True)
 
     if total_success > 0:

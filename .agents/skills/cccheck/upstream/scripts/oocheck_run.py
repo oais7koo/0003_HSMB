@@ -102,6 +102,7 @@ def _load_sp_from_state() -> str:
     return "00"
 
 SP_CONTEXT = _load_sp_from_state()  # oocontext 상태 파일에서 자동 로드
+SP_EXPLICIT = False  # main()에서 --sp 명시 시 True (run 범위: 전체 vs 특정 SP)
 
 
 def get_sp_doc_path(base_doc_num: str) -> Path:
@@ -147,7 +148,7 @@ def get_sp_doc_path(base_doc_num: str) -> Path:
 def set_sp_context(sp: str):
     """SP 컨텍스트 설정"""
     global SP_CONTEXT
-    if sp in ["00", "01", "02", "03", "04", "05"]:
+    if sp in [f"{n:02d}" for n in range(10)]:
         SP_CONTEXT = sp
         print(f"[INFO] SP Context: {sp}")
     else:
@@ -365,10 +366,14 @@ def cmd_dart_run(target_dir):
         sp_match = re.match(r"^(\d{2})_", dir_name)
         sp_doc = f"d{int(sp_match.group(1)) * 10000 + 4}_todo.md" if sp_match else "d0004_todo.md"
         print(f"\n[INFO] 이슈 등록 대상: {sp_doc} (자동 등록 안 함 — 에이전트 판단)")
-        return 1
+        rc = 1
     else:
         print("\n[OK] All checks passed successfully. 이슈 없음.")
-        return 0
+        rc = 0
+
+    # [2단계] 체크리스트 실행
+    print_checklist_stage()
+    return rc
 
 
 def run_py_compile_all():
@@ -569,13 +574,17 @@ def cmd_run():
         print("  설치 명령: uv sync --group dev")
 
     # d0004_todo.md에 이슈 등록
+    rc = 0
     if issue_collector.issues:
         register_issues_to_todo(issue_collector)
         print(f"\n[OK] {len(issue_collector.issues)}개 이슈가 d0004_todo.md에 등록됨")
-        return 1
+        rc = 1
     else:
         print("\n[OK] All checks passed successfully. 이슈 없음.")
-        return 0
+
+    # [2단계] 체크리스트 실행
+    print_checklist_stage()
+    return rc
 
 
 def parse_pylint_errors(cmd):
@@ -1056,6 +1065,185 @@ def cmd_circular(module_name: str = None):
         return 0
 
 
+# ============================================================
+# d0008 프로젝트 체크리스트 (oocheck add / run 2단계)
+# ============================================================
+
+# 체크리스트 항목 성격별 접두사 (안1 — 도메인 분류)
+CHECKLIST_CATEGORIES = {
+    "C": ("코드", ["코드", "구현", "함수", "클래스", "pylint", "lint", "리팩토링",
+                   "refactor", "api", "모듈", "module", "알고리즘"]),
+    "D": ("문서", ["문서", "doc", "prd", "가이드", "guide", "readme", "주석",
+                   "명세", "튜토리얼", "tutorial"]),
+    "S": ("보안", ["보안", "security", "취약점", "인증", "auth", "권한",
+                   "시크릿", "secret", "토큰", "token"]),
+    "T": ("테스트", ["테스트", "test", "pytest", "커버리지", "coverage", "tc", "검증"]),
+    "E": ("환경", ["환경", "설정", "config", "의존성", "패키지", "package",
+                   "uv", "빌드", "build", "배포", "deploy"]),
+    "G": ("일반", []),
+}
+
+
+def detect_checklist_category(content: str) -> str:
+    """체크리스트 내용에서 성격(접두사) 판정. 미매칭 시 G(일반)."""
+    low = content.lower()
+    for prefix, (_name, keywords) in CHECKLIST_CATEGORIES.items():
+        for kw in keywords:
+            if kw in low:
+                return prefix
+    return "G"
+
+
+def get_d0008_path(sp: str) -> Path:
+    """SP별 d0008_checklist.md 경로 반환."""
+    sp = f"{int(sp):02d}"
+    if sp == "00":
+        fname = "d0008_checklist.md"
+    else:
+        fname = f"d{int(sp) * 10000 + 8}_checklist.md"
+    return PROJECT_ROOT / "00_doc" / f"sp{sp}" / fname
+
+
+def ensure_d0008(sp: str) -> Path:
+    """d0008_checklist.md 없으면 템플릿 기반으로 생성."""
+    path = get_d0008_path(sp)
+    if path.exists():
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    today = datetime.now().strftime("%Y-%m-%d")
+    template = SCRIPT_DIR.parent / "templates" / "d0008_checklist_template.md"
+    if template.exists():
+        text = template.read_text(encoding="utf-8")
+        text = text.replace("{SP}", f"{int(sp):02d}").replace("{DATE}", today)
+    else:
+        text = (f"# SP{int(sp):02d} 프로젝트 체크리스트\n\n"
+                f"## 문서이력관리\n- v01 {today} — 초기 생성\n\n---\n\n"
+                f"## 체크리스트 항목\n\n(oocheck add 로 항목 추가)\n")
+    path.write_text(text, encoding="utf-8")
+    print(f"[OK] d0008 체크리스트 생성: {path.relative_to(PROJECT_ROOT)}")
+    return path
+
+
+def get_next_checklist_id(content: str, prefix: str) -> str:
+    """접두사별 다음 체크리스트 ID 반환 (예: C001)."""
+    nums = re.findall(rf"^### {prefix}(\d+)", content, re.MULTILINE)
+    n = max((int(x) for x in nums), default=0) + 1
+    return f"{prefix}{n:03d}"
+
+
+def cmd_add(args: list) -> int:
+    """oocheck add — 체크리스트 항목 추가.
+
+    oocheck add checklist "항목"  → oocheck 스킬 체크리스트(references/checklist.md)
+    oocheck add "내용"            → d{SP}0008_checklist.md (프로젝트 체크리스트)
+    """
+    if args and args[0] == "checklist":
+        item = " ".join(args[1:]).strip().strip('"').strip("'")
+        if not item:
+            print('[ERROR] 사용법: oocheck add checklist "항목"')
+            return 1
+        cl_path = SCRIPT_DIR.parent / "references" / "checklist.md"
+        if not cl_path.exists():
+            print(f"[ERROR] 스킬 체크리스트 없음: {cl_path}")
+            return 1
+        lines = cl_path.read_text(encoding="utf-8").splitlines()
+        rows = [i for i, ln in enumerate(lines) if re.match(r"^\| C\d+ \|", ln)]
+        nums = [int(re.match(r"^\| C(\d+) \|", lines[i]).group(1)) for i in rows]
+        nxt = max(nums, default=0) + 1
+        lines.insert(rows[-1] + 1, f"| C{nxt:02d} | {item} | {item} | WARNING |")
+        cl_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"[OK] C{nxt:02d} 추가됨 → oocheck 스킬 체크리스트 (references/checklist.md)")
+        return 0
+
+    # d0008 프로젝트 체크리스트에 추가
+    content_text = " ".join(args).strip().strip('"').strip("'")
+    if not content_text:
+        print('[ERROR] 사용법: oocheck add "체크리스트 내용"')
+        return 1
+    sp = f"{int(SP_CONTEXT):02d}"
+    path = ensure_d0008(sp)
+    doc = path.read_text(encoding="utf-8")
+    prefix = detect_checklist_category(content_text)
+    item_id = get_next_checklist_id(doc, prefix)
+    cat_name = CHECKLIST_CATEGORIES[prefix][0]
+    today = datetime.now().strftime("%Y-%m-%d")
+    block = (
+        f"### {item_id} [{cat_name}] {content_text}\n"
+        f"#### 등록일: {today} | 우선순위: medium\n"
+        f"#### 체크 내용\n"
+        f"{content_text}\n"
+    )
+    section_h = "## 체크리스트 항목"
+    if section_h in doc:
+        idx = doc.index(section_h) + len(section_h)
+        body = doc[idx:].replace("(oocheck add 로 항목 추가)", "").strip()
+        new_body = (body + "\n\n" + block) if body else block
+        doc = doc[:idx] + "\n\n" + new_body + "\n"
+    else:
+        doc = doc.rstrip() + f"\n\n{section_h}\n\n{block}"
+    path.write_text(doc, encoding="utf-8")
+    print(f"[OK] {item_id} [{cat_name}] 추가됨 → {path.relative_to(PROJECT_ROOT)}")
+    return 0
+
+
+def list_skill_checklists() -> list:
+    """references/checklist.md 를 보유한 oo* 스킬 목록 반환."""
+    skills_dir = PROJECT_ROOT / ".claude" / "skills"
+    result = []
+    if skills_dir.exists():
+        for d in sorted(skills_dir.glob("oo*")):
+            if (d / "references" / "checklist.md").exists():
+                result.append(d.name)
+    return result
+
+
+def scan_sp_with_d0008() -> list:
+    """d0008_checklist.md 가 존재하는 SP 목록 반환."""
+    sps = []
+    doc_dir = PROJECT_ROOT / "00_doc"
+    if doc_dir.exists():
+        for d in sorted(doc_dir.glob("sp*")):
+            sp = d.name[2:]
+            if sp.isdigit() and get_d0008_path(sp).exists():
+                sps.append(sp)
+    return sps
+
+
+def print_checklist_stage():
+    """oocheck run 2단계 — 체크리스트 실행 안내 (대화형 선택은 Claude가 수행)."""
+    print("\n" + "=" * 60)
+    print("# [2단계] 체크리스트 실행")
+    print("=" * 60)
+
+    if SP_EXPLICIT:
+        sps = [f"{int(SP_CONTEXT):02d}"]
+        print(f"\n범위: SP{int(SP_CONTEXT):02d} (--sp 지정)")
+    else:
+        sps = scan_sp_with_d0008()
+        print("\n범위: 전체 SP")
+
+    print("\n## 프로젝트 체크리스트 (d0008)")
+    found = False
+    for sp in sps:
+        p = get_d0008_path(sp)
+        if p.exists():
+            ids = re.findall(r"^### ([CDSTEG]\d+)", p.read_text(encoding="utf-8"), re.MULTILINE)
+            print(f"  - SP{sp}: {p.relative_to(PROJECT_ROOT)} ({len(ids)}개 항목)")
+            found = True
+    if not found:
+        print('  (d0008_checklist.md 없음 — `oocheck add "내용"` 으로 항목 추가)')
+
+    skills = list_skill_checklists()
+    print(f"\n## 체크리스트 보유 스킬 ({len(skills)}개)")
+    print("  " + (", ".join(skills) if skills else "(없음)"))
+
+    print("\n## 다음 단계 (Claude가 SKILL.md에 따라 수행)")
+    print("  1. 위 '체크리스트 보유 스킬' 목록을 사용자에게 제시")
+    print("  2. 어떤 스킬의 체크리스트를 체크할지 사용자 선택 받기")
+    print("  3. d0008 항목 + oocheck 스킬 체크리스트 + 선택 스킬 체크리스트 전체 체크")
+    print("  4. 체크 결과를 d{SP}0004_todo.md (및 d0004) 에 등록")
+
+
 def print_usage():
     """사용법 출력"""
     print("""oocheck - 통합 코드 품질 체크
@@ -1069,6 +1257,7 @@ def print_usage():
     oocheck update           d0004/d0010 문서 정리
     oocheck debug [에러]     심층 디버깅 워크플로우
     oocheck circular [모듈]  순환 참조 감지
+    oocheck add "내용"       d0008 프로젝트 체크리스트 항목 추가 (성격 자동분류)
 
 예시:
     python .claude/skills/oocheck/scripts/oocheck_run.py run
@@ -1089,6 +1278,7 @@ def cmd_show_checklist():
 
 
 def main():
+    global SP_EXPLICIT
     # 서브명령어 없이 실행 시 도움말 출력
     if not sys.argv[1:]:
         sys.argv.append("run")
@@ -1106,6 +1296,7 @@ def main():
         if _a == "--sp" and _i + 1 < len(args):
             try:
                 set_sp_context(f"{int(args[_i + 1]):02d}")
+                SP_EXPLICIT = True
             except ValueError:
                 pass
             args = args[:_i] + args[_i + 2:]
@@ -1137,6 +1328,8 @@ def main():
     elif subcommand == "circular":
         module_name = args[1] if len(args) > 1 else None
         return cmd_circular(module_name)
+    elif subcommand == "add":
+        return cmd_add(args[1:])
     elif subcommand == "check":
         # check: 스킬 체크리스트/상태 출력 (alias of run 요약)
         print(f"[{subcommand}] oocheck 체크리스트 안내")

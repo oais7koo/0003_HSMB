@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 # OAIS=03_paper/ 하위, 독립 프로젝트=루트 직하 양쪽 호환
-# scripts/ → cccheck/ → skills/ → .claude/ → PROJECT_ROOT (5 levels up)
+# scripts/ → cccheck/ → skills/ → .codex/ → PROJECT_ROOT (5 levels up)
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 _PAPER_BASE = _PROJECT_ROOT / "03_paper" if (_PROJECT_ROOT / "03_paper").exists() else _PROJECT_ROOT
 PAPER_DIR = _PAPER_BASE / "11_paper_en"

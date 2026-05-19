@@ -60,8 +60,8 @@ def main():
     flags = load_flags(flags_file)
     changed = False
 
-    # 스킬 SKILL.md 변경 감지: .claude/skills/oo*/SKILL.md
-    if ".claude" in parts and "skills" in parts:
+    # 스킬 SKILL.md 변경 감지: .agents/skills/oo*/SKILL.md
+    if ".codex" in parts and "skills" in parts:
         try:
             skills_idx = list(parts).index("skills")
             skill_name = parts[skills_idx + 1] if skills_idx + 1 < len(parts) else ""
@@ -75,7 +75,7 @@ def main():
         except (ValueError, IndexError):
             pass
 
-    # 튜토리얼 파일 변경 감지: .claude/tutorial/*.md
+    # 튜토리얼 파일 변경 감지: .codex/tutorial/*.md
     if "00_doc" in parts and "tutorial" in parts:
         tutorial_file = fp.name
         if tutorial_file.endswith(".md") and tutorial_file != "README.md":

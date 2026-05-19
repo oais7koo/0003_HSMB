@@ -121,39 +121,102 @@ CLI_REGISTRY = {
     },
 }
 
-# Plugin names for O/X status check (details in template)
-PLUGIN_NAMES = [
-    "code-review", "commit-commands", "frontend-design", "feature-dev",
-    "context7", "serena", "claude-mem", "playwright", "typescript-lsp",
-    "pyright-lsp", "security-guidance", "paper-search-tools", "oh-my-claudecode", "pencil",
-    "codex", "andrej-karpathy-skills", "superpowers"
-]
-
-# 필수 플러그인 목록 (나머지는 선택)
-PLUGIN_REQUIRED = {
-    "code-review", "commit-commands", "oh-my-claudecode", "context7", "pyright-lsp",
-    "andrej-karpathy-skills", "superpowers", "codex"
+# 플러그인 단일 레지스트리 (SSOT)
+# d0009 테이블·O/X 상태·필수 점검(§11)·설치 안내가 모두 이 딕셔너리에서 파생된다.
+# 새 플러그인 추가 시 이곳에만 등록하면 d0009 테이블에 자동 반영된다.
+# (구조: MCP_SERVER_REGISTRY와 동일 패턴 — role/required/install)
+PLUGIN_REGISTRY = {
+    "code-review": {
+        "role": "PR/코드 리뷰 자동화",
+        "required": True,
+        "install": "/plugin install code-review@claude-plugins-official",
+    },
+    "commit-commands": {
+        "role": "Git 커밋 메시지 생성",
+        "required": True,
+        "install": "/plugin install commit-commands@claude-plugins-official",
+    },
+    "frontend-design": {
+        "role": "프론트엔드 UI/UX 디자인",
+        "required": False,
+        "install": "/plugin install frontend-design@claude-plugins-official",
+    },
+    "feature-dev": {
+        "role": "기능 개발 워크플로우",
+        "required": False,
+        "install": "/plugin install feature-dev@claude-plugins-official",
+    },
+    "context7": {
+        "role": "라이브러리 문서 조회",
+        "required": True,
+        "install": "/plugin install context7@claude-plugins-official",
+    },
+    "serena": {
+        "role": "시맨틱 코드 분석·심볼 탐색 LSP",
+        "required": False,
+        "install": "/plugin install serena@claude-plugins-official",
+    },
+    "claude-mem": {
+        "role": "계획 생성/실행 메모리",
+        "required": False,
+        "install": "/plugin marketplace add thedotmack/claude-mem → /plugin install claude-mem",
+    },
+    "playwright": {
+        "role": "E2E 테스트 자동화",
+        "required": False,
+        "install": "/plugin install playwright@claude-plugins-official",
+    },
+    "typescript-lsp": {
+        "role": "TypeScript 언어 서버",
+        "required": False,
+        "install": "/plugin install typescript-lsp@claude-plugins-official",
+    },
+    "pyright-lsp": {
+        "role": "Python 타입 체크 (Pyright)",
+        "required": True,
+        "install": "/plugin install pyright-lsp@claude-plugins-official",
+    },
+    "security-guidance": {
+        "role": "보안 가이드라인 제공",
+        "required": False,
+        "install": "/plugin install security-guidance@claude-plugins-official",
+    },
+    "paper-search-tools": {
+        "role": "논문 검색 MCP & Skills",
+        "required": False,
+        "install": "/plugin marketplace add fcakyon/claude-codex-settings → /plugin install paper-search-tools@fcakyon-claude-plugins",
+    },
+    "oh-my-claudecode": {
+        "role": "Claude Code 확장 (omc)",
+        "required": True,
+        "install": "/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode → /plugin install oh-my-claudecode → /oh-my-claudecode:omc-setup",
+    },
+    "pencil": {
+        "role": "UI 디자인 (.pen 파일 편집)",
+        "required": False,
+        "install": "/plugin install pencil",
+    },
+    "codex": {
+        "role": "Claude×Codex 코드 리뷰·버그 수정 위임",
+        "required": True,
+        "install": "/plugin marketplace add openai/codex-plugin-cc → /plugin install codex@openai-codex → /codex:setup → ! codex login",
+    },
+    "andrej-karpathy-skills": {
+        "role": "Karpathy LLM 코딩 가이드라인 (CLAUDE.md)",
+        "required": True,
+        "install": "/plugin marketplace add forrestchang/andrej-karpathy-skills → /plugin install andrej-karpathy-skills@forrestchang-andrej-karpathy-skills",
+    },
+    "superpowers": {
+        "role": "스킬 기반 워크플로우 확장 (obra)",
+        "required": True,
+        "install": "/plugin marketplace add obra/superpowers-marketplace → /plugin install superpowers@superpowers-marketplace",
+    },
 }
 
-# 플러그인 설치 명령어 (§11 누락 시 안내용)
-PLUGIN_INSTALL_CMDS = {
-    "code-review": "/plugin install code-review@claude-plugins-official",
-    "commit-commands": "/plugin install commit-commands@claude-plugins-official",
-    "context7": "/plugin install context7@claude-plugins-official",
-    "pyright-lsp": "/plugin install pyright-lsp@claude-plugins-official",
-    "playwright": "/plugin install playwright@claude-plugins-official",
-    "frontend-design": "/plugin install frontend-design@claude-plugins-official",
-    "feature-dev": "/plugin install feature-dev@claude-plugins-official",
-    "typescript-lsp": "/plugin install typescript-lsp@claude-plugins-official",
-    "security-guidance": "/plugin install security-guidance@claude-plugins-official",
-    "pencil": "/plugin install pencil",
-    "claude-mem": "/plugin marketplace add thedotmack/claude-mem → /plugin install claude-mem",
-    "paper-search-tools": "/plugin marketplace add fcakyon/claude-codex-settings → /plugin install paper-search-tools@fcakyon-claude-plugins",
-    "oh-my-claudecode": "/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode → /plugin install oh-my-claudecode → /oh-my-claudecode:omc-setup",
-    "codex": "/plugin marketplace add openai/codex-plugin-cc → /plugin install codex@openai-codex → /codex:setup → ! codex login",
-    "andrej-karpathy-skills": "/plugin marketplace add forrestchang/andrej-karpathy-skills → /plugin install andrej-karpathy-skills@forrestchang-andrej-karpathy-skills",
-    "superpowers": "/plugin marketplace add obra/superpowers-marketplace → /plugin install superpowers@superpowers-marketplace",
-}
+# 하위 호환 파생 상수 — PLUGIN_REGISTRY 단일 소스에서 생성
+PLUGIN_NAMES = list(PLUGIN_REGISTRY.keys())
+PLUGIN_REQUIRED = {k for k, v in PLUGIN_REGISTRY.items() if v.get("required")}
+PLUGIN_INSTALL_CMDS = {k: v["install"] for k, v in PLUGIN_REGISTRY.items()}
 
 # Claude skill names for O/X status check (details in template)
 CLAUDE_SKILL_NAMES = [
@@ -709,31 +772,37 @@ def check_qmd_mcp_collection() -> dict:
 
 
 def check_qmd_required_collections() -> dict:
-    """qmd collection list로 1_oais, code(3_code) 컬렉션 등록 여부 확인."""
-    import subprocess, shutil
+    """qmd collection list로 oais(1_oais), code(3_code) 컬렉션 등록 여부 확인."""
+    import subprocess, shutil, re
     result = {"available": False, "collections": [], "missing": []}
     required = {"oais": "1_oais 프로젝트", "code": "3_code 프로젝트"}
 
-    qmd_node = shutil.which("qmd")
-    node_bin = Path(r"C:\Users\oaiskoo\home\util\nodejs\node-v22.17.0-win-x64\node.exe")
-    qmd_js = Path(r"C:\Users\oaiskoo\home\util\nodejs\node-v22.17.0-win-x64\node_modules\@tobilu\qmd\dist\cli\qmd.js")
+    # qmd.CMD 래퍼는 /bin/sh를 호출해 subprocess에서 실패하므로
+    # node.exe로 qmd.js를 직접 실행한다.
+    node_bin = shutil.which("node")
+    qmd_cmd = shutil.which("qmd")
+    if not node_bin or not qmd_cmd:
+        return result
+    qmd_js = Path(qmd_cmd).parent / "node_modules" / "@tobilu" / "qmd" / "dist" / "cli" / "qmd.js"
+    if not qmd_js.exists():
+        return result
 
     try:
-        if node_bin.exists() and qmd_js.exists():
-            cmd = [str(node_bin), str(qmd_js), "collection", "list"]
-        elif qmd_node:
-            cmd = [qmd_node, "collection", "list"]
-        else:
-            return result
-        out = subprocess.run(cmd, capture_output=True, text=True, timeout=10).stdout
-        result["available"] = True
-        for name in required:
-            if name in out:
-                result["collections"].append(name)
-            else:
-                result["missing"].append((name, required[name]))
+        out = subprocess.run(
+            [node_bin, str(qmd_js), "collection", "list"],
+            capture_output=True, text=True, timeout=15,
+        ).stdout
     except Exception:
-        pass
+        return result
+
+    result["available"] = True
+    # "name (qmd://name/)" 형태의 줄에서 컬렉션명을 정확히 추출
+    registered = set(re.findall(r"^(\S+)\s+\(qmd://", out, re.MULTILINE))
+    for name, desc in required.items():
+        if name in registered:
+            result["collections"].append(name)
+        else:
+            result["missing"].append((name, desc))
     return result
 
 
@@ -1170,25 +1239,27 @@ def generate_env_report(
         req = "★" if info.get("required") else "-"
         mcp_status_table += f"| {server_name} | {info['role']} | {req} | {status} | `{install_cmd}` |\n"
 
-    # Build plugins O/X status (details in template)
+    # Build plugins status table from PLUGIN_REGISTRY (SSOT) — MCP 테이블과 동일 방식
     plugins_installed_count = 0
-    plugin_status = {}
-    for plugin_name in PLUGIN_NAMES:
+    plugins_status_table = ""
+    for plugin_name, info in PLUGIN_REGISTRY.items():
         is_installed = plugin_name in claude_plugins
         if is_installed:
             plugins_installed_count += 1
-        plugin_status[plugin_name] = "O" if is_installed else "X"
+        status = "O" if is_installed else "X"
+        req = "★" if info.get("required") else "-"
+        plugins_status_table += (
+            f"| {plugin_name} | {info['role']} | {req} | {status} | `{info['install']}` |\n"
+        )
 
-    # Auto-detect new plugins not in PLUGIN_NAMES
-    new_plugin_rows = ""
+    # Auto-detect installed plugins not in PLUGIN_REGISTRY
+    new_plugin_count = 0
     for plugin_name in claude_plugins:
-        if plugin_name not in PLUGIN_NAMES:
+        if plugin_name not in PLUGIN_REGISTRY:
+            new_plugin_count += 1
             plugins_installed_count += 1
-            req = "★" if plugin_name in PLUGIN_REQUIRED else "-"
-            new_plugin_rows += f"| {plugin_name} | (신규 감지) | {req} | O | - |\n"
-    plugins_total_count = len(PLUGIN_NAMES) + sum(
-        1 for p in claude_plugins if p not in PLUGIN_NAMES
-    )
+            plugins_status_table += f"| {plugin_name} | (신규 감지) | - | O | - |\n"
+    plugins_total_count = len(PLUGIN_REGISTRY) + new_plugin_count
 
     # Build Claude skills O/X status (details in template)
     claude_skills_installed_count = 0
@@ -1287,7 +1358,7 @@ def generate_env_report(
         '{{MCP_STATUS_TABLE}}': mcp_status_table.rstrip(),
         '{{PLUGINS_INSTALLED_COUNT}}': str(plugins_installed_count),
         '{{PLUGINS_TOTAL_COUNT}}': str(plugins_total_count),
-        '{{PLUGINS_NEW_ROWS}}': new_plugin_rows,
+        '{{PLUGINS_STATUS_TABLE}}': plugins_status_table.rstrip(),
         '{{CLAUDE_SKILLS_INSTALLED_COUNT}}': str(claude_skills_installed_count),
         '{{CLAUDE_SKILLS_COUNT}}': str(len(claude_skills)),
         '{{CLAUDE_SKILLS_TABLE}}': claude_skills_table.rstrip(),
@@ -1333,10 +1404,6 @@ def generate_env_report(
 
     for placeholder, value in replacements.items():
         content = content.replace(placeholder, value)
-
-    # Replace plugin status placeholders ({{P_plugin-name}} -> O/X)
-    for plugin_name, status in plugin_status.items():
-        content = content.replace(f'{{{{P_{plugin_name}}}}}', status)
 
     # Replace Claude skill status placeholders ({{S_skill-name}} -> O/X)
     for skill_name, status in claude_skill_status.items():
@@ -1805,6 +1872,60 @@ def run_subcommand(subcmd: str, args: list) -> int:
                 log_warn(git_tmp["message"])
             if git_tmp.get("details"):
                 log_tip(git_tmp["details"])
+
+        # C22. pyrightconfig.json + VS Code 인터프리터 경로 확인
+        print("\n[C22 pyrightconfig.json + VS Code Interpreter Check]")
+        pyright_path = PROJECT_ROOT / "pyrightconfig.json"
+        if pyright_path.exists():
+            try:
+                cfg = json.loads(pyright_path.read_text(encoding="utf-8"))
+                if cfg.get("venvPath") and cfg.get("venv"):
+                    log_ok(f"pyrightconfig.json 존재 (venvPath={cfg['venvPath']}, venv={cfg['venv']})")
+                else:
+                    log_warn("pyrightconfig.json 존재하나 venvPath/venv 미설정")
+                    log_tip('Fix: {"venvPath": ".", "venv": ".venv"} 형태로 작성')
+            except Exception:
+                log_warn("pyrightconfig.json 읽기 실패")
+        else:
+            log_warn("pyrightconfig.json 없음 → Pylance가 .venv를 못 찾아 import 오류 발생")
+            log_tip('Fix: 프로젝트 루트에 {"venvPath": ".", "venv": ".venv"} 작성 후 VS Code Reload Window')
+
+        # C22-b. .vscode/settings.json 인터프리터 경로 Windows 호환성 확인
+        vscode_settings = PROJECT_ROOT / ".vscode" / "settings.json"
+        if vscode_settings.exists():
+            try:
+                vs_cfg = json.loads(vscode_settings.read_text(encoding="utf-8"))
+                interp = vs_cfg.get("python.defaultInterpreterPath", "")
+                if interp and "/bin/python" in interp and "Scripts" not in interp:
+                    log_warn(f".vscode/settings.json 인터프리터 경로가 Unix 형식: {interp}")
+                    log_tip("Fix: python.defaultInterpreterPath를 ${workspaceFolder}/.venv/Scripts/python.exe 로 변경 (Windows)")
+                elif interp:
+                    log_ok(f".vscode/settings.json 인터프리터 경로: {interp}")
+            except Exception:
+                log_warn(".vscode/settings.json 읽기 실패")
+
+        # C23. pylint 설치 확인
+        print("\n[C23 pylint Check]")
+        venv_pylint = PROJECT_ROOT / ".venv" / "bin" / "python"
+        venv_pylint_win = PROJECT_ROOT / ".venv" / "Scripts" / "python.exe"
+        venv_python = venv_pylint if venv_pylint.exists() else (venv_pylint_win if venv_pylint_win.exists() else None)
+        if venv_python:
+            try:
+                pylint_check = subprocess.run(
+                    [str(venv_python), "-m", "pylint", "--version"],
+                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=5
+                )
+                if pylint_check.returncode == 0:
+                    version_line = pylint_check.stdout.decode("utf-8", errors="replace").strip().splitlines()[0]
+                    log_ok(f"pylint 설치됨: {version_line}")
+                else:
+                    log_warn("pylint 미설치 → Python 코드 품질 검증 불가")
+                    log_tip("Fix: uv add --dev pylint")
+            except Exception:
+                log_warn("pylint 확인 실패")
+        else:
+            log_warn(".venv 없음 → pylint 확인 불가")
+            log_tip("Fix: uv sync 후 uv add --dev pylint")
 
         return result.returncode if settings_result["passed"] else 1
 

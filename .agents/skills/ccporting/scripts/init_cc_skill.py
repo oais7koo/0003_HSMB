@@ -30,7 +30,7 @@ CODEX_COMPAT_PATTERNS = [
     ("CLAUDE_TOOL_WRITE", r"\bWrite\s*\("),
     ("CLAUDE_TOOL_EDIT", r"\bEdit\s*\("),
     ("CLAUDE_TOOL_BASH", r"\bBash\b|mcp__desktop-commander__start_process"),
-    ("CLAUDE_AGENT_KEYWORD", r"\bclaude\b|\bClaude Code\b"),
+    ("CLAUDE_AGENT_KEYWORD", r"\bClaude Code\b"),
     ("CLAUDE_COMMAND_PREFIX", r"`oo[a-z0-9_]+(?:\s+[a-z0-9_\-]+)?`"),
     ("CLAUDE_PATH_HINT", r"\.claude/skills/"),
 ]
@@ -40,6 +40,9 @@ AUTOFIX_REPLACEMENTS = [
     (r"\bClaude\b", "Codex"),
     (r"\bclaude\b", "codex"),
     (r"\.claude/skills/", ".agents/skills/"),
+    (r"\.codex/skills/", ".agents/skills/"),
+    (r"\.codex/commands/", ".claude/commands/"),
+    (r"\.codex/templates/", ".claude/templates/"),
     (r"`oo([a-z0-9_]+)\b", r"`cc\1"),
 ]
 
@@ -275,23 +278,39 @@ def iter_autofix_files(skill_root: Path):
 def scan_text_for_patterns(text: str) -> list[tuple[str, str]]:
     hits: list[tuple[str, str]] = []
     for code, pattern in CODEX_COMPAT_PATTERNS:
-        m = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
+        flags = re.MULTILINE
+        if code == "CLAUDE_AGENT_KEYWORD":
+            flags |= re.IGNORECASE
+        m = re.search(pattern, text, flags)
         if m:
             snippet = text[m.start() : m.start() + 120].splitlines()[0]
             hits.append((code, snippet.strip()))
     return hits
 
 
-def apply_autofix_text(text: str) -> str:
+def build_skill_name_replacements(manifest: dict) -> list[tuple[str, str]]:
+    pairs: list[tuple[str, str]] = []
+    for port in manifest.get("ports", []):
+        src_name = Path(port["source"]).name
+        target = port["target"]
+        if src_name.startswith("oo") and target.startswith("cc"):
+            pairs.append((src_name, target))
+    return sorted(pairs, key=lambda item: len(item[0]), reverse=True)
+
+
+def apply_autofix_text(text: str, skill_name_replacements: list[tuple[str, str]]) -> str:
     out = text
     for pattern, repl in AUTOFIX_REPLACEMENTS:
         out = re.sub(pattern, repl, out)
+    for src_name, target in skill_name_replacements:
+        out = re.sub(rf"\b{re.escape(src_name)}\b", target, out)
     return out
 
 
 def cmd_autofix(repo_root: Path, manifest: dict, port_name: str | None, target_root: Path):
     changed_files = 0
     scanned_files = 0
+    skill_name_replacements = build_skill_name_replacements(manifest)
     for port in port_iter(manifest, port_name):
         target = port["target"]
         skill_root = target_root / target
@@ -299,7 +318,7 @@ def cmd_autofix(repo_root: Path, manifest: dict, port_name: str | None, target_r
         target_changed = 0
         for fp in iter_autofix_files(skill_root):
             old = fp.read_text(encoding="utf-8", errors="ignore")
-            new = apply_autofix_text(old)
+            new = apply_autofix_text(old, skill_name_replacements)
             scanned_files += 1
             target_scanned += 1
             if new != old:

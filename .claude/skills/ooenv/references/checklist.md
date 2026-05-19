@@ -26,6 +26,8 @@
 | C19 | MinGW gcc 설치 | /c/msys64/mingw64/bin/gcc.exe 존재 여부 (Rust GNU toolchain 링커 필수) | WARNING |
 | C20 | ~/.bashrc PATH 설정 | ~/.bashrc에 ~/.cargo/bin + /c/msys64/mingw64/bin PATH 등록 여부 | WARNING |
 | C21 | 중복 GitHub 도구 정리 | `gh auth status` 통과 시 `github@claude-plugins-official` plugin이 settings.json에 등록되어 있으면 안 됨 (CLI 우선 정책, guide.md §3.10) | WARNING |
+| C22 | pyrightconfig.json + VS Code 인터프리터 경로 | 프로젝트 루트에 `pyrightconfig.json`(`venvPath`/`venv` → `.venv`) 존재 여부. 없으면 Pylance가 `.venv`를 못 찾아 `import torch` 등 미해결 오류 발생. **추가 확인**: `.vscode/settings.json`의 `python.defaultInterpreterPath`가 Windows 환경에서 `.venv/Scripts/python.exe`인지 확인 (Unix 경로 `.venv/bin/python` 사용 시 인터프리터 미인식). **해결**: 루트에 `{"venvPath": ".", "venv": ".venv"}` 작성 + `.vscode/settings.json`에서 경로를 `${workspaceFolder}/.venv/Scripts/python.exe`로 수정 → VS Code `Developer: Reload Window` 실행 | WARNING |
+| C23 | pylint 코드 품질 | 작업한 Python 파일이 pylint 통과(권장 9.0/10 이상)하는지 확인. 실행: `.venv/bin/python -m pylint <파일>`. **해결**: C0114/C0116 → 모듈·함수 docstring 추가, R0402 → `import x.y as y`를 `from x import y`로, C0411 → 표준 import를 서드파티보다 앞에 배치, C0412 → 동일 패키지 import를 한 그룹으로 묶기 | WARNING |
 
 ## check 출력 형식
 

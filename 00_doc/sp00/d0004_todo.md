@@ -10,31 +10,10 @@
 - [TODO] [medium] NIQE/PIQE/BRISQUE 정식 메트릭으로 교체 — `src/ps2000_통합IQA.py:316-345` 세 메트릭 모두 간이 구현(NSS·SVR·블록통계 미적용). `pyiqa.create_metric("niqe"|"brisque")` 도입, PIQE는 MATLAB 또는 대체 라이브러리 조사 필요 (2026-05-15 추가)
 - [TODO] [medium] 출력 CSV 컬럼명 d0100 §6.1 표준 헤더 매핑 — 현재 `niqe_simple`/`piqe_simple`/`dl_dbcnn`/`dl_arniqa` → 표준 `niqe`/`piqe`/`dbcnn`/`arniqa`로 통일. F002-1 산출물 호환성 확보 (2026-05-15 추가)
 - [TODO] [low] F002-1 산출 CSV 7종 선별 — v04는 23개 NR 메트릭 계산 중. `task_A_metrics_per_frame.csv`/`task_A_metrics_per_condition.csv` 산출 시 d0100 §6.1 헤더(hsmb,cpbd,niqe,piqe,brisque,dbcnn,arniqa) 7종만 추출하는 필터/리포터 구현 (2026-05-15 추가)
-- [TODO] [medium] HSMB↔MTF50 방향 불일치 원인 분석 — d0043 §5.2.3 발견: HSMB(높을수록 선명)와 MTF50_H PLCC=-0.438로 이론적 기대와 반대 방향. ISO=400 defocus 102장 제외 부분집합(N≈40조건) 재분석 필요. 출처: d0043 §8 후속과제 (2026-05-18 추가)
+- [TODO] [medium] HSMB↔MTF50 방향 불일치 원인 분석 — d3011 §11.2.2 발견: HSMB(높을수록 선명)와 MTF50_H PLCC=-0.438로 이론적 기대와 반대 방향. ISO=400 defocus 102장 제외 부분집합(N≈40조건) 재분석 필요. 출처: d3011 §11.4 후속 과제 (2026-05-18 추가)
 - [TODO] [low] [검토] DBCNN·ARNIQA 커스텀 IQA 모델(파인튜닝) 가능성 검토 — 현재 `common_iqa7.py`는 pyiqa pretrained(DBCNN=KonIQ10k, ARNIQA) 그대로 사용. 원 모델 backbone 다운로드 → 터널 모션블러 도메인 데이터로 파인튜닝 → 커스텀 IQA 모델로 지표 측정 가능 여부 검토. 검토 항목: ① MOS/품질 라벨 데이터 확보 방안 ② pyiqa 파인튜닝·재학습 지원 여부 ③ 논문 재투고 시 표준 pretrained 대비 커스텀 모델의 정당성·재현성 (2026-05-17 추가, 검토)
 
-## 완료 (→ d0010_history.md)
-
-- [DONE] ps3100 E1-1 ps1204 터널표준영상 IQA 분석 완료 — 47조건 470장 9종 NR-IQA 산출(center_crop=False). hsmb 평균=0.8316. 산출물: `data/ps3100/01~04_*_2605180743.{xlsx,png}`. 실행시간 1,229초, PermissionError 발생 → save_checkpoint 비치명적 처리 후 --resume 재개 완료 (2026-05-18 완료)
-- [DONE] ps3020/ps3030 center crop 50% 적용 — ps1301/ps1302 대용량 대응. 전체 이미지 대신 가로·세로 가운데 50%(면적 25%) crop 후 IQA 산출. `common_iqa7.center_crop_half()` 추가 + `compute_all_from_path(center_crop=True)`. ps3040은 concat이라 코드 불변. d3020·d3030·d3040(v04~v05)·d0002_plan(v03) 반영 (2026-05-18 완료)
-- [DONE] d3010 §9 SFR↔IQA 결과 해석 및 d0043 리포트 작성 완료 — ps3011 상관분석 → d0043 통합 리포트(IQA 분포 + SFR 상관 N=50). 핵심: arniqa↔MTF50_H PLCC=+0.84(최강), HSMB↔MTF50 방향 불일치 발견 → 후속 분석 별도 TODO 등록 (2026-05-18 완료)
-- [DONE] ps3040 E3-4 ps1010+ps1301 통합 풀 IQA 완료 — E3-1(520행)+E3-2(737행) concat → 1,257행. 산출물: `data/ps3040/01_통합풀데이터_2605180538.xlsx`, `02_source별통계_*.xlsx`, `04_histogram_*.png`. 실행시간 1.44초 (IQA 재산출 없음) (2026-05-18 완료)
-- [DONE] ps3020 E3-2 ps1301 실제크랙 IQA 분석 완료 — 737장/50조건 7종 NR-IQA 산출(center_crop=True). hsmb 평균=0.6132, defocus(ISO=400) 148프레임. 산출물: `data/ps3020/01~04_*_2605171829.{xlsx,png}`. 실행시간 4.9시간 (2026-05-17 완료)
-- [DONE] ps3030 E3-3 ps1302 인쇄크랙 IQA 분석 완료 — 50장 7종 NR-IQA 산출(center_crop=True). 산출물: `data/ps3030/01_전체데이터_2605171728.xlsx`, `04_histogram_2605171728.png`. d3030 F002-6 ✅ (2026-05-17 완료)
-- [DONE] ps3011 E3-1 SFR↔IQA 상관분석 스크립트 구현 및 실행 완료 — `src/ps3011_e3_1_sfr_correlation.py` 신규 작성. 50조건 SFR_cypx.csv 파싱(R1090/MTF50 H·V 평균) → IQA 9컬럼 조인 → PLCC/SROCC/KRCC 산출. 산출물: `e3_1_sfr_metrics.csv`, `e3_1_correlation.csv`, scatter 2종. 명세: d3010 §9 (2026-05-17 완료)
-- [DONE] ps3010 E3-1 ps1010 IQA 분석 완료 — 520장/50조건 7종 NR-IQA 산출(hsmb/cpbd/niqe/piqe/brisque/dbcnn/arniqa). defocus(ISO=400) 102장 식별. 산출물: `data/ps3010/01~04_*_2605171535.{xlsx,png}`. 실행시간 34.5분, CUDA 사용 (2026-05-17 완료)
-- [DONE] E3 스크립트 재부팅 복구성 강화 — `ps3010`/`ps3020` 체크포인트를 이미지 단위(`condition+frame`)로 변경, `ps3030` 체크포인트 원자적 저장·중복제거 적용, `ps3040` 단계 체크포인트(`_checkpoint_stage.json`, `_checkpoint_pool.csv`) + `--resume` 추가. 윈도우 재부팅/강제종료 후 체크포인트부터 재개 가능 (2026-05-17 완료)
-- [DONE] common_iqa7.py HSMBCalculator 교체 및 검증 완료 — 기존 v2 계통(Scharr+CLAHE+Lap+FFT 융합) → ps5010 v1 정식 구현(Sobel+mean임계+순수 Weibull CDF)으로 교체. 15000lx-500us-00 이미지 01.png 기준 common_iqa7=0.8888, ps2010=0.8888 (Δ=0.0000). d0900 target(0.8893) Δ=0.0005. uv sync + ps5101 GPU 테스트 정상 확인 (2026-05-15 완료)
-- [DONE] common_iqa7 7종 IQA 동작 검증 완료 — compute_all_from_path() 9컬럼 산출: hsmb✅ niqe✅ niqe_matlab✅ piqe✅ brisque✅ brisque_matlab✅ dbcnn✅ arniqa✅ cpbd✅(patch 적용 후). cpbd의 scipy.ndimage.imread 제거 이슈는 `scripts/patch_cpbd.py`로 해결 — `.venv/.../cpbd/compute.py` import를 cv2 fallback으로 교체. 절차: PRD §7.1 참조 (2026-05-15 완료)
-- [DONE] ps2000_통합IQA.py HSMB 파라미터 PRD 사양으로 수정 완료 — `src/ps2000_통합IQA.py` 수정 내역: ① CONFIG threshold_ratio 0.3→0.1, beta 1.8→2.0, edge_weight 0.8→1.5 (line 99-101) ② JNB 하드코딩 2.5→3.0 (line 514) ③ p_jnb cumsum[45]→cumsum[63] (line 521). 근거: d1600 분석 — ps5010 v1(ew=1.5/β=2.0/JNB=3/cdf[63])이 PRD §4.1 사양과 완전 일치하며 PLCC -0.9532로 최고 성능. 참조: d1600_hsmb_기존값비교.md, d0900_hsmb_적합버전찾기.md (2026-05-15 완료)
-- [DONE] pyproject.toml `[dependency-groups]` dev 그룹 검증 — 이미 정의됨(pytest/pylint/mypy/black/isort), `uv sync --group dev` 정상 동작 확인 (2026-05-13)
-- [DONE] qmd 컬렉션 등록 — `oais` (C:\Users\oaiskoo\doom\1_oais, 13,907 files) + `code` (C:\Users\oaiskoo\doom\3_code, 1,693 files) (2026-05-13)
-- [DONE] task-master-ai npm 글로벌 설치 — 0.43.1 (2026-05-13)
-- [DONE] ooenv 스크립트 SP 경로 하드코딩 버그 수정 — flat 구조(OAIS_NO_SP=1 또는 sp00/ 부재) 자동 감지 로직 추가, ENV_REPORT_PATH 동적 결정 (2026-04-26)
-- [DONE] ps2000_통합IQA.py v04 — DL-IQA (DBCNN + ARNIQA) 통합 (2026-04-23)
-- [DONE] pyproject.toml — cu128 explicit index + [tool.uv.sources] 설정 (2026-04-23)
-- [DONE] CUDA torch 2.11.0+cu128 동작 확인 — RTX 3070, CUDA available=True (2026-04-23)
-- [DONE] ps2000_통합IQA.py GPU 전체 실행 — 940장, DL-IQA 포함, 결과 3파일 생성 (2026-04-23)
+## 완료 ToDo
 
 ---
 
@@ -52,8 +31,6 @@
 ## 대기 ToDo
 
 > `cctodo add` 명령으로 추가된 항목.
-
-### ~~C001~~ [DONE] d0004 §환경 메모 GPU 정보 현행화 — RTX 3070(CC 8.6) → GTX 750 Ti(CC 5.0) 수정 완료 (2026-05-17)
 
 ### C002 [CHECK] 타 컴퓨터에서 ps3010~ps3040 재시작(체크포인트) 검증 절차
 #### 등록일: 2026-05-17 | 우선순위: high

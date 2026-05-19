@@ -50,22 +50,8 @@
 
 | 플러그인 | 역할 | 필수 | 설치 | 설치 방법 |
 |---------|------|:----:|:----:|----------|
-| code-review | PR/코드 리뷰 자동화 | ★ | {{P_code-review}} | `/plugin install code-review@claude-plugins-official` |
-| commit-commands | Git 커밋 메시지 생성 | ★ | {{P_commit-commands}} | `/plugin install commit-commands@claude-plugins-official` |
-| frontend-design | 프론트엔드 UI/UX 디자인 | - | {{P_frontend-design}} | `/plugin install frontend-design@claude-plugins-official` |
-| feature-dev | 기능 개발 워크플로우 | - | {{P_feature-dev}} | `/plugin install feature-dev@claude-plugins-official` |
-| context7 | 라이브러리 문서 조회 | ★ | {{P_context7}} | `/plugin install context7@claude-plugins-official` |
-| claude-mem | 계획 생성/실행 메모리 | - | {{P_claude-mem}} | `/plugin marketplace add thedotmack/claude-mem` → `/plugin install claude-mem` |
-| playwright | E2E 테스트 자동화 | - | {{P_playwright}} | `/plugin install playwright@claude-plugins-official` |
-| typescript-lsp | TypeScript 언어 서버 | - | {{P_typescript-lsp}} | `/plugin install typescript-lsp@claude-plugins-official` |
-| pyright-lsp | Python 타입 체크 (Pyright) | ★ | {{P_pyright-lsp}} | `/plugin install pyright-lsp@claude-plugins-official` |
-| security-guidance | 보안 가이드라인 제공 | - | {{P_security-guidance}} | `/plugin install security-guidance@claude-plugins-official` |
-| paper-search-tools | 논문 검색 MCP & Skills | - | {{P_paper-search-tools}} | `/plugin marketplace add fcakyon/claude-codex-settings` → `/plugin install paper-search-tools@fcakyon-claude-plugins` |
-| oh-my-claudecode | Claude Code 확장 (omc) | ★ | {{P_oh-my-claudecode}} | `/plugin marketplace add https://github.com/Yeachan-Heo/oh-my-claudecode` → `/plugin install oh-my-claudecode` → `/oh-my-claudecode:omc-setup` |
-| pencil | UI 디자인 (.pen 파일 편집) | - | {{P_pencil}} | `/plugin install pencil` |
-| codex | Claude×Codex 코드 리뷰·버그 수정 위임 | ★ | {{P_codex}} | `/plugin marketplace add openai/codex-plugin-cc` → `/plugin install codex@openai-codex` → `/codex:setup` → `! codex login` |
-| andrej-karpathy-skills | Karpathy LLM 코딩 가이드라인 (CLAUDE.md) | ★ | {{P_andrej-karpathy-skills}} | `/plugin marketplace add forrestchang/andrej-karpathy-skills` → `/plugin install andrej-karpathy-skills@forrestchang-andrej-karpathy-skills` |
-{{PLUGINS_NEW_ROWS}}
+{{PLUGINS_STATUS_TABLE}}
+
 ---
 
 ## 4. 스킬 현황

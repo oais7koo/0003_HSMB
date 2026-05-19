@@ -31,6 +31,8 @@ Task(subagent_type="codex:rescue",
      prompt="Second-opinion review: [파일경로] — focus on logic defects and missed edge cases")
 ```
 
+> ※ **read-only 모드 작동 방식**: codex 플러그인이 자동화용으로 제공하는 에이전트는 `codex-rescue` 단 1개이며, 이름은 "rescue"(수정)지만 프롬프트에 **"review" 또는 "read-only"** 키워드가 포함되면 read-only 모드로 동작한다(codex-rescue.md L34: `Default to --write unless the user asks for read-only behavior or only wants review`). ooreview는 항상 위 템플릿처럼 "Second-opinion review" 또는 "focus on... review"로 시작하여 수정 없이 의견만 받는다.
+
 **Codex 리뷰 프롬프트 템플릿**:
 - 일반: `"Review [file] for bugs, design issues, and improvements. Give line-specific feedback."`
 - 보안: `"Security audit [file]: injection, auth bypass, data exposure, input validation."`

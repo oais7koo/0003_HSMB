@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ooscrap_run.py - ooscrap 스킬 스크립트 (스크래핑/유튜브 STT/처리)
+ooscrap_run.py - ccscrap 스킬 스크립트 (스크래핑/유튜브 STT/처리)
 Usage: uv run python .agents/skills/ccscrap/scripts/ooscrap_run.py [help|version|status]
 """
 import os
@@ -70,7 +70,7 @@ def cmd_show_downlist():
         print(f"[{SKILL_NAME}] 다운로드 리스트 없음: {downlist_path}")
         return
     content = open(downlist_path, encoding="utf-8").read()
-    print(f"[ooscrap] 다운로드 리스트: {downlist_path}\n")
+    print(f"[ccscrap] 다운로드 리스트: {downlist_path}\n")
     print(content)
 
 

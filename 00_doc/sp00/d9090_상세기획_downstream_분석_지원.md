@@ -7,6 +7,7 @@
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| v02 | 2026-05-19 | d9020(downstream task 실험 개념 설명서) 내용 흡수 — 별도 문서 폐지 |
 | v01 | 2026-04-26 | 초기 작성 |
 
 ---
@@ -20,7 +21,7 @@
 | Reviewer 대응 | **C3 (CNN crack detection downstream)** — 본 대응 |
 | 트리거 | KICT Chulhee Lee Task B 결과 수령 (TBD-5) |
 | 상태 | blocked |
-| 버전 | v01 |
+| 버전 | v02 |
 | 작성일 | 2026-04-26 |
 
 ---
@@ -28,6 +29,19 @@
 ## 2. 기능 개요
 
 협업자(KICT)가 수행한 **Task B (CNN crack detection)** 결과 데이터를 수령·검증하고, **HSMB threshold pre-filtering이 downstream 검출 성능을 개선하는지** 분석하여 Reviewer C3 지적에 대응. F002-3(자체 E2)와 비교 보강.
+
+### 2.1 자체 E2 vs 협업 Task B 역할 구분
+
+본 프로젝트의 downstream 관련 실험은 두 종류로 나뉜다.
+
+| 구분 | 담당 문서 | 목적 | 논문 역할 |
+|------|----------|------|----------|
+| 자체 E2 | `d9060_상세기획_E2_HSMB_크랙검출_상관.md` | 보유 모델로 HSMB × F1 상관성 자체 확인 | §V-E 초안 및 보조 증거 |
+| 협업 Task B (본 문서) | `d9090_상세기획_downstream_분석_지원.md` | KICT 협업자가 수행하는 본격 CNN crack detection 실험 | **Reviewer C3 본 대응 근거** |
+
+자체 E2는 빠르게 근거를 확보하기 위한 보조 실험이고, 논문 본문에서는 협업 Task B 결과를 우선 사용한다. 두 결과가 같은 방향을 보이면 HSMB의 downstream 설명력이 더 강하게 뒷받침된다.
+
+---
 
 ## 3. 요구사항
 
@@ -73,12 +87,28 @@
 
 ## 7. 참고 자료
 
-- PRD: `00_doc/d0001_prd.md` §3 RQ3·RQ4, §5 F07
-- 계획: `00_doc/d0002_plan.md` E004, S6 (trigger)
+- PRD: `00_doc/sp00/d0001_prd.md` §3 RQ3·RQ4, §5 F07
+- 계획: `00_doc/sp00/d0002_plan.md` E004, S6 (trigger)
 - 협업: KICT Chulhee Lee, `data/02_260422_HSMB논문 수정안/`
+- 자체 E2 실험: `00_doc/sp00/d9060_상세기획_E2_HSMB_크랙검출_상관.md` (F002-3)
+- BEW 기준값: `00_doc/sp00/d9010_bew.md`
 
 ## 8. 이슈
 
 | 날짜 | 내용 | 상태 |
 |------|------|------|
 | 2026-04-26 | Task B 결과 수령 양식(R01) KICT와 사전 협의 필요 | 🔴 미해결 |
+
+## 9. 결과 해석 주의사항
+
+Crack detection 성능은 블러 외에도 다음 요인에 영향을 받는다. 협업 Task B 결과 통합·분석 시 HSMB 하나만으로 F1 변화를 설명하지 않고, BEW, 이미지 조건, crack 통계와 함께 복합적으로 해석해야 한다.
+
+| 교란 요인 | 영향 설명 |
+|----------|----------|
+| 균열 두께 | 폭이 좁은 균열은 블러와 무관하게 검출 난이도 자체가 높음 |
+| 조명 조건 | 조도·반사 차이가 crack 대비를 바꿔 F1에 영향 |
+| 배경 복잡도 | 배경 texture가 복잡할수록 오검출 증가 |
+| 라벨 품질 | GT mask 정밀도에 따라 F1 산출값 자체가 달라짐 |
+| 모델 threshold | 검출 모델의 confidence threshold 설정이 precision/recall 균형에 영향 |
+
+HSMB pre-filtering 효과가 부정적(threshold 적용 후 F1 개선 미확인)으로 나타날 경우, HSMB는 블러 정량화에는 유효하지만 해당 crack detection 모델의 성능을 직접 예측하는 지표로는 제한적이라고 정직하게 보고하고 Discussion에 한계를 명시한다.

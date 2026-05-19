@@ -1,13 +1,13 @@
 ---
 name: ccfix
-description: "에이전트 활용: .claude/guides/common_guide.md | 서브프로젝트: .claude/skills/oocontext/SKILL.md"
+description: "에이전트 활용: .codex/guides/common_guide.md | 서브프로젝트: .agents/skills/cccontext/SKILL.md"
 ---
 
 <!-- ccporting:generated-from-upstream -->
-<!-- 원본 Claude 스킬은 upstream/ 폴더에 보관된다. -->
+<!-- 원본 스킬은 upstream/ 폴더에 보관된다. -->
 
-> 에이전트 활용: .claude/guides/common_guide.md | 서브프로젝트: .claude/skills/oocontext/SKILL.md
-> 상세 가이드: .claude/skills/ccfix/references/guide.md
+> 에이전트 활용: .codex/guides/common_guide.md | 서브프로젝트: .agents/skills/cccontext/SKILL.md
+> 상세 가이드: .agents/skills/ccfix/references/guide.md
 
 ## 0. 스킬 요약
 
@@ -15,16 +15,16 @@ description: "에이전트 활용: .claude/guides/common_guide.md | 서브프로
 |------|------|
 | **핵심 역할** | d{SP}0004_todo.md 활성 이슈를 서브에이전트 병렬 처리로 자동 수정 |
 | **하는 것** | 코드 이슈(S/T/W) 자동 수정, 수정 후 d{SP}0010으로 이동 |
-| **하지 않는 것** | 커스텀 Todo 처리(→ootodo), 이슈 발견(→oocheck), Git 커밋(→oocommit) |
+| **하지 않는 것** | 커스텀 Todo 처리(→cctodo), 이슈 발견(→cccheck), Git 커밋(→cccommit) |
 | **참조 범위** | 현재 프로젝트 내부 파일만 / 외부 프로젝트 자동 포함 안 함 |
 | **수정 대상** | 이슈 관련 코드 파일, `d{SP}0004_todo.md`, `d{SP}0010_history.md` |
 | **실행 레벨** | [자동] — 3단계(분석→병렬수정→검증) 자동 실행 |
-| **에이전트 호환** | Claude Code 권장 — 병렬 서브에이전트 자동 배치 / 다른 에이전트: 이슈별 순차 처리로 대체 가능 |
+| **에이전트 호환** | Codex 권장 — 병렬 서브에이전트 자동 배치 / 다른 에이전트: 이슈별 순차 처리로 대체 가능 |
 
 ## 문서 이력 관리
 - v03 2026-04-23 — 동적 sys.path 패턴 [WARNING] 룰 추가 — 정적 import로 마이그레이션 권장
 - v02 2026-03-29 — Flutter/Dart 지원 추가 — 프로젝트 자동 감지, Dart 에러 코드/검증/False Positive 패턴
-- v01 2026-03-24 — 문서이력 섹션 추가 (ooskill run 자동)
+- v01 2026-03-24 — 문서이력 섹션 추가 (ccskill run 자동)
 
 ---
 
@@ -32,16 +32,16 @@ description: "에이전트 활용: .claude/guides/common_guide.md | 서브프로
 
 d{SP}0004_todo.md 이슈를 **서브에이전트 병렬 처리**로 자동 수정 -> d{SP}0010_history.md 기록.
 
-- **컨텍스트**: --sp N 또는 oocontext N
+- **컨텍스트**: --sp N 또는 cccontext N
 - **역할 구분**: 에러/버그 -> d{SP}0004_todo.md, 개발 작업 -> d{SP}0002_plan.md
 - **병행 처리**: SP!=00일 때 d0004 AND d{SP}0004 모두 확인/수정
 - **3단계**: Phase 1(분석) -> Phase 2(병렬 수정) -> Phase 3(검증/문서)
 - **다중 언어**: Python (.py) + Flutter/Dart (.dart) 지원 — 프로젝트 자동 감지
 
-### ccfix vs ootodo 역할 구분
+### ccfix vs cctodo 역할 구분
 
 - **ccfix**: d0004의 "현재 이슈 (Active Issues)" 섹션을 관리. oocheck가 발견한 코드 에러(S/T/W 이슈)를 서브에이전트 병렬로 자동 수정하는 **코드 이슈 전문 수정기**.
-- **ootodo**: d0004의 "커스텀 Todo" 섹션을 관리. 사용자가 직접 추가한 할 일을 처리하며, 코딩(oodev 위임)과 비코딩(문서, 분석 등 직접 처리) 모두 대응하는 **범용 할 일 관리자**.
+- **cctodo**: d0004의 "커스텀 Todo" 섹션을 관리. 사용자가 직접 추가한 할 일을 처리하며, 코딩(ccdev 위임)과 비코딩(문서, 분석 등 직접 처리) 모두 대응하는 **범용 할 일 관리자**.
 - **공통점**: 둘 다 d0004_todo.md를 읽고, 완료 시 d0010_history.md에 기록.
 - **차이점**: 다루는 섹션(현재 이슈 vs 커스텀 Todo), 작업 범위(코드 전용 vs 범용), 처리 방식(3단계 병렬 분석/수정/검증 vs 단순 위임)이 다름.
 
@@ -123,7 +123,7 @@ improve 옵션: `--focus performance\|security\|quality\|readability`, `--scope 
 
 ## 5. False Positive
 
-> Python: .claude/guides/debugging_guide.md 섹션 4 참조
+> Python: .codex/guides/debugging_guide.md 섹션 4 참조
 
 ### 5.1 Flutter/Dart False Positive 패턴
 
@@ -165,7 +165,7 @@ from some.module import something   # 위 sys.path 이후 위치한 import
 - 모듈을 `oais/` 또는 표준 패키지로 이전 → 정적 import 사용
 - `pyproject.toml`의 `[tool.uv.sources]` 또는 패키지 구조 개선으로 경로 문제 근본 해결
 
-**수정 시 주의**: 동적 sys.path 제거 후 반드시 `ootest run --runtime`으로 import 검증 실행
+**수정 시 주의**: 동적 sys.path 제거 후 반드시 `cctest run --runtime`으로 import 검증 실행
 
 ### 6.2 Flutter/Dart 에러 코드
 
@@ -222,7 +222,7 @@ from some.module import something   # 위 sys.path 이후 위치한 import
 - **수정 제한**: 복잡 로직, DB 스키마, 프로덕션 직접 수정 불가
 - **안전**: preview 사전 확인, --interactive 단계별, git 커밋 후 수정
 
-> **관련 문서**: `.claude/skills/oocheck/SKILL.md` | `.claude/skills/oolib/SKILL.md` | `00_doc/d{SP}0004_todo.md` | `00_doc/d{SP}0010_history.md`
+> **관련 문서**: `.agents/skills/cccheck/SKILL.md` | `.agents/skills/cclib/SKILL.md` | `00_doc/d{SP}0004_todo.md` | `00_doc/d{SP}0010_history.md`
 
 ## 서브에이전트
 
@@ -237,7 +237,7 @@ from some.module import something   # 위 sys.path 이후 위치한 import
 
 ## run과 update 분리 원칙
 
-> 이 스킬은 `.claude/guides/run_update_separation.md` 원칙을 따른다.
+> 이 스킬은 `.codex/guides/run_update_separation.md` 원칙을 따른다.
 
 | 서브커맨드 | 역할 |
 |-----------|------|
@@ -253,7 +253,7 @@ from some.module import something   # 위 sys.path 이후 위치한 import
 ## Karpathy 코딩 가이드라인 (필수 준수)
 
 > 이 스킬은 코딩 작업 수행 시 **`/andrej-karpathy-skills:karpathy-guidelines`** 스킬의 4원칙을 준수한다.
-> 로컬 미러: `.claude/rules/karpathy-guidelines.md`
+> 로컬 미러: `.codex/rules/karpathy-guidelines.md`
 
 | # | 원칙 | 핵심 규칙 |
 |---|------|----------|
@@ -275,10 +275,10 @@ from some.module import something   # 위 sys.path 이후 위치한 import
 
 | 항목 | 내용 |
 |------|------|
-| 위임 기준 | `.claude/guides/gemma_delegation.md` 참조 |
+| 위임 기준 | `.codex/guides/gemma_delegation.md` 참조 |
 | 승인 확인 | "이 작업은 [유형]입니다. 로컬 Gemma로 처리할까요? (y/n, 기본: y)" |
-| 실행 명령 | `uv run python .claude/skills/gemma/scripts/gemma_run.py "프롬프트"` |
-| 폴백 | 서버 미가동·응답 불량 시 Claude 본체로 자동 전환 |
+| 실행 명령 | `uv run python .agents/skills/gemma/scripts/gemma_run.py "프롬프트"` |
+| 폴백 | 서버 미가동·응답 불량 시 Codex 본체로 자동 전환 |
 
 <!-- GEMMA-REF:END -->
 <!-- SAMPLE-REF:START -->
@@ -289,7 +289,7 @@ from some.module import something   # 위 sys.path 이후 위치한 import
 
 | 항목 | 내용 |
 |------|------|
-| 샘플 위치 | `.claude/skills/{스킬명}/samples/` |
+| 샘플 위치 | `.agents/skills/{스킬명}/samples/` |
 | 참조 시점 | 산출물 작성 직전 (on-demand, 자동 로드 X) |
 | 샘플 있는 경우 | 샘플의 스타일·깊이·어조를 참고하여 산출물 작성 |
 | 샘플 없는 경우 | 템플릿(`templates/`)만으로 진행 (현재 상태) |
